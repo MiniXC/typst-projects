@@ -1,21 +1,39 @@
+// PACKAGES
+
+#import "@preview/abbr:0.2.3"
+#import "@preview/wordometer:0.1.4": word-count, total-words, total-characters
+
+#show: word-count
+
+#abbr.make(
+  ("KDE", "Kernel Density Estimation", "Kernel Density Estimates"),
+  ("PCA", "Principal component analysis"),
+)
 
 
 // CONFIG
+#let review = false
+
 #let print = false
+
 #set page(
-  paper: "a4",
-  margin: (
-    top: 1.5cm,
-    bottom: 1.5cm,
-    inside: if print { 3.5cm } else { 3cm },
-    outside: if print { 2.5cm } else { 3cm },
-  ),
-  binding: left,
-)
+    paper: "a4",
+    margin: (
+      top: 1.5cm,
+      bottom: 1.5cm,
+      inside: if review { 4.5cm } else {if print { 3.5cm } else { 3cm }},
+      outside: if review { 4.5cm } else {if print { 2.5cm } else { 3cm }},
+    ),
+    binding: left,
+  )
 #set text(
-  font: "Source Sans Pro",
+  font: "New Computer Modern",
   size: 12pt,
-  hyphenate: false,
+  hyphenate: true,
+)
+#set par(
+  justify: true,
+  leading: 0.52em,
 )
 #let use-heading-lines = true
 #let line = [
@@ -46,7 +64,8 @@
   #block()
   #block(above: 1.5em, below: 2em)[
     #line
-    #set text(font: "Crimson Pro", size: 26pt, weight: "medium")
+    #set text(font: "Crimson Pro", size: 26pt, weight: "medium", hyphenate: false)
+    #set par(justify: false)
     Part #parts.display("I")
 
     #(it.body)
@@ -59,7 +78,8 @@
 ): it => [
   #pagebreak()
   #block()
-  #set text(font: "Crimson Pro", size: 24pt, weight: "regular")
+  #set text(font: "Crimson Pro", size: 24pt, weight: "regular", hyphenate: false)
+  #set par(justify: false)
   #if it.body.text.contains("Content") {
     [#(it.body)]
   } else {
@@ -86,7 +106,8 @@
   #block()
   #block(above: 1.5em, below: 2em)[
     #line
-    #set text(font: "Crimson Pro", size: 24pt, weight: "regular")
+    #set text(font: "Crimson Pro", size: 24pt, weight: "regular", hyphenate: false)
+    #set par(justify: false)
     #content.text
     #line
   ]
@@ -112,6 +133,17 @@
         #context document.author.first()
       ]
     ]
+    #if review {
+      block(above: 0em, below: 2em)[
+        #text(10pt, fill: blue)[
+          Review version with wide margins and spacing
+  
+          Word Count: #total-words
+          
+          Character Count #total-characters
+        ]
+      ]
+    }
     #text(14pt)[
         Doctor of Philosophy
 
@@ -154,11 +186,15 @@
       if it.element.depth == 1 {
         parts-outline.step()
         set text(font: "Crimson Pro", size: 18pt, style: "italic")
-        it.indented([
-          Part #context [#parts-outline.display("I")] #h(.3em) --
-        ], [
-          #it.body()
-        ])
+        if not it.body().text.contains("Appendix") {
+          it.indented([
+            Part #context [#parts-outline.display("I")] #h(.3em) --
+          ], [
+            #it.body()
+          ])
+       } else {
+         it.body()
+       }
       } else {
         c-page.update(it.page())
         context if c-page.get() != p-page.get() {
@@ -186,6 +222,7 @@
 #set page(numbering: "1", number-align: center)
 #context counter(page).update(1)
 
+#set text(top-edge: if review {1em} else {"cap-height"}, bottom-edge: if review {-.8em} else {"baseline"})
 
 == Introduction
 
@@ -194,23 +231,15 @@
 === Notation
 === Contributions
 
-= Text-to-speech fundamentals
+= Synthetic speech for speech recognition
 
-== Modeling and training approaches
+== Modeling and Training Text-to-Speech Models
 
 === Architectural choices
 
 === Training data considerations
 
 === Injecting stochasticity
-
-== Evaluation
-
-=== Listening and preference tests
-
-=== Objective metrics
-
-= Synthetic speech for speech recognition
 
 == TTS-for-ASR task
 
@@ -234,6 +263,12 @@
 
 = Quantifying distances of synthetic and real speech
 
+== Other ways of synthetic speech evaluation
+
+=== Listening and preference tests
+
+=== Objective metrics
+
 == Factors and representations of speech
 
 === Self-supervised learning representations
@@ -254,22 +289,51 @@
 
 == Measuring distributional distance
 
+#figure(
+  image(
+    "figures/9/xvector.svg",
+    alt: "Three 3D surface plots showing kernel density estimates of X-Vector speaker embeddings projected into 2D PCA space. The first plot, labeled 'Ground Truth,' shows two distinct high-density peaks. The second plot, labeled 'Synthetic,' has a similar distribution with slightly smoother peaks. The third plot, labeled 'Noise,' shows a single narrow peak, which is approximately 5 times higher than the peaks in the other figures."
+  ),
+  caption: [#abbr.pls[KDE] of X-Vector speaker representations projected into a 2-dimensional #abbr.s[PCA] space, shown for (left to right) ground truth, synthetic, and noise data. The density is normalized and scaled by $times 10^(-5)$.]
+)
+
 === Wasserstein distance
+#lorem(200)
+
+==== Fréchet inception distance
+
+==== Comparison with other distributional measures
 
 
+#show heading.where(
+  level: 2
+): it => [
+  #pagebreak()
+  #block()
+  #set text(font: "Crimson Pro", size: 24pt, weight: "regular", hyphenate: false)
+  #set par(justify: false)
+  #if it.body.text.contains("Content") {
+    [#(it.body)]
+  } else {
+    [
+      #set align(center)
+      #block(above: 1.5em, below: 2em)[
+        #line
+        Appendix #counter(heading).display() #h(.5em) -- #h(.5em) #(it.body)
+        #line
+      ]
+    ]
+  }
+]
 
-// = Text-to-Speech for Automatic Speech Recognition
+#context counter(heading).update(0)
+#show heading.where(level: 2): set heading(numbering: "A", level: 1)
+= Appendix
 
-// == Text-to-Speech Fundamentals
+== Figures
 
-// === Modeling and Training Approaches
+== Abbreviations
 
-// ==== Stochasticity in Speech Synthesis
+#abbr.list()
 
-// ==== Architectural Choices
-
-// == Automatic-Speech-Recognition Fundamentals
-
-// === Hybrid and Deep Architectures
-
-// = Text-to-Speech Distribution Distance 
+== Open source contributions
