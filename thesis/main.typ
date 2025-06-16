@@ -1,6 +1,6 @@
 // PACKAGES
 
-#import "@preview/abbr:0.2.3"
+#import "abbr.typ"
 #import "@preview/wordometer:0.1.4": word-count, total-words, total-characters
 
 #show: word-count
@@ -186,14 +186,17 @@
       if it.element.depth == 1 {
         parts-outline.step()
         set text(font: "Crimson Pro", size: 18pt, style: "italic")
-        if not it.body().text.contains("Appendix") {
+        if not (it.body().text.contains("Appendix") or it.body().text.contains("Bibliography")) {
           it.indented([
             Part #context [#parts-outline.display("I")] #h(.3em) --
           ], [
             #it.body()
           ])
        } else {
-         it.body()
+         [
+           #it.body()
+           
+         ]
        }
       } else {
         c-page.update(it.page())
@@ -224,85 +227,30 @@
 
 #set text(top-edge: if review {1em} else {"cap-height"}, bottom-edge: if review {-.8em} else {"baseline"})
 
-== Introduction
-
-=== Synthetic speech
-=== Distribution gap
-=== Notation
-=== Contributions
+#include "chapters/01_introduction.typ"
 
 = Synthetic speech for speech recognition
 
-== Modeling and Training Text-to-Speech Models
+In this first part of our work, we explore how well-suited synthetic speech is for training speech recognition models.
+If the distribution of real speech was perfectly modeled, we would assume similar performance when training with synthetic speech as when training with real speech. However, this is not the case, suggesting systematic differences between synthetic and real speech, which we explore in the following chapters.
 
-=== Architectural choices
+#include "chapters/02_modeling.typ"
 
-=== Training data considerations
+#include "chapters/03_tts_asr.typ"
 
-=== Injecting stochasticity
+#include "chapters/04_attr_tts.typ"
 
-== TTS-for-ASR task
-
-=== Data augmentation with synthetic speech
-
-=== Exclusively synthetic training 
-
-=== Implications on speech distributions
-
-== Attribute-driven speech synthesis
-
-=== Prosodic correlates
-
-=== Utterance conditioning
-
-== Scaling properties for TTS-for-ASR
-
-=== Dataset size impact on performance
-
-=== Stochasticity and scaling
+#include "chapters/05_scaling.typ"
 
 = Quantifying distances of synthetic and real speech
 
-== Other ways of synthetic speech evaluation
+#include "chapters/06_eval.typ"
 
-=== Listening and preference tests
+#include "chapters/07_factors.typ"
 
-=== Objective metrics
+#include "chapters/08_distance.typ"
 
-== Factors and representations of speech
-
-=== Self-supervised learning representations
-
-=== Prosody representations
-
-=== Environmental effects
-
-=== Speaker identity
-
-== Distance measures for TTS
-
-=== Algorithmic
-
-=== Model-based
-
-=== Distributional
-
-== Measuring distributional distance
-
-#figure(
-  image(
-    "figures/9/xvector.svg",
-    alt: "Three 3D surface plots showing kernel density estimates of X-Vector speaker embeddings projected into 2D PCA space. The first plot, labeled 'Ground Truth,' shows two distinct high-density peaks. The second plot, labeled 'Synthetic,' has a similar distribution with slightly smoother peaks. The third plot, labeled 'Noise,' shows a single narrow peak, which is approximately 5 times higher than the peaks in the other figures."
-  ),
-  caption: [#abbr.pls[KDE] of X-Vector speaker representations projected into a 2-dimensional #abbr.s[PCA] space, shown for (left to right) ground truth, synthetic, and noise data. The density is normalized and scaled by $times 10^(-5)$.]
-)
-
-=== Wasserstein distance
-#lorem(200)
-
-==== Fréchet inception distance
-
-==== Comparison with other distributional measures
+#include "chapters/09_measuring.typ"
 
 
 #show heading.where(
@@ -328,12 +276,32 @@
 
 #context counter(heading).update(0)
 #show heading.where(level: 2): set heading(numbering: "A", level: 1)
+#show heading.where(
+  level: 1
+): it => [
+  #pagebreak()
+  #set align(center+horizon)
+  #parts.step()
+  #block()
+  #block(above: 1.5em, below: 2em)[
+    #line
+    #set text(font: "Crimson Pro", size: 26pt, weight: "medium", hyphenate: false)
+    #set par(justify: false)
+    #(it.body)
+    #line
+  ]
+]
+
+#bibliography("refs.bib")
+
 = Appendix
 
-== Figures
+== Additional Figures
 
 == Abbreviations
 
-#abbr.list()
+#abbr.list(columns: 2)
 
 == Open source contributions
+
+== On the use of GenAI
