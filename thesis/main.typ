@@ -5,6 +5,8 @@
 
 #show: word-count
 
+#set quote(block: true)
+
 #abbr.make(
   ("KDE", "Kernel Density Estimation", "Kernel Density Estimates"),
   ("PCA", "Principal component analysis"),
@@ -252,6 +254,8 @@ If the distribution of real speech was perfectly modeled, we would assume simila
 
 #include "chapters/09_measuring.typ"
 
+#include "chapters/10_limitations.typ"
+
 
 #show heading.where(
   level: 2
@@ -305,3 +309,32 @@ If the distribution of real speech was perfectly modeled, we would assume simila
 == Open source contributions
 
 == On the use of GenAI
+
+Generative AI (GenAI) was used in the making of this thesis in accordance with the University of Edinburgh's GenAI policy#footnote[#link(
+  "https://information-services.ed.ac.uk/computing/comms-and-collab/elm/guidance-for-working-with-generative-ai",
+  underline[https://information-services.ed.ac.uk/computing/comms-and-collab/elm/guidance-for-working-with-generative-ai],
+)]. For most cases, the Edinburgh Language Model service was used.
+
+How to use these tools in academia is controversial, and in the light of the contents of this thesis, we set out to use them in a way that does not reduce the diversity of the lexical distribution found in this work, as is so often the case with GenAI.
+
+The general process for using GenAI in this work was conducted as follows:
+
+1. Outline the problem and decide if GenAI is an appropriate tool to help.
+
+2. Think of how to pose this problem to GenAI while minimising AI bias.
+
+3. Create a new chat with GenAI, pose the problem and look at the output.
+
+4. Close the chat, think over the output, and then incorporate suggestions.
+
+*Problems suitable for GenAI*: We generally deem the following problems suitable for GenAI use:
+- Repetitive text formatting/processing -- for example, switching from full titles to standard conference abbreviations in the bibliography.
+- Grammatical error checking -- for example, checking if a specific paragraph has any grammatical mistakes.
+- Structural improvements -- for example, interrogating if a different structure could be more intuitive for a specific section.
+
+*Minimising Bias*: We use the following rules/techniques to minimise the introduction of GenAI-induced bias.
+- Never copy prose: No prose is every copied, nor is the GenAI output displayed to the author while writing.
+- Critique, not revision: We never ask to create a "better version" of any given input, but instead ask for specific critique of potential shortcomings. We had to sometimes explicitly specify this to the GenAI tools since they seemed prone to replacing the input with their own version, even when we did not ask for it.
+- Be specific: We never asked open-ended questions to GenAI, such as "My thesis topic is [...] how would you structure this thesis?" - we always posed a narrow, specific problem with text we had already created.
+
+*Transparency*: We publish all GenAI chats used in the making of this work at #link("https://github.com/minixc/thesis_genai", underline[github.com/minixc/thesis_genai]).

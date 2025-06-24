@@ -2,6 +2,10 @@
 
 == Measuring distributional distance
 
+#quote(attribution: [Yossi Rubner, Carlo Tomasi and Leonidas J. Guibas #linebreak() #emph("The Earth Mover's Distance as a Metric for Image Retrieval"), 2000 @rubner_earth_2000], [
+  … we want to define a consistent measure of distance, or dissimilarity, between two distributions of mass in a space that is itself endowed with a ground distance. … Practically, it is important that [such] distances between distributions correlate with human perception.
+])
+
 #figure(
   image(
     "../figures/9/xvector.svg",
