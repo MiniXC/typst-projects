@@ -6,10 +6,19 @@
 #show: word-count
 
 #set quote(block: true)
+#set cite(style: "springer-mathphys")
 
 #abbr.make(
   ("KDE", "Kernel Density Estimation", "Kernel Density Estimates"),
   ("PCA", "Principal component analysis"),
+  ("MFCC", "Mel Frequency Cepstral Coefficient"),
+  ("SSL", "Self-Supervised Learning"),
+  ("NLP", "Natural Language Processing"),
+  ("TTS", "Text-to-Speech"),
+  ("CNN", "Convolutional Neural Network"),
+  ("g2p", "Grapheme-to-Phoneme"),
+  ("VAD", "Voice Activity Detection"),
+  ("DNN", "Deep Neural Network")
 )
 
 
@@ -304,7 +313,7 @@ If the distribution of real speech was perfectly modeled, we would assume simila
 
 == Abbreviations
 
-#abbr.list(columns: 2)
+#abbr.list(columns: 1)
 
 == Open source contributions
 
@@ -331,6 +340,7 @@ The general process for using GenAI in this work was conducted as follows:
 - Repetitive text formatting/processing -- for example, switching from full titles to standard conference abbreviations in the bibliography.
 - Grammatical error checking -- for example, checking if a specific paragraph has any grammatical mistakes.
 - Structural improvements -- for example, interrogating if a different structure could be more intuitive for a specific section.
+- Summarising/searching long-form content -- for example, asking if certain viewpoints are featured in a lengthy paper or book.
 
 *Minimising Bias*: We use the following rules/techniques to minimise the introduction of GenAI-induced bias.
 - Never copy prose: No prose is every copied, nor is the GenAI output displayed to the author while writing.
