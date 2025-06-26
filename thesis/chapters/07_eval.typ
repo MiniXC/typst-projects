@@ -1,4 +1,4 @@
-== Traditional synthetic speech evaluation
+== Synthetic speech evaluation
 
 === Listening and preference tests
 

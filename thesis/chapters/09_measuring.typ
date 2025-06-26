@@ -1,10 +1,13 @@
 #import "../abbr.typ"
+#import "../quote.typ": q 
 
 == Measuring distributional distance
 
-#quote(attribution: [Yossi Rubner, Carlo Tomasi and Leonidas J. Guibas #linebreak() #emph("The Earth Mover's Distance as a Metric for Image Retrieval"), 2000 @rubner_earth_2000], [
-  … we want to define a consistent measure of distance, or dissimilarity, between two distributions of mass in a space that is itself endowed with a ground distance. … Practically, it is important that [such] distances between distributions correlate with human perception.
-])
+#q(
+  [Yossi Rubner, Carlo Tomasi and Leonidas J. Guibas], 
+  [#emph("The Earth Mover's Distance as a Metric for Image Retrieval"), 2000 @rubner_earth_2000],
+  [… we want to define a consistent measure of distance, or dissimilarity, between two distributions of mass in a space that is itself endowed with a ground distance. … Practically, it is important that [such] distances between distributions correlate with human perception.]
+)
 
 #figure(
   image(
@@ -24,14 +27,14 @@ We now define the set of all possible speech recordings with some specific const
 
 When creating a system capable of producing synthetic speech, we should aim to model the real speech distribution "hidden" within this impossibly large possible recording space -- however, if we knew said distribution, we would not need to model it in the first place. We therefore usually settle for estimating the distribution from data, and verify our models learned something approximating the real distribution by asking listeners to quantify their subjective perceptions.
 
-=== Perceptually-motivated factorized evaluation
-
-As we discussed in @8distances, there are various ways to objectively evaluate if synthetic speech matches its real counterparts, and many are perceptually motivated.
-
-
-
 === Wasserstein distance
 
 ==== Fréchet inception distance
 
-==== Comparison with other distributional measures
+==== Distributional measures in speech
+
+// METHODOLOGY 
+
+=== Perceptually-motivated factorized evaluation
+
+As we discussed in @8distances, there are various ways to objectively evaluate if synthetic speech matches its real counterparts, and many are perceptually motivated, in-line with the representations presented in @06_perceptual.

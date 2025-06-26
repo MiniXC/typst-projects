@@ -18,7 +18,11 @@
   ("CNN", "Convolutional Neural Network"),
   ("g2p", "Grapheme-to-Phoneme"),
   ("VAD", "Voice Activity Detection"),
-  ("DNN", "Deep Neural Network")
+  ("DNN", "Deep Neural Network"),
+  ("SRMR", "Speech-to-reverberation modulation energy ratio"),
+  ("PESQ", "Perceptual Evaluation of Speech Quality"),
+  ("SNR", "Signal-to-noise ratio"),
+  ("WADA", "Waveform Amplitude Distribution Analysis")
 )
 
 
@@ -172,6 +176,8 @@
 #set page(numbering: "i", number-align: center)
 #counter(page).update(1)
 
+#set text(top-edge: if review {1em} else {"cap-height"}, bottom-edge: if review {-.8em} else {"baseline"})
+
 // Abstract
 #frontmatter-heading([Abstract])
 #lorem(200)
@@ -184,6 +190,8 @@
 // Acknowledgements
 #frontmatter-heading([Acknowledgements])
 #lorem(200)
+
+#set text(top-edge: "cap-height", bottom-edge: "baseline")
 
 // Table of Contents
 #let parts-outline = counter("parts-outline")
@@ -255,9 +263,9 @@ If the distribution of real speech was perfectly modeled, we would assume simila
 
 = Quantifying distances of synthetic and real speech
 
-#include "chapters/06_eval.typ"
+#include "chapters/06_factors.typ"
 
-#include "chapters/07_factors.typ"
+#include "chapters/07_eval.typ"
 
 #include "chapters/08_distance.typ"
 

@@ -1,9 +1,13 @@
 #import "../abbr.typ"
+#import "../quote.typ": q
 
 == Factors and representations of speech
 
-#quote(attribution: [James L. McClelland and Jeffrey L. Elman #linebreak() #emph[The TRACE Model of Speech Perception], 1986 @mcclelland_trace_1986],
-[… we could say that speech perception is the process of forming representations of the stimulus -- the speaker’s utterance -- at several levels of description.])
+#q(
+  [James L. McClelland and Jeffrey L. Elman],
+  [#emph[The TRACE Model of Speech Perception], 1986 @mcclelland_trace_1986],
+  [… we could say that speech perception is the process of forming representations of the stimulus -- the speaker’s utterance -- at several levels of description.]
+)
 
 In speech technology the acoustic signals which make up speech are represented in a number of different ways. Due to the continuous, large and highly redundant nature of the "raw" signal in audio recordings, representations such as mel spectrograms or #abbr.pla[MFCC] were used from the onset, both to more closely align with human perception and to compress the signal @flanagan_speech_1971. Since then, representations at #emph[several levels of description] have been introduced -- often aiming to encode a particular aspect of speech. In this chapter, we discuss these representations and how they relate to human perception, as well as our own contribution of a self-supervised prosodic representation model. These representations are valuable for synthetic speech evaluation since they can help us quantify both synthetic and real speech across several dimensions or factors.
 
@@ -13,7 +17,7 @@ A prolific field of study when it comes to speech representations is #abbr.a[SSL
 
 This methodology was adapted to speech by later works @schneider_wav2vec_2019@baevski_wav2vec_2020@hsu_hubert_2021@chen_wavlm_2022. These approaches typically process speech into 20-millisecond chunks which are passed through a #abbr.a[CNN] and discretised. HuBERT @hsu_hubert_2021 and WavLM @chen_wavlm_2022 use iterative clustering, while wav2vec and wav2vec 2.0 use vector quantisation, with discretisation using Gumbel softmax in the latter. Due to this, the latter family of models relies on contrastive loss while the former can use categorical cross entropy as in BERT @devlin_bert_2019. The resulting representations achieve state-of-the-art results on several benchmarks and challenges @evain_lebenchmark_2021@yang_superb_2021@shi_mlsuperb_2023@tsai_superb-sg_2022@wang_fine-tuned_2021 -- they have also been expanded to cover many languages beyond English @conneau_unsupervised_2021@boito_mhubert-147_2024. However useful these models and their representations are for downstream tasks, it is not clear in which ways the latent spaces learned by these models correlate with human perception. For example, @millet_humanlike_2022 find that #abbr.pla[MFCC] predict systematic effects of contrasts between specific pairs of phones better than self-supervised models. Similar effects can be observed with tasks such as word segmentation @pasad_words_2024, and different layers of the model have been shown to correlate with different perceptual units @pasad_layer-wise_2021. It therefore stands to reason that while these representations are useful for a wide range of tasks, they do not intuitively correlate with human perception. In the following sections, we discuss more specific representations which more transparently correlate with different aspects of human perception.
 
-=== Perceptually-grounded representations
+=== Perceptually-grounded representations <06_perceptual>
 
 In this work, we divide non-verbal perception of speech into three categories.
 - *Prosody* relates to features the speaker can control independently of lexical/verbal content.
@@ -38,4 +42,8 @@ Speaker characteristics relate to the quality of a speakers voice uncontrollable
 
 ==== Ambient
 
-Lastly ambient acoustics or environmental effects are shaped by recording conditions more generally. They can include the microphone being used for recording the speech and its distance to the speaker, the acoustics of the space of recording (e.g. leading to reverberation) and background noise. These effects are sometimes overlooked in speech research, as a recent hallmark work on dysarthria detection has shown @schu_silence_2023: Higher performance was achieved when using non-speech segments than when using speech segments, indicating most previous methods had relied on ambient acoustics rather than speech characteristics for this task. 
+Lastly ambient acoustics or environmental effects are shaped by recording conditions more generally. They can include the microphone being used for recording the speech and its distance to the speaker, the acoustics of the space of recording (e.g. leading to reverberation) and background noise. These effects are sometimes overlooked in speech research, as a recent hallmark work on dysarthria detection has shown @schu_silence_2023: Higher performance was achieved when using non-speech segments than when using speech segments, indicating most previous methods had relied on ambient acoustics rather than speech characteristics for this task. Correlates for ambient acoustics include reverberation in the form of #abbr.a[SRMR] @kinoshita_reverb_2013 and more general estimates of the "quality" of the signal when, for example, transferred over telephone networks such as #abbr.a[PESQ] @rix_pesq_2001. Another measure is the #abbr.a[SNR] which can be estimated using the amplitude distribution using #abbr.a[WADA] @kim_wada_2008.
+
+==== For synthetic speech
+
+As explored in @04_correlates, prosodic correlates have been widely used in #abbr.a[TTS]. The same is true for speaker representations. Ambient measures are more commonly used for filtering the training data than in the architecture of generative models.
