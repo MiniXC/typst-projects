@@ -37,4 +37,4 @@ When creating a system capable of producing synthetic speech, we should aim to m
 
 === Perceptually-motivated factorized evaluation
 
-As we discussed in @8distances, there are various ways to objectively evaluate if synthetic speech matches its real counterparts, and many are perceptually motivated, in-line with the representations presented in @06_perceptual.
+As we discussed in @07_distances, there are various ways to objectively evaluate if synthetic speech matches its real counterparts, and many are perceptually motivated, in-line with the representations presented in @06_perceptual.

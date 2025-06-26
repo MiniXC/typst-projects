@@ -22,7 +22,8 @@
   ("SRMR", "Speech-to-reverberation modulation energy ratio"),
   ("PESQ", "Perceptual Evaluation of Speech Quality"),
   ("SNR", "Signal-to-noise ratio"),
-  ("WADA", "Waveform Amplitude Distribution Analysis")
+  ("WADA", "Waveform Amplitude Distribution Analysis"),
+  ("MOS", "Mean Opinion Score"),
 )
 
 
@@ -267,11 +268,9 @@ If the distribution of real speech was perfectly modeled, we would assume simila
 
 #include "chapters/07_eval.typ"
 
-#include "chapters/08_distance.typ"
+#include "chapters/08_measuring.typ"
 
-#include "chapters/09_measuring.typ"
-
-#include "chapters/10_limitations.typ"
+#include "chapters/09_limitations.typ"
 
 
 #show heading.where(
