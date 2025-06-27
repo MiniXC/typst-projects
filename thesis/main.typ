@@ -47,11 +47,12 @@
   ("HMM", "Hidden Markov Model"),
   ("CTC", "Connectionist Temporal Classification"),
   ("LF-MMI", "Lattice-Free Maximum Mutual Information"),
-  ("GST", "Global Style Token")
+  ("GST", "Global Style Token"),
+  ("RIR", "Room Impulse Response")
 )
 
 // CONFIG
-#let review = false
+#let review = true
 
 #let print = false
 
@@ -368,17 +369,18 @@ Since our work in TTS-for-ASR suggested a large discrepancy between expected and
     "references/representations.bib",
     "references/tts.bib",
     "references/tts_for_asr.bib",
-    "references/datasets.bib"
+    "references/datasets.bib",
+    "references/scaling.bib"
   )
 )
 
 = Appendix
 
-== Additional Figures
+// == Additional Figures
 
 == Abbreviations
 
-#abbr.list(columns: 1)
+#abbr.list(columns: 2)
 
 == Open source contributions
 

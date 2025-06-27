@@ -86,6 +86,6 @@ The CTC loss is the negative log-likelihood of this total probability, $cal(L)_(
 
 In recent #abbr.a[ASR] works, #abbr.a[SSL] is frequently employed, where a model is first pre-trained on a task like predicting masked portions of the speech. The resulting model is then fine-tuned with an additional "head" for the desired task and objective, most commonly #abbr.a[CTC]. See @06_ssl for more details.
 
-#inline-note[This is the only chapter with background only, is that ok?]
+#inline-note[This and the next chapter have background only, is that ok?]
 
 #inline-note[TODO: Add some notes on WER, CER to set up WERR in the next chapter?]

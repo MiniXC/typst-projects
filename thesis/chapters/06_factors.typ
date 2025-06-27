@@ -46,4 +46,4 @@ Lastly ambient acoustics or environmental effects are shaped by recording condit
 
 ==== For synthetic speech
 
-As explored in @04_correlates, prosodic correlates have been widely used in #abbr.a[TTS]. The same is true for speaker representations. Ambient measures are more commonly used for filtering the training data than in the architecture of generative models.
+As explored in @04_prosodic_correlates, prosodic correlates have been widely used in #abbr.a[TTS]. The same is true for speaker representations. Ambient measures are more commonly used for filtering the training data than in the architecture of generative models.

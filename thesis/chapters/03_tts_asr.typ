@@ -47,13 +47,6 @@ The motivation behind using #abbr.a[TTS]-generated data for ASR in today's very 
 
 The data most commonly used for TTS-for-ASR is read audiobook speech, such as LibriSpeech @panayotov_librispeech_2015 and LibriTTS @zen_libritts_2019.
 
-=== Training on synthetic data alone
-However, a more fundamental question is how well synthetic speech can be used to train #abbr.a[ASR] on its own. It is natural to assume that if #abbr.pla[MOS], human ratings, which are explained in more detail in @07_subjective, are statistically indistinguishable between synthetic and real speech @chen_vall-e_2024@tan_naturalspeech_2024 so should be their usefulness as training data for #abbr.a[ASR] systems.
-
-As can be seen in @fig_werr, this is not the case, with #abbr.pla[WERR], defined as the ratio between #abbr.pla[WER] when training on synthetic compared to real speech, tending towards $2$ rather than $1$ as would be expected if they were truly equivalent. To illustrate this, we can compute the ratio of Mean Opinion Scores (MOS) as well. Using this measure, Tacotron 2 @shen_natural_2018, which was published a year prior to the earliest system in @fig_werr, achieves a subjective score ratio of $approx 1.02$, still $0.65$ lower than the best reported TTS-for-ASR systems' #abbr.a[WERR].
- 
-This observation sets up much of the exploration in #link(<part_01>, [Part I]) of this work. Somehow, listeners seem to give favorable ratings to synthetic speech which consistently produces close to #emph[$2$ times] the #abbr.a[WER] of real speech. What is missing in the speech that explains this gap? 
-
 === Methods for synthetic data diversity
 
 A variety of techniques have been developed to generate synthetic speech that is not just natural-sounding, but also diverse and robust enough for ASR training.
@@ -63,3 +56,11 @@ A primary approach is to introduce and control sources of variation through *lat
 A more direct form of control is achieved through *explicit conditioning*. Here, specific attributes are extracted from reference audio and used as additional inputs to the TTS model. This commonly includes conditioning on speaker representations like d-vectors to control speaker identity @du_speaker_2020 @wang_improving_2020, as well as prosodic features like pitch, energy, and phoneme durations to control the speaking style @rossenbach_duration_2023.
 
 Finally, the synthetic speech can be made more suitable for real-world ASR by applying *post-generation data augmentation*. This involves adding simulated background noise or acoustic reverberation to the clean synthetic output, which helps the ASR system become more robust to varied environmental conditions @rossenbach_synthattention_2020.
+
+=== Training on synthetic data alone
+However, a more fundamental question is how well synthetic speech can be used to train #abbr.a[ASR] on its own. It is natural to assume that if #abbr.pla[MOS], human ratings, which are explained in more detail in @07_subjective, are statistically indistinguishable between synthetic and real speech @chen_vall-e_2024@tan_naturalspeech_2024 so should be their usefulness as training data for #abbr.a[ASR] systems.
+
+As can be seen in @fig_werr, this is not the case, with #abbr.pla[WERR], defined as the ratio between #abbr.pla[WER] when training on synthetic compared to real speech, tending towards $2$ rather than $1$ as would be expected if they were truly equivalent -- even with the methods outline in  To illustrate this, we can compute the ratio of Mean Opinion Scores (MOS) as well. Using this measure, Tacotron 2 @shen_natural_2018, which was published a year prior to the earliest system in @fig_werr, achieves a subjective score ratio of $approx 1.02$, still $0.65$ lower than the best reported TTS-for-ASR systems' #abbr.a[WERR].
+ 
+This observation sets up much of the exploration in #link(<part_01>, [Part I]) of this work. Somehow, listeners seem to give favorable ratings to synthetic speech which consistently produces close to #emph[$2$ times] the #abbr.a[WER] of real speech. What is missing in the speech that explains this gap? We seek to answer this question in the following Chapters.
+
