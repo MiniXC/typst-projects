@@ -1,7 +1,7 @@
 #import "../abbr.typ"
 #import "../quote.typ": q
 
-== Factors and representations of speech
+== Factors and representations of speech <06_factors>
 
 #q(
   [James L. McClelland and Jeffrey L. Elman],
@@ -36,7 +36,7 @@ Prosody does not have one universal definition, but we follow @jurafsky_slp_2008
 
 *Energy*, also referred to as loudness or intensity, can be estimated is trivially -- it is the magnitude of the audio signal or spectrogram. It is rarely used outside of simple #abbr.a[VAD] methods and has proved less useful than pitch for expressive #abbr.a[TTS] @lancucki_fastpitch_2021 - however, both pitch and energy are necessary components for conveying emotion in speech @jurafsky_slp_2008@haque_energypitch_2017.
 
-==== Speaker
+==== Speaker <06_speaker>
 
 Speaker characteristics relate to the quality of a speakers voice uncontrollable by them, dictated by the morphology and motor control of their vocal tract. This can be modeled in several ways, based on the task at hand, which are mainly speaker recognition (#emph[Who is speaking?]) and speaker verification (#emph[Is this specific person speaking?]). However, we focus primarily on #abbr.a[DNN] representations which can be useful for either task in this work. These are referred to as speaker embeddings @snyder_x_2018@wan_generalized_2018@desplanques_ecapa_2020. As of the time of writing frequently used methods include x-vectors @snyder_x_2018, d-vectors @wan_generalized_2018 and ECAPA-TDNN @desplanques_ecapa_2020. For TTS conditioning, no large performance differences have been found across speaker embedding systems @stan_spkanalysis_2023 -- similarly, while some embeddings perform better for specific tasks, no clear best system has emerged @zhao_probing_2022.
 

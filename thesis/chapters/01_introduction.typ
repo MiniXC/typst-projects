@@ -11,7 +11,7 @@
   be made.]
 )
 
-Substantial progress has been made in #abbr.a[TTS] -- it is now often impossible to tell if a computer or human is talking @tan_naturalspeech_2024
+// Substantial progress has been made in #abbr.a[TTS] -- it is now often impossible to tell if a computer or human is talking @tan_naturalspeech_2024@chen_vall-e_2024@eskimez_e2_2024.
 
 === Synthetic speech
 

@@ -8,6 +8,7 @@
 #set quote(block: true)
 #set cite(style: "springer-mathphys")
 
+
 #abbr.make(
   ("KDE", "Kernel Density Estimation", "Kernel Density Estimates"),
   ("PCA", "Principal component analysis"),
@@ -24,8 +25,19 @@
   ("SNR", "Signal-to-noise ratio"),
   ("WADA", "Waveform Amplitude Distribution Analysis"),
   ("MOS", "Mean Opinion Score"),
+  ("CMOS", "Comparison MOS"),
+  ("SMOS", "Speaker Similarity MOS"),
+  ("STOI", "Short‑Time Objective Intelligibility"),
+  ("MCD", "Mel-Cepstral Distortion"),
+  ("WER", "Word Error Rate"),
+  ("WERR", "Relative Word Error Rate Reduction"),
+  ("CER", "Character Error Rate"),
+  ("ASR", "Automatic Speech Recognition"),
+  ("FID", "Fréchet Inception Distance"),
+  ("FAD", "Fréchet Audio Distance"),
+  ("EMD", "Earth Mover's Distance"),
+  ("CDF", "Cumulative distribution function")
 )
-
 
 // CONFIG
 #let review = false
@@ -264,6 +276,8 @@ If the distribution of real speech was perfectly modeled, we would assume simila
 
 = Quantifying distances of synthetic and real speech
 
+Since our work in TTS-for-ASR suggested a large discrepancy between expected and actual performance due to a mismatch in distributions, we explore in which ways TTS evaluation can be improved by considering these distributions rather than individual samples alone.
+
 #include "chapters/06_factors.typ"
 
 #include "chapters/07_eval.typ"
@@ -312,7 +326,15 @@ If the distribution of real speech was perfectly modeled, we would assume simila
   ]
 ]
 
-#bibliography("refs.bib")
+#bibliography(
+  (
+    "references/benchmarks.bib",
+    "references/metrics.bib",
+    "references/misc.bib",
+    "references/representations.bib",
+    "references/tts.bib",
+  )
+)
 
 = Appendix
 
@@ -323,6 +345,16 @@ If the distribution of real speech was perfectly modeled, we would assume simila
 #abbr.list(columns: 1)
 
 == Open source contributions
+
+As far as licenses and resources permitted, all code and datasets used in the making of this thesis have been published at the web locations below.
+
+- *Phones* #sym.arrow #underline[#link("https://minixc.github.io/phones",[minixc.github.io/phones])]: A library for calculating distances between phones across languages.
+- *TTSDS* #sym.arrow #underline[#link("https://ttsdsbenchmark.com",[ttsdsbenchmark.com])]: The TTSDS score libary and datasets introduced in @08_dist[Chapter].
+- *MPM* #sym.arrow #underline[#link("https://github.com/MiniXC/masked_prosody_model",[github.com/MiniXC/masked_prosody_model])]: #abbr.a[SSL] prosody correlate model introduced in @06_factors[Chapter].
+- *Speech Diffusion* #sym.arrow #underline[#link("https://github.com/MiniXC/speech-diffusion",[github.com/MiniXC/speech-diffusion])]: The diffusion architecture introduced in @05_scaling[Chapter].
+- *LightningFastSpeech2* #sym.arrow #underline[#link("https://github.com/MiniXC/LightningFastSpeech2", [github.com/MiniXC/LightningFastSpeech2])]: A reimplemention of FastSpeech2 with additional prosodic correlates and conditioning, introduced in @04_attr[Chapter].
+- #emph[Various datasets and pretrained models] #sym.arrow #underline[#link("https://huggingface.co/cdminix", [huggingface.co/cdminix])]: Includes forced-aligned versions of LibriTTS (@04_attr[Chapter]), Vocex (@06_factors[Chapter]), and detailed listening test results from TTSDS (@08_dist[Chapter]).
+
 
 == On the use of GenAI
 
