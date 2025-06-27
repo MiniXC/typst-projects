@@ -14,7 +14,7 @@ There are two main paradigms for accomplishing this task:
 
 Seeing #abbr.a[TTS] as a *hierarchical pipeline* breaks the problem into a series of steps and representations, moving from the utterance-level information such as speaker @stanton_speaker_2022 and lexical content, to phone level, frame level (i.e. mel spectrogram or MFCC frames) to sample level. The precise levels might differ in their definition and purpose between systems, but generally there is a gradual transformation from lower- to higher-resolution representations, ending in the raw waveform. The individual transformations might be accomplished using #abbr.pla[DNN], other learned modules or rule-based systems.
 
-#inline-note[Expand this and add a figure, the hierarchical approach is a good way to explain TTS in general.]
+#inline-note[TODO: Expand this section and add a figure, the hierarchical approach is a good way to explain TTS in general.]
 
 ==== #abbr.l[E2E]
 The second paradigm is the #abbr.a[E2E] approach in which a #abbr.a[DNN] directly predicts the output from the input. In many other domains, this approach has lead to consistently better results, however, for the high-resolution, continuous and highly inter-correlated nature of audio signals, this does not necessarily seem to be the case at the time of writing. Even the most recent #abbr.a[E2E] systems often use one or two components of the hierarchical approach, most commonly the #emph[vocoder], which converts mel spectrograms or other intermediate representations to raw waveforms @eskimez_e2_2024@chen_vall-e_2024, as well as the #abbr.a[g2p] conversion module @casanova_xtts_2024.
@@ -31,7 +31,6 @@ $ p(bold(S)|bold(T),bold(e)_S) = product_(i=1)^n p(s_i|s_1,dots,s_(i-1),bold(T),
 
 In contrast *#abbr.l[NAR] models* assume conditional independence between output frames given the full conditioning information:
 
-// p(\mathbf{S}|\mathbf{T}, \mathbf{e}_{spk}) = \prod_{i=1}^{n} p(s_i | \mathbf{T}, \mathbf{e}_{spk})
 $ p(bold(S)|bold(T),bold(e)_S) = product_(i=1)^n p(s_i|bold(T),bold(e)_S) $
 
 
@@ -82,3 +81,11 @@ The probability of any single path $bold(pi)$ is calculated as the product of th
 $ p(bold(pi)|bold(X)) = product_(t=1)^T p(pi_t | bold(X)) $
 
 The CTC loss is the negative log-likelihood of this total probability, $cal(L)_("CTC") = -log p(bold(Y)|bold(X))$, which is calculated efficiently using dynamic programming. By maximizing the summed probability of all valid paths, the CTC objective implicitly minimizes the probability of all other label sequences, making it an inherently discriminative training criterion.
+
+==== Pretrain-finetune approach
+
+In recent #abbr.a[ASR] works, #abbr.a[SSL] is frequently employed, where a model is first pre-trained on a task like predicting masked portions of the speech. The resulting model is then fine-tuned with an additional "head" for the desired task and objective, most commonly #abbr.a[CTC]. See @06_ssl for more details.
+
+#inline-note[This is the only chapter with background only, is that ok?]
+
+#inline-note[TODO: Add some notes on WER, CER to set up WERR in the next chapter?]

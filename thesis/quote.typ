@@ -4,6 +4,6 @@
     attribution: [
       #attribution #linebreak() #title
     ],
-    content
+    ["#content"]
   )
 }

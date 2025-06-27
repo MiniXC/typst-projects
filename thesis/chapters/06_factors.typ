@@ -11,7 +11,7 @@
 
 In speech technology the acoustic signals which make up speech are represented in a number of different ways. Due to the continuous, large and highly redundant nature of the "raw" signal in audio recordings, representations such as mel spectrograms or #abbr.pla[MFCC] were used from the onset, both to more closely align with human perception and to compress the signal @flanagan_speech_1971. Since then, representations at #emph[several levels of description] have been introduced -- often aiming to encode a particular aspect of speech. In this chapter, we discuss these representations and how they relate to human perception, as well as our own contribution of a self-supervised prosodic representation model. These representations are valuable for synthetic speech evaluation since they can help us quantify both synthetic and real speech across several dimensions or factors.
 
-=== Self-supervised learning representations
+=== Self-supervised learning representations <06_ssl>
 
 A prolific field of study when it comes to speech representations is #abbr.a[SSL]. In this a model is trained to predict pseudo-labels created from the data itself. The first of these models were introduced for #abbr.a[NLP] in which a percentage of tokens in the original data are masked and said models are trained to predict the masked tokens using cross entropy loss @devlin_bert_2019.
 

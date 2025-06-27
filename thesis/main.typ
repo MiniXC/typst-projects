@@ -30,7 +30,7 @@
   ("STOI", "Short‑Time Objective Intelligibility"),
   ("MCD", "Mel-Cepstral Distortion"),
   ("WER", "Word Error Rate"),
-  ("WERR", "Relative Word Error Rate Reduction"),
+  ("WERR", "Word Error Rate Ratio"),
   ("CER", "Character Error Rate"),
   ("ASR", "Automatic Speech Recognition"),
   ("FID", "Fréchet Inception Distance"),
@@ -46,7 +46,8 @@
   ("DDPM", "Denoising Diffusion Probabilistic Model"),
   ("HMM", "Hidden Markov Model"),
   ("CTC", "Connectionist Temporal Classification"),
-  ("LF-MMI", "Lattice-Free Maximum Mutual Information")
+  ("LF-MMI", "Lattice-Free Maximum Mutual Information"),
+  ("GST", "Global Style Token")
 )
 
 // CONFIG
@@ -177,8 +178,6 @@
           Review version with wide margins and spacing
   
           Word Count: #total-words
-          
-          Character Count #total-characters
         ]
       ]
     }
@@ -203,16 +202,16 @@
 
 // Abstract
 #frontmatter-heading([Abstract])
-#lorem(200)
+
 
 
 // Lay Summary
 #frontmatter-heading([Lay Summary])
-#lorem(200)
+
 
 // Acknowledgements
 #frontmatter-heading([Acknowledgements])
-#lorem(200)
+
 
 #set text(top-edge: "cap-height", bottom-edge: "baseline")
 
@@ -368,6 +367,8 @@ Since our work in TTS-for-ASR suggested a large discrepancy between expected and
     "references/misc.bib",
     "references/representations.bib",
     "references/tts.bib",
+    "references/tts_for_asr.bib",
+    "references/datasets.bib"
   )
 )
 
