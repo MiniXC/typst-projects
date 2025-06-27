@@ -36,7 +36,17 @@
   ("FID", "Fréchet Inception Distance"),
   ("FAD", "Fréchet Audio Distance"),
   ("EMD", "Earth Mover's Distance"),
-  ("CDF", "Cumulative distribution function")
+  ("CDF", "Cumulative distribution function"),
+  ("E2E", "End-to-End"),
+  ("AR", "Autoregressive"),
+  ("NAR", "Non-Autoregressive"),
+  ("MSE", "Mean-Squared Error"),
+  ("ELBO", "Evidence lower bound"),
+  ("VAE", "Variational Autoencoder"),
+  ("DDPM", "Denoising Diffusion Probabilistic Model"),
+  ("HMM", "Hidden Markov Model"),
+  ("CTC", "Connectionist Temporal Classification"),
+  ("LF-MMI", "Lattice-Free Maximum Mutual Information")
 )
 
 // CONFIG
@@ -231,14 +241,39 @@
          ]
        }
       } else {
-        c-page.update(it.page())
-        context if c-page.get() != p-page.get() {
-          it.indented(it.prefix(), [#it.body() #h(2em) #it.page()])
+        if it.element.depth == 2 {
+          set text(font: "Crimson Pro", size: 15pt)
+          c-page.update(it.page())
+          context if c-page.get() != p-page.get() {
+            it.indented(it.prefix(), [#it.body() #h(2em) #it.page()])
+          }
+          context if c-page.get() == p-page.get() {
+            it.indented(it.prefix(), [#it.body() #h(2em)])
+          }
+          p-page.update(it.page())
         }
-        context if c-page.get() == p-page.get() {
-          it.indented(it.prefix(), [#it.body() #h(2em)])
+        if it.element.depth == 3 {
+          set text(font: "Crimson Pro", size: 14pt)
+          c-page.update(it.page())
+          context if c-page.get() != p-page.get() {
+            it.indented(it.prefix(), [#it.body() #h(2em) #it.page()])
+          }
+          context if c-page.get() == p-page.get() {
+            it.indented(it.prefix(), [#it.body() #h(2em)])
+          }
+          p-page.update(it.page())
         }
-        p-page.update(it.page())
+        // if it.element.depth == 4 {
+        //   set text(font: "Crimson Pro", size: 13pt)
+        //   c-page.update(it.page())
+        //   context if c-page.get() != p-page.get() {
+        //     it.indented(it.prefix(), [#it.body() #h(2em) #it.page()])
+        //   }
+        //   context if c-page.get() == p-page.get() {
+        //     it.indented(it.prefix(), [#it.body() #h(2em)])
+        //   }
+        //   p-page.update(it.page())
+        // }
       }
     }
   )
@@ -261,7 +296,7 @@
 
 #include "chapters/01_introduction.typ"
 
-= Synthetic speech for speech recognition
+= Synthetic speech for speech recognition <part_01>
 
 In this first part of our work, we explore how well-suited synthetic speech is for training speech recognition models.
 If the distribution of real speech was perfectly modeled, we would assume similar performance when training with synthetic speech as when training with real speech. However, this is not the case, suggesting systematic differences between synthetic and real speech, which we explore in the following chapters.
