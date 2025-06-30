@@ -7,3 +7,11 @@
     ["#content"]
   )
 }
+
+#let citep(key) = {
+  cite(key, form: "prose")
+}
+
+#let citea(key) = {
+  cite(key, form: "author")
+}

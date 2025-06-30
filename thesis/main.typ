@@ -6,7 +6,7 @@
 #show: word-count
 
 #set quote(block: true)
-#set cite(style: "springer-mathphys")
+#set cite(style: "american-anthropological-association")
 
 
 #abbr.make(
@@ -52,7 +52,7 @@
 )
 
 // CONFIG
-#let review = true
+#let review = false
 
 #let print = false
 
@@ -77,7 +77,7 @@
 )
 #let use-heading-lines = true
 #let line = [
-  #block(spacing: 0em, above: .8em, below: 1.2em)[
+  #block(spacing: 0em, above: 1.5em, below: 1.5em)[
     #if use-heading-lines {
       [#line(length: 100%)]
     }
@@ -173,7 +173,7 @@
         #context document.author.first()
       ]
     ]
-    #if review {
+    #if true {
       block(above: 0em, below: 2em)[
         #text(10pt, fill: blue)[
           Review version with wide margins and spacing
@@ -204,7 +204,8 @@
 // Abstract
 #frontmatter-heading([Abstract])
 
-
+#abbr.a[TTS] data generation has advanced to the point where it often mimics real data convincingly, according to human judges. Does that mean that in these settings, TTS is solved? If this were the case, the resulting data could be used as a stand-in from any problem were real data is needed -- especially in the inverse of #abbr.a[TTS], #abbr.a[ASR]. In this work, we attempt to use purely synthetic, #abbr.a[TTS]-generated, data for #abbr.a[ASR] and find a large discrepancy between the expected performance based on human judgements and the actual suitability of the data. While we show this #emph[synthetic-real gap] can be reduced by conditioning on a broad set of utterance-level characteristics, it cannot be explained fully. Further we find that dataset scale can equally only explain part of the gap, leading to diminishing returns beyond a certain point.
+In light of these findings, we continue to investigate the problem from the other directions -- can we evaluate #abbr.a[TTS] in a way that shows this gap, while also offering explainabilty as to which areas lack the most. To this end, we introduce a benchmark which measures the divergence between real and synthetic data on a distribution level across several factors, including prosody, speaker identity, ambient acoustics and intelligibility. By normalising distribution distances across these factors to follow the same scale, we can show their average correlates with human judgement, while simultaneously showing full saturation has not been reached, unlike said human judgements. As we extend our benchmark to 14 languages, we find this is especially the case for languages other than English and Chinese. Our work shows that work remains to be done in #abbr.a[TTS] research, and that evaluation techniques should be adapted and improved as systems reach human parity by traditional measures.
 
 // Lay Summary
 #frontmatter-heading([Lay Summary])
