@@ -48,7 +48,10 @@
   ("CTC", "Connectionist Temporal Classification"),
   ("LF-MMI", "Lattice-Free Maximum Mutual Information"),
   ("GST", "Global Style Token"),
-  ("RIR", "Room Impulse Response")
+  ("RIR", "Room Impulse Response"),
+  ("VC", "Voice Conversion"),
+  ("LLM", "Large Language Model"),
+  ("TTSDS", "Text-to-Speech Distribution Score")
 )
 
 // CONFIG
@@ -297,12 +300,16 @@ In light of these findings, we continue to investigate the problem from the othe
 
 #include "chapters/01_introduction.typ"
 
-= Synthetic speech for speech recognition <part_01>
+= Background <part_00>
 
 In this first part of our work, we explore how well-suited synthetic speech is for training speech recognition models.
 If the distribution of real speech was perfectly modeled, we would assume similar performance when training with synthetic speech as when training with real speech. However, this is not the case, suggesting systematic differences between synthetic and real speech, which we explore in the following chapters.
 
 #include "chapters/02_modeling.typ"
+
+#include "chapters/06_factors.typ"
+
+= Synthetic speech for speech recognition <part_01>
 
 #include "chapters/03_tts_asr.typ"
 
@@ -310,11 +317,9 @@ If the distribution of real speech was perfectly modeled, we would assume simila
 
 #include "chapters/05_scaling.typ"
 
-= Quantifying distances of synthetic and real speech
+= Quantifying distances of synthetic and real speech <part_02>
 
 Since our work in TTS-for-ASR suggested a large discrepancy between expected and actual performance due to a mismatch in distributions, we explore in which ways TTS evaluation can be improved by considering these distributions rather than individual samples alone.
-
-#include "chapters/06_factors.typ"
 
 #include "chapters/07_eval.typ"
 
@@ -371,8 +376,11 @@ Since our work in TTS-for-ASR suggested a large discrepancy between expected and
     "references/tts.bib",
     "references/tts_for_asr.bib",
     "references/datasets.bib",
-    "references/scaling.bib"
-  )
+    "references/scaling.bib",
+    "references/asr.bib",
+    "references/own.bib"
+  ),
+  style: "american-anthropological-association"
 )
 
 = Appendix

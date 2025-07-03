@@ -1,11 +1,11 @@
 #import "../abbr.typ"
-#import "../quote.typ": q
+#import "../quote.typ": *
 
 == Synthetic speech evaluation <07_eval>
 
 #q(
-  [Sebastian Möller, Tiago H. Falk],
-  [#emph("Quality Prediction for Synthesized Speech"), 2009 @moller_quality_2009],
+  [#citep(<moller_quality_2009>)],
+  [#emph("Quality prediction for synthesized speech: Comparison of approaches")],
   [Each time a new TTS system is developed which potentially introduces new types of degradations, the validity and reliability of such a prediction algorithm has to be tested anew.]
 )
 
@@ -42,15 +42,15 @@ All these questions should be answered #emph[before] conducting a listening test
 
 There are also drawbacks to subjective evaluation. We will not go into detail on the advantages and disadvantages of every methodology here, but there are two main drawbacks to consider. Firstly, *lack of standardisation* means there is no standardised framework for most listening test methodologies, beyond the labels and values for particular scales. This means the questions above are answered differently (and often not reported) making it difficult or even impossible to compare results between studies. Subjective listening test results should only ever be compared to results obtained within the same study with the same participants and setup. Additionally, there is the *scale/comparison trade-off* -- many methodologies operate by presenting an ordinal scale to listeners on which they rate recordings on, which are then averaged, however this is not necessarily statistically meaningful. But when instead using a comparison-based task (in which one sample has to be rated over another), many more comparisons are needed @wells_bws_2024.
 
-==== #abbr.l[MOS]
+==== Mean opinion score
 
 #abbr.a[MOS] is the most-commonly used and likely most-criticised listening test methodology @kirkland_mospit_2023. Raters are asked to rate recordings on a scale from 1 to 5 (Bad to Excellent) @ITU_P800 -- however, this is where the standardisation ends. The original recommendation was intended for evaluation of telecommunication systems and therefore asked listeners to rate #emph[quality], while most, but not all @kirkland_mospit_2023, #abbr.a[TTS] evaluations instead ask for #emph[naturalness] -- sometimes the former is referred to as Q-MOS and the latter as N-MOS. There is also no universal agreement for how many stimuli to present at a single time or many of the other questions listed above, and sometimes even the core definition in @ITU_P800 is altered to, for example, alter the number or type of labels @kirkland_mospit_2023.
 
-==== #abbr.l[CMOS]
+==== Comparison MOS
 
 This is an A/B-test-inspired variation of #abbr.a[MOS], in which two samples are presented and the listener is asked to compare and rate on a 7-point scale from -3 (A is much better than B) to +3 (A is much worse than B), with 0 indicating they are equivalent in naturalness (or quality). However, the same standardisation problem is present. E.g., sometimes a 13-point scale (from -6 to +6) is employed @li_styletts_2023 and even the name of the test is sometimes referred to as comparative instead of comparison #abbr.a[MOS].
 
-==== #abbr.l[SMOS]
+==== Speaker similarity MOS
 
 Sometimes we do not want to evaluate the quality or naturalness of the speech, but how closely the speakers in two samples resemble each other. In this case, #abbr.a[SMOS] is commonly used, which operates in the same way as #abbr.a[CMOS], but instead asks listeners to rate how closely the speakers resemble each other.
 
@@ -70,7 +70,7 @@ To predict scores directly, researchers train neural networks that map a single 
 
 Often reported are also #abbr.l[WER] and #abbr.l[CER], computed on #abbr.a[ASR] transcripts.
 
-==== Speaker Similarity
+==== Speaker similarity
 
 Analogous to #abbr.a[SMOS], cosine similarity between the speaker embeddings (see @06_speaker) of a reference and target speech is frequently reported.
 

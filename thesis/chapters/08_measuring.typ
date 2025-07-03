@@ -1,14 +1,18 @@
 #import "../abbr.typ"
-#import "../quote.typ": q 
+#import "../quote.typ": * 
 #import "@preview/drafting:0.2.2": inline-note
 
 == Measuring distributional distance <08_dist>
 
 #q(
-  [Yossi Rubner, Carlo Tomasi and Leonidas J. Guibas], 
-  [#emph("The Earth Mover's Distance as a Metric for Image Retrieval"), 2000 @rubner_earth_2000],
+  [#citep(<rubner_earth_2000>)], 
+  [#emph("The Earth Mover's Distance as a Metric for Image Retrieval")],
   [… we want to define a consistent measure of distance, or dissimilarity, between two distributions of mass in a space that is itself endowed with a ground distance. … Practically, it is important that [such] distances between distributions correlate with human perception.]
 )
+
+As we have established throughout this work, it is useful to think of speech as a distribution. In this chapter, we formalize this further, and introduce a method to empirically measure how far real and synthetic speech distributions are apart across systems, domains and languages.
+
+=== Audio & speech distributions
 
 #figure(
   image(
@@ -16,12 +20,8 @@
     alt: "Three 3D surface plots showing kernel density estimates of X-Vector speaker embeddings projected into 2D PCA space. The first plot, labeled 'Ground Truth,' shows two distinct high-density peaks. The second plot, labeled 'Synthetic,' has a similar distribution with slightly smoother peaks. The third plot, labeled 'Noise,' shows a single narrow peak, which is approximately 5 times higher than the peaks in the other figures."
   ),
   caption: [#abbr.pls[KDE] of X-Vector speaker representations projected into a 2-dimensional #abbr.s[PCA] space, shown for (left to right) ground truth, synthetic, and noise data. The density is normalized and scaled by $times 10^(-5)$.],
-  
+  placement: none,
 )
-
-As we have established throughout this work, it is useful to think of speech as a distribution. In this chapter, we formalize this further, and introduce a method to empirically measure how far real and synthetic speech distributions are apart across systems, domains and languages.
-
-=== Audio & speech distributions
 
 If we think of the set of all possible speech recordings with some specific constraints, the difficulty of matching the real speech distribution becomes clear. Even if we constrain utterances to never exceed 60 seconds, and allow each data point within an utterance to only be one of $2^16$ values (referred to as a bit depth of 16) and set the sampling rate to 16kHz, this results in $16,000*60=960,000$ values per recording. The resulting number of possible recordings is hard to fathom: $2^(16 times 960,000)$ -- however, to human listeners, the vast majority of these recordings would sound like meaningless noise.
 
@@ -29,7 +29,7 @@ If we think of the set of all possible speech recordings with some specific cons
 
 When creating a system capable of producing synthetic speech, we should aim to model the real speech distribution "hidden" within this impossibly large possible recording space -- however, if we knew said distribution, we would not need to model it in the first place. We therefore usually settle for estimating the distribution from data, and verify our models learned something approximating the real distribution by asking listeners to quantify their subjective perceptions as outlined in @07_eval[Chapter]. However, we can also quantify how closely the synthetic distribution resembles the real distribution as outlined in the remainder of this Chapter.
 
-=== #abbr.l[EMD]
+=== Earth movers distance
 
 An inuitive way to measure the distance between two distributions is the #abbr.a[EMD], named and first introduced for the purpose of determining perceptual similarity for image retrieval by @rubner_earth_2000 and is derived from the Wasserstein distance @vaserstein_markov_1969 which in turn makes use of the Kantorovich–Rubinstein metric @kantorovich_planning_1939. Its motivation is explained as follows:
 
@@ -43,7 +43,7 @@ distance.]
 
 This makes it a transport problem @hitchcock_transport_1941, which can be solved for the 2D case of image histograms as in the original work @rubner_earth_2000 -- however, speech representations (see @06_perceptual) are often high-dimensional, in which case this problem is prohibitively expensive.
 
-=== The 2-Wasserstein Metric
+=== Wasserstein metric
 
 While the general #abbr.a[EMD] is computationally complex, a specific instance known as the *2-Wasserstein distance* offers tractable solutions in certain cases that are highly relevant for comparing distributions of speech representations.
 
@@ -63,7 +63,7 @@ $ W_2^2(P_R, P_S) = integral_0^1(C_R^(-1)(z)-C_S^(-1)(z))^2d z $
 
 This property is the foundation of the *Sliced-Wasserstein distance*, which computes the average Wasserstein distance between distributions over many random one-dimensional projections. However, there is another, form for the high-dimensional case which does not rely on slices.
 
-==== High-dimensional case with Gaussian assumption
+==== High-dimensional case with gaussian assumption
 
 For sets of high-dimensional vectors, as is common for #abbr.a[DNN] features, computing the quantile functions is not feasible. However, as proposed by @heusel_fid_2017 in the context of image generation, we can make a simplifying assumption: that the embedding distributions can be approximated by multivariate Gaussians. This is a reasonable assumption for embeddings that have been projected into a well-behaved latent space @heusel_fid_2017. This approximation allows us to again compute the 2-Wasserstein distance in closed form using only the mean and covariance of the distributions.
 

@@ -1,11 +1,18 @@
 #import "../abbr.typ" 
 #import "@preview/drafting:0.2.2": inline-note
+#import "../quote.typ": *
 
 == Modeling and Training TTS and ASR Models <02_modeling>
 
-In this chapter, we introduce common architectures and training approaches #abbr.l[TTS] and #abbr.l[ASR] as preliminaries for our contributions in later chapters. They are introduced here since TTS-for-ASR requires an understanding of both (@03_ttsasr[Chapter]).
+#q(
+  [#citep(<sutton_bitter_2019>)],
+  [#emph[The Bitter Lesson]],
+  [The biggest lesson that can be read from 70 years of AI research is that general methods that leverage computation are ultimately the most effective, and by a large margin.]
+)
 
-=== #abbr.l[TTS]
+In this chapter, we introduce common architectures and training approaches for #abbr.l[TTS] and #abbr.l[ASR] as preliminaries for our contributions in later chapters. They are introduced here since TTS-for-ASR requires an understanding of both (@03_ttsasr[Chapter]).
+
+=== Text-to-speech
 
 As outlined in @01_intro[Chapter], we constrain this work to multi-speaker voice-cloning #abbr.a[TTS], in which there are two inputs; a speaker representation derived from a reference recording, which is most commonly a speaker embedding (see @06_speaker), but could also be a Mel Spectrogram or any other representation containing information about the given speaker @eskimez_e2_2024, like a text prompt describing their characteristics @lyth_parler_2024. Mapping these inputs to an acoustic realisation is a complex "one-to-many" problem @ren_revisiting_2022@blumstein_phonetic_1981.
 There are two main paradigms for accomplishing this task:
@@ -16,10 +23,14 @@ Seeing #abbr.a[TTS] as a *hierarchical pipeline* breaks the problem into a serie
 
 #inline-note[TODO: Expand this section and add a figure, the hierarchical approach is a good way to explain TTS in general.]
 
-==== #abbr.l[E2E]
+==== End-to-end
 The second paradigm is the #abbr.a[E2E] approach in which a #abbr.a[DNN] directly predicts the output from the input. In many other domains, this approach has lead to consistently better results, however, for the high-resolution, continuous and highly inter-correlated nature of audio signals, this does not necessarily seem to be the case at the time of writing. Even the most recent #abbr.a[E2E] systems often use one or two components of the hierarchical approach, most commonly the #emph[vocoder], which converts mel spectrograms or other intermediate representations to raw waveforms @eskimez_e2_2024@chen_vall-e_2024, as well as the #abbr.a[g2p] conversion module @casanova_xtts_2024.
 
-==== #abbr.l[AR] and #abbr.l[NAR]
+==== Large-language-model-based
+
+A third way of synthetic speech generation is emerging, inspired by #abbr.pla[LLM] -- speech is converted into a discrete sequence of tokens and the task is to simply predict the next (speech) token @lyth_parler_2024. This can be used for unconditional speech generation, as well as conditioned on text tokens or a specific speaker to effectively make it a #abbr.a[TTS] or #abbr.a[VC] system.
+
+==== Autoregressive and nonautoregressive
 
 If we let $T$ be the input lexical sequence (e.g., sub-word tokens), $bold(S) = (s_1, dots, s_n)$ be the target acoustic sequence (e.g., Mel-spectrogram frames), and $bold(e)_S$ be the speaker embedding vector for the target speaker, the goal of a multi-speaker conditional TTS model is to learn the distribution $p(bold(S)|bold(T),bold(e)_S)$.
 
@@ -56,7 +67,7 @@ where $c$ represents the conditioning variables such as text and speaker informa
 
 Automatic Speech Recognition (ASR) systems perform the inverse task of TTS, mapping an acoustic signal to its corresponding lexical transcription. Modern high-performance ASR systems are almost exclusively trained using discriminative objectives. In contrast to generative approaches that might model the probability of an acoustic sequence given a text, discriminative models are optimized to directly model the posterior probability $p(bold(T)|bold(S))$, maximizing the score of the correct transcription while simultaneously minimizing the scores of all incorrect competing hypotheses. This approach has proven more effective at achieving low Word Error Rates (WER). The two dominant paradigms for discriminative ASR training are hybrid HMM-DNN systems and end-to-end models.
 
-==== Hybrid HMM-DNN Systems
+==== Hybrid HMM-DNN systems
 
 Hybrid systems combine the strengths of Deep Neural Networks (DNNs) for acoustic modeling with the temporal modeling capabilities of Hidden Markov Models (HMMs). In this architecture, the DNN, often a Time-Delay Neural Network (TDNN) @peddinti_time_2015, processes acoustic feature vectors $bold(o)_t$ at each time step $t$ and outputs a posterior probability distribution over the set of HMM states $q$:
 
@@ -68,7 +79,7 @@ $ cal(L)_(text("MMI"))(theta) = log (p_theta(bold(O) | cal(M)_(W_text("ref"))) p
 
 Here, $cal(M)_W$ is the HMM corresponding to a word sequence $W$, and $p(W)$ is a language model probability. The numerator represents the likelihood of the correct transcription, while the denominator sums over the likelihoods of all possible transcriptions, explicitly creating a margin that pushes down the scores of incorrect hypotheses. The "Lattice-Free" component streamlines this process by using a simpler phone-level decoding graph, allowing for more efficient end-to-end discriminative training.
 
-==== End-to-End Models
+==== End-to-end models
 
 #abbr.a[E2E] models represent a paradigm shift, collapsing the entire ASR pipeline into a single, deep neural network. Architectures such as the Conformer @gulati_conformer_2020 have become standard, learning a direct mapping from an acoustic sequence $bold(X)$ to a label sequence $bold(Y)$ (e.g., characters or sub-words). The key enabling technology for this is the #abbr.a[CTC] loss function @graves_ctc_2012.
 

@@ -1,11 +1,11 @@
 #import "../abbr.typ"
-#import "../quote.typ": q
+#import "../quote.typ": *
 
 == Factors and representations of speech <06_factors>
 
 #q(
-  [James L. McClelland and Jeffrey L. Elman],
-  [#emph[The TRACE Model of Speech Perception], 1986 @mcclelland_trace_1986],
+  [#citep(<mcclelland_trace_1986>)],
+  [#emph[The TRACE Model of Speech Perception]],
   [… we could say that speech perception is the process of forming representations of the stimulus -- the speaker’s utterance -- at several levels of description.]
 )
 
