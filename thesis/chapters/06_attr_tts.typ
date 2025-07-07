@@ -1,6 +1,6 @@
 #import "../abbr.typ" 
 
-== Increasing Synthetic Diversity <04_attr>
+== Increasing Synthetic Diversity <06_attr>
 
 As established in the preceding chapter, a notable discrepancy exists between synthetic and real speech. While modern #abbr.s[TTS] systems can achieve high subjective naturalness, the resulting speech often exhibits a more narrow distribution, lacking the rich diversity inherent in human expression @hu_syntpp_2022. This limitation is a primary cause for the performance gap observed when using synthetic data for #abbr.s[ASR] model training, where the Word Error Rate Ratio (#abbr.s[WERR]) consistently remains well above the ideal value of 1.
 
@@ -28,9 +28,9 @@ In modern non-autoregressive architectures, this control is often implemented vi
 
 At inference time, the model must be provided with target attribute values. If none are given, the adapter typically predicts the mean values seen during training, leading to a collapse in diversity. True control is therefore achieved by supplying the desired attribute values as an input to the model.
 
-==== Controllable attributes <04_prosodic_correlates>
+==== Controllable attributes <06_prosodic_correlates>
 
-The attributes used for conditioning are typically correlates of perceptually relevant phenomena, as detailed in @06_perceptual[Chapter 6]. Key examples include:
+The attributes used for conditioning are typically correlates of perceptually relevant phenomena, as detailed in @02_perceptual[Chapter]. Key examples include:
 
 -   *Prosody*: Features such as pitch (F0), energy (loudness), and phoneme duration (speaking rate) are fundamental to speaking style. Architectures like FastSpeech 2 and FastPitch explicitly model and predict these attributes at the frame or phoneme level @ren_fastspeech_2019@ren_fastspeech_2021@lancucki_fastpitch_2021.
 -   *Acoustic Environment*: For #abbr.s[ASR] robustness, it is beneficial to model environmental factors. These can be quantified using metrics like the #abbr.a[SRMR] @kinoshita_reverb_2013 and the #abbr.a[SNR], which can be estimated non-intrusively using methods like Waveform Amplitude Distribution Analysis (#abbr.s[WADA]) @kim_wada_2008.

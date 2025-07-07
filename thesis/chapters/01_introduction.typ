@@ -76,9 +76,9 @@ Whenever we use more than one set of inputs to condition speech generation with,
   ),
   placement: none,
   caption: "Text-to-Speech (TTS) inputs and output.",
-) <tts_vs_vc>
+) <fig_tts>
 
-#abbr.l[TTS] systems, as shown in @tts_vs_vc, map text input $T$ to corresponding speech waveforms $S$ using a model or chain of models $f_theta (T)=S$, where $theta$ represents the model parameters trained on large-scale paired text-speech datasets. Multi-speaker systems need some form of speaker representation in $cal(C)$, such as reference audios ($A_R$) or speaker embeddings ($E_S$). Other conditioning can include prosodic correlates such as pitch ($F_"F0"$), and learned style vectors $E_"STY"$ @nose_style_2007.
+#abbr.l[TTS] systems, as shown in @fig_tts, map text input $T$ to corresponding speech waveforms $S$ using a model or chain of models $f_theta (T)=S$, where $theta$ represents the model parameters trained on large-scale paired text-speech datasets. Multi-speaker systems need some form of speaker representation in $cal(C)$, such as reference audios ($A_R$) or speaker embeddings ($E_S$). Other conditioning can include prosodic correlates such as pitch ($F_"F0"$), and learned style vectors $E_"STY"$ @nose_style_2007.
 
 ==== Other speech generation approaches
 #abbr.l[VC] systems transform a source speaker's speech $S$ into a target speaker's voice (represented as $E_"SPK"$ or $A_"SPK"$) using a model $g_phi (S,cal(C))=Syn$, where $phi$ represents the model parameters trained on paired or unpaired speech data from multiple speakers @mohammadi_vc_2017.
@@ -109,7 +109,7 @@ To begin our investigation, the task of using synthetic speech for #abbr.a[ASR] 
 
 The research questions we ask in this area are:
 - Can the distributional distance as quantified by #abbr.a[TTS]-for-#abbr.a[ASR] be reduced by introducing changes to the #abbr.a[TTS] side?
-  - We specifically look at conditioning (@04_attr[Chapter]) and scaling (@05_scaling[Chapter]).
+  - We specifically look at conditioning (@06_attr[Chapter]) and scaling (@07_scaling[Chapter]).
 - Do these changes explain the gap sufficiently?
 
 While we find that these changes improve #abbr.a[TTS]-for-#abbr.a[ASR] performance, our research on scaling indicates diminishing returns. Additionally #abbr.a[TTS]-for-#abbr.a[ASR] is computationally expensive (two models have to be trained, after all), does not offer explainability as to which parts or components of the speech might be lacking, and training setups between models have to be matched exactly to avoid advantages of simply more training data. For these reasons, we move on to introduce an evaluation framework which is more efficient and can give us insight into the individual factors, while also allowing us to evaluate the checkpoints of open-source models.

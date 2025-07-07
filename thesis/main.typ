@@ -305,27 +305,27 @@ In light of these findings, we continue to investigate the problem from the othe
 In this first part of our work, we explore how well-suited synthetic speech is for training speech recognition models.
 If the distribution of real speech was perfectly modeled, we would assume similar performance when training with synthetic speech as when training with real speech. However, this is not the case, suggesting systematic differences between synthetic and real speech, which we explore in the following chapters.
 
-#include "chapters/02_modeling.typ"
+#include "chapters/02_factors.typ"
 
-#include "chapters/06_factors.typ"
+#include "chapters/03_tts.typ"
+
+#include "chapters/04_asr.typ"
 
 = Synthetic speech for speech recognition <part_01>
 
-#include "chapters/03_tts_asr.typ"
+#include "chapters/05_tts_asr.typ"
 
-#include "chapters/04_attr_tts.typ"
+#include "chapters/06_attr_tts.typ"
 
-#include "chapters/05_scaling.typ"
+#include "chapters/07_scaling.typ"
 
 = Quantifying distances of synthetic and real speech <part_02>
 
 Since our work in TTS-for-ASR suggested a large discrepancy between expected and actual performance due to a mismatch in distributions, we explore in which ways TTS evaluation can be improved by considering these distributions rather than individual samples alone.
 
-#include "chapters/07_eval.typ"
+#include "chapters/08_eval.typ"
 
-#include "chapters/08_measuring.typ"
-
-#include "chapters/09_limitations.typ"
+#include "chapters/09_measuring.typ"
 
 
 #show heading.where(
@@ -396,11 +396,11 @@ Since our work in TTS-for-ASR suggested a large discrepancy between expected and
 As far as licenses and resources permitted, all code and datasets used in the making of this thesis have been published at the web locations below.
 
 - *Phones* #sym.arrow #underline[#link("https://minixc.github.io/phones",[minixc.github.io/phones])]: A library for calculating distances between phones across languages.
-- *TTSDS* #sym.arrow #underline[#link("https://ttsdsbenchmark.com",[ttsdsbenchmark.com])]: The TTSDS score libary and datasets introduced in @08_dist[Chapter].
-- *MPM* #sym.arrow #underline[#link("https://github.com/MiniXC/masked_prosody_model",[github.com/MiniXC/masked_prosody_model])]: #abbr.a[SSL] prosody correlate model introduced in @06_factors[Chapter].
-- *Speech Diffusion* #sym.arrow #underline[#link("https://github.com/MiniXC/speech-diffusion",[github.com/MiniXC/speech-diffusion])]: The diffusion architecture introduced in @05_scaling[Chapter].
-- *LightningFastSpeech2* #sym.arrow #underline[#link("https://github.com/MiniXC/LightningFastSpeech2", [github.com/MiniXC/LightningFastSpeech2])]: A reimplemention of FastSpeech2 with additional prosodic correlates and conditioning, introduced in @04_attr[Chapter].
-- #emph[Various datasets and pretrained models] #sym.arrow #underline[#link("https://huggingface.co/cdminix", [huggingface.co/cdminix])]: Includes forced-aligned versions of LibriTTS (@04_attr[Chapter]), Vocex (@06_factors[Chapter]), and detailed listening test results from TTSDS (@08_dist[Chapter]).
+- *TTSDS* #sym.arrow #underline[#link("https://ttsdsbenchmark.com",[ttsdsbenchmark.com])]: The TTSDS score libary and datasets introduced in @09_dist[Chapter].
+- *MPM* #sym.arrow #underline[#link("https://github.com/MiniXC/masked_prosody_model",[github.com/MiniXC/masked_prosody_model])]: #abbr.a[SSL] prosody correlate model introduced in @02_factors[Chapter].
+- *Speech Diffusion* #sym.arrow #underline[#link("https://github.com/MiniXC/speech-diffusion",[github.com/MiniXC/speech-diffusion])]: The diffusion architecture introduced in @07_scaling[Chapter].
+- *LightningFastSpeech2* #sym.arrow #underline[#link("https://github.com/MiniXC/LightningFastSpeech2", [github.com/MiniXC/LightningFastSpeech2])]: A reimplemention of FastSpeech2 with additional prosodic correlates and conditioning, introduced in @06_attr[Chapter].
+- #emph[Various datasets and pretrained models] #sym.arrow #underline[#link("https://huggingface.co/cdminix", [huggingface.co/cdminix])]: Includes forced-aligned versions of LibriTTS (@06_attr[Chapter]), Vocex (@02_factors[Chapter]), and detailed listening test results from TTSDS (@09_dist[Chapter]).
 
 
 == On the use of GenAI

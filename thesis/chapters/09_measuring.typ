@@ -2,7 +2,7 @@
 #import "../quote.typ": * 
 #import "@preview/drafting:0.2.2": inline-note
 
-== Measuring distributional distance <08_dist>
+== Measuring distributional distance <09_dist>
 
 #q(
   [#citep(<rubner_earth_2000>)], 
@@ -27,7 +27,7 @@ If we think of the set of all possible speech recordings with some specific cons
 
 // Of course, the number of possible sentences, even in English alone, is similarly large: If we assume vocabulary of 100,000 unique words, which cannot be formed by combining two or more words, if we assume a maximum number of $256$ words per sentence, we arrive at $2^(8*100,000)$ -- although again, just as with recordings, the majority of these combinations would not be perceived as well-formed sentences by most humans.
 
-When creating a system capable of producing synthetic speech, we should aim to model the real speech distribution "hidden" within this impossibly large possible recording space -- however, if we knew said distribution, we would not need to model it in the first place. We therefore usually settle for estimating the distribution from data, and verify our models learned something approximating the real distribution by asking listeners to quantify their subjective perceptions as outlined in @07_eval[Chapter]. However, we can also quantify how closely the synthetic distribution resembles the real distribution as outlined in the remainder of this Chapter.
+When creating a system capable of producing synthetic speech, we should aim to model the real speech distribution "hidden" within this impossibly large possible recording space -- however, if we knew said distribution, we would not need to model it in the first place. We therefore usually settle for estimating the distribution from data, and verify our models learned something approximating the real distribution by asking listeners to quantify their subjective perceptions as outlined in @08_eval[Chapter]. However, we can also quantify how closely the synthetic distribution resembles the real distribution as outlined in the remainder of this Chapter.
 
 === Earth movers distance
 
@@ -41,7 +41,7 @@ as a collection of holes in that same space. Then, the #abbr.a[EMD] measures the
 distance.]
 )
 
-This makes it a transport problem @hitchcock_transport_1941, which can be solved for the 2D case of image histograms as in the original work @rubner_earth_2000 -- however, speech representations (see @06_perceptual) are often high-dimensional, in which case this problem is prohibitively expensive.
+This makes it a transport problem @hitchcock_transport_1941, which can be solved for the 2D case of image histograms as in the original work @rubner_earth_2000 -- however, speech representations (see @02_perceptual) are often high-dimensional, in which case this problem is prohibitively expensive.
 
 === Wasserstein metric
 
@@ -83,7 +83,7 @@ The first term, $||mu_R - mu_S||_2^2$, measures the distance between the centers
 
 === Perceptually-motivated factorized evaluation
 
-As we discussed in @07_distances, there are various ways to objectively evaluate if synthetic speech matches its real counterparts, and many are perceptually motivated, in-line with the representations presented in @06_perceptual.
+As we discussed in @08_distances, there are various ways to objectively evaluate if synthetic speech matches its real counterparts, and many are perceptually motivated, in-line with the representations presented in @02_perceptual.
 
 #inline-note()[
   The rest of this Section will be Methodology which is not covered in this version.

@@ -1,7 +1,7 @@
 #import "../abbr.typ"
 #import "../quote.typ": *
 
-== Synthetic speech evaluation <07_eval>
+== Synthetic speech evaluation <08_eval>
 
 #q(
   [#citep(<moller_quality_2009>)],
@@ -15,7 +15,7 @@ In this chapter, we outline evaluation methodology for synthetic speech, both #e
 
 Here we discuss the most common subjective listening test methodologies and best practices. Subjective tests are the gold standard for synthetic speech evaluation, however, there are drawbacks and trade-offs to any listening test since human behaviour can never be fully anticipated, especially across differing groups of listeners, spans of time, and sets of #abbr.a[TTS] systems.
 
-==== Best practices & drawbacks <07_practices>
+==== Best practices & drawbacks <08_practices>
 
 Before detailing the individual methods, we will outline best practice according to the literature, as well as commonly misunderstood aspects of listening tests, including their drawbacks.
 
@@ -54,9 +54,9 @@ This is an A/B-test-inspired variation of #abbr.a[MOS], in which two samples are
 
 Sometimes we do not want to evaluate the quality or naturalness of the speech, but how closely the speakers in two samples resemble each other. In this case, #abbr.a[SMOS] is commonly used, which operates in the same way as #abbr.a[CMOS], but instead asks listeners to rate how closely the speakers resemble each other.
 
-=== Objective metrics <07_distances>
+=== Objective metrics <08_distances>
 
-Due to the considerable effort and resources required to conduct subjective evaluation, objective metrics are frequently used for TTS evaluation, especially for ablation studies @cooper_review_2024. We group existing metrics into several categories into the following categories, with the function of *distributional* metrics being outlined in further detail in @08_dist[Chapter]. In addition to these families we also distinguish #emph[intrusive] and #emph[non-intrusive] metrics. Intrusive metrics require some ground truth speech of the same speaker as a reference. Non-intrusive metrics are reference-free. When the reference does not need to contain the same lexical content, it is described as #emph[non-matching]. 
+Due to the considerable effort and resources required to conduct subjective evaluation, objective metrics are frequently used for TTS evaluation, especially for ablation studies @cooper_review_2024. We group existing metrics into several categories into the following categories, with the function of *distributional* metrics being outlined in further detail in @09_dist[Chapter]. In addition to these families we also distinguish #emph[intrusive] and #emph[non-intrusive] metrics. Intrusive metrics require some ground truth speech of the same speaker as a reference. Non-intrusive metrics are reference-free. When the reference does not need to contain the same lexical content, it is described as #emph[non-matching]. 
 
 ==== Signal-based reference metrics
 
@@ -64,7 +64,7 @@ The oldest group consists of intrusive metrics that compare each synthetic utter
 
 ==== Model-based
 
-To predict scores directly, researchers train neural networks that map a single audio signal to an estimated MOS. #emph[MOSNet] @lo_mosnet_2019 introduced the idea, and was followed by #emph[UTMOS] @saeki_utmos_2022, its SSL‑based successor #emph[UTMOSv2] @baba_t05_2024, and #emph[NISQA‑MOS] @mittag_nisqa_2021. #emph[SQUIM-MOS] @kumar_torchaudio-squim_2023 additionally grounds its prediction by requiring a non-matching reference of the ground truth speech. These methods report in‑domain correlations; however, recent VoiceMOS challenges @huang_voicemos_2024 show that correlation with subjective ratings drops out-of-domain. The drawbacks listed in @07_distances make training these networks challenging, and generalisation to new TTS systems or domains unlikely -- as the quote from @moller_quality_2009 at the beginning of this chapter indicates, each time substantially different TTS systems are introduced, learned metrics will have to be adjusted and verified anew. A recent prediction system goes beyond #abbr.a[MOS] and argues that no single score can capture everything listeners care about. #emph[Audiobox Aesthetics] predicts four axes, Production Quality, Complexity, Enjoyment, and Usefulness, for arbitrary audio @tjandra_meta_2025 -- however, the challenges of learning from subjective labels remain the same.
+To predict scores directly, researchers train neural networks that map a single audio signal to an estimated MOS. #emph[MOSNet] @lo_mosnet_2019 introduced the idea, and was followed by #emph[UTMOS] @saeki_utmos_2022, its SSL‑based successor #emph[UTMOSv2] @baba_t05_2024, and #emph[NISQA‑MOS] @mittag_nisqa_2021. #emph[SQUIM-MOS] @kumar_torchaudio-squim_2023 additionally grounds its prediction by requiring a non-matching reference of the ground truth speech. These methods report in‑domain correlations; however, recent VoiceMOS challenges @huang_voicemos_2024 show that correlation with subjective ratings drops out-of-domain. The drawbacks listed in @08_distances make training these networks challenging, and generalisation to new TTS systems or domains unlikely -- as the quote from @moller_quality_2009 at the beginning of this chapter indicates, each time substantially different TTS systems are introduced, learned metrics will have to be adjusted and verified anew. A recent prediction system goes beyond #abbr.a[MOS] and argues that no single score can capture everything listeners care about. #emph[Audiobox Aesthetics] predicts four axes, Production Quality, Complexity, Enjoyment, and Usefulness, for arbitrary audio @tjandra_meta_2025 -- however, the challenges of learning from subjective labels remain the same.
 
 ==== Intelligibility
 
@@ -72,7 +72,7 @@ Often reported are also #abbr.l[WER] and #abbr.l[CER], computed on #abbr.a[ASR] 
 
 ==== Speaker similarity
 
-Analogous to #abbr.a[SMOS], cosine similarity between the speaker embeddings (see @06_speaker) of a reference and target speech is frequently reported.
+Analogous to #abbr.a[SMOS], cosine similarity between the speaker embeddings (see @02_speaker) of a reference and target speech is frequently reported.
 
 ==== Distributional
 

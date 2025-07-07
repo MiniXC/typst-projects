@@ -1,7 +1,7 @@
 #import "../abbr.typ" 
 #import "../quote.typ": *
 
-== Scaling properties for TTS-for-ASR <05_scaling>
+== Scaling properties for TTS-for-ASR <07_scaling>
 
 // #q(
 //   [#citep(<sutton_bitter_2019>)],
