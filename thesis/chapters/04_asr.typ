@@ -1,7 +1,7 @@
 #import "../abbr.typ" 
 #import "../quote.typ": *
 
-=== Automatic speech recognition
+=== Automatic speech recognition <04_asr>
 
 Automatic Speech Recognition (ASR) systems perform the inverse task of TTS, mapping an acoustic signal to its corresponding lexical transcription. Modern high-performance ASR systems are almost exclusively trained using discriminative objectives. In contrast to generative approaches that might model the probability of an acoustic sequence given a text, discriminative models are optimized to directly model the posterior probability $p(bold(T)|bold(S))$, maximizing the score of the correct transcription while simultaneously minimizing the scores of all incorrect competing hypotheses. This approach has proven more effective at achieving low Word Error Rates (WER). The two dominant paradigms for discriminative ASR training are hybrid HMM-DNN systems and end-to-end models.
 

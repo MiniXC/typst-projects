@@ -1,7 +1,7 @@
 #import "../abbr.typ" 
 #import "../quote.typ": *
 
-== Modeling and Training TTS and ASR Models <03_modeling>
+== Modeling and Training TTS and ASR Models <03_tts>
 
 #q(
   [#citep(<sutton_bitter_2019>)],
@@ -9,7 +9,7 @@
   [The biggest lesson that can be read from 70 years of AI research is that general methods that leverage computation are ultimately the most effective, and by a large margin.]
 )
 
-In this chapter, we introduce common architectures and training approaches for #abbr.l[TTS] and #abbr.l[ASR] as preliminaries for our contributions in later chapters. They are introduced here since TTS-for-ASR requires an understanding of both (@05_ttsasr[Chapter]).
+In this chapter, we introduce common architectures and training approaches for #abbr.l[TTS] and #abbr.l[ASR] as preliminaries for our contributions in later chapters. We also discuss general trends towards end-to-end, pretraining and scaling models and datasets in both #abbr.a[TTS] and #abbr.a[ASR].
 
 === Text-to-speech
 

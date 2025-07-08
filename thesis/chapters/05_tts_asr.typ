@@ -24,7 +24,7 @@ The data most commonly used for TTS-for-ASR is read audiobook speech, such as Li
     columns: 1,
     row-gutter: 0mm,
     column-gutter: 0mm,
-    image("../figures/3/tts_for_asr.svg"),
+    image("../figures/5/tts_for_asr.svg"),
     diagram(
       spacing: 5pt,
       cell-size: (4mm, 10mm),
