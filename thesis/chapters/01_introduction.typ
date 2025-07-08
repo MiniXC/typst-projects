@@ -113,13 +113,13 @@ If we compare this with speech in the real world, there is no speech without com
     "../figures/1/syntpp_figure.png",
     alt: ""
   ),
-  caption: [Visualisation of hypothesised distribution of synthetic speech compared to real speech. Some speech is completly unrealistic (artifacts), while some is over- or undersampled, or cannot be generated at all. Figure by #citep(<hu_syntpp_2022>).],
+  caption: [Visualisation of hypothesised distribution of synthetic speech compared to real speech. Some speech is completely unrealistic (artifacts), while some is over- or undersampled, or cannot be generated at all. Figure by #citep(<hu_syntpp_2022>).],
   placement: none,
 )
 
 A frequently-mentioned difficulty of matching the distributions of the real and synthetic speech is the one-to-many problem @ren_fastspeech_2019 -- one combination of speaker identity and text can have many possible realisations. The fundamental impossibility of modelling all possible realisations without having a perfect model of each speaker leads to some fundamental differences between real and synthetic speech distributions: some speech might be produced which could never be uttered by a human -- think the classic robotic sound caused by certain vocoders @hu_syntpp_2022, but these could also be more subtle and imperceptible by listeners such as is explicitly the goal for speech watermarking @nematollahi_watermarking_2013. Some speech might be more common in the synthetic data distribution than the real data distribution. And yet more speech might be present in the real distribution but not, or rarely, in the synthetic one.
 
-The goal of this work is to investigate how these distributions differ in #emph[meaningful] ways -- that is, in ways that matter to human listeners. For example, it might be interesting that a specific algorithmic metric, such as #abbr.a[MCD] between synthetic and real speech is lower for one #abbr.a[TTS] system than for another. However, if this does not positively affect a listeners perception of the speech we do not deem it meaningful for this work.
+The goal of this work is to investigate how these distributions differ in #emph[meaningful] ways -- that is, in ways that matter to human listeners. For example, it might be interesting that a specific algorithmic metric, such as #abbr.a[MCD] between synthetic and real speech is lower for one #abbr.a[TTS] system than for another. However, in this work, we only focus on such differences if they do affect listeners' perceptions of the speech.
 
 === TTS-for-ASR evaluation
 
@@ -133,15 +133,15 @@ While we find that these changes improve #abbr.a[TTS]-for-#abbr.a[ASR] performan
 
 === Text-to-speech distribution score
 
-#abbr.a[TTS]-for-#abbr.a[ASR] is computationally expensive and complex (two models have to be trained, after all) and does not offer explicit explainations as to which parts or components of the speech might be lacking. For these reasons, we move on to introduce an evaluation framework which is more efficient and can give us insight into the individual factors.
+#abbr.a[TTS]-for-#abbr.a[ASR] is computationally expensive and complex (two models have to be trained, after all) and does not offer explicit explanations as to which parts or components of the speech might be lacking. For these reasons, we move on to introduce an evaluation framework which is more efficient and can give us insight into the individual factors.
 
 Most #abbr.a[TTS] evaluation paradigms at the time of writing are paired sample-to-sample comparisons, no matter if conducting #emph[subjective] (asking people to compare) or #emph[objective] (using algorithms or models) evaluation. But if we think of speech as a distribution, this makes little sense -- when comparing two utterances, even if they contain the same content and are produced by the same speaker, they could sit at two wildly different, but equally valid, locations of the distribution space. For subjective evaluation we expect real speakers to be able to compensate for this if we ask them the right questions -- after all, they should be able to tell they are both natural. But can we expect this to be the case for objective algorithms and models?
 
 The research questions this leads us to are:
 - Is there a way to measure the differences between synthetic and real speech that captures the distributional distance?
   - Can it predict human judgement, especially for modern systems which are close to (or have reached) human parity?
-  - Can it be interpretable, such that we can point to different aspects of the speech?
-  - Can it show if synthetic speech has reached human parity, as subjective evaluation would suggest, or if it is still lacking, as #abbr.a[TTS]-for-#abbr.a[ASR] evaluation would make us believe?
+  - Can it be interpretable with respect to different aspects/factors of the speech?
+  // - Can it show if synthetic speech has reached human parity, as subjective evaluation would suggest, or if it is still lacking, as #abbr.a[TTS]-for-#abbr.a[ASR] evaluation would make us believe?
 
 To address these questions, we introduce the #abbr.l[TTSDS], which measures the distributional distances of various speech representations to arrive at individual distances for different #emph[factors] of speech as well as an overall distribution distance which correlates with human evaluation results across time and domains while also showing full human parity has only been reached in a limited set of domains and languages.
 
@@ -163,3 +163,7 @@ To address these questions, we introduce the #abbr.l[TTSDS], which measures the 
 - #cite(<minixhofer_ttsds_2024>, form: "full", style: "iso-690-numeric")
 
 - #cite(<minixhofer_ttsds2_2025>, form: "full", style: "iso-690-numeric")
+
+=== Conclusions and open questions
+
+In this work, we discuss and address the difficult problem of synthetic speech evaluation. First, we investigate how well the synthetic speech performs for the proxy task of #abbr.a[TTS]-for-#abbr.a[ASR], and find the gap is larger than expected from previously reported naturalness ratings by humans, and cannot, to the best of our knowledge, be fully explained by changes to the #abbr.a[TTS] systems. The fact listening test do not show this gap motivates us to approach this task from a distributional perspective: We introduce #abbr.a[TTSDS], a metric which approximates the actual distance between synthetic and real speech distributions. We accomplish this by utilising a number of representations related to different aspects or factors of the speech, effectively creating an ensemble of distribution distances. Our metric both outperforms all state-of-the-art metrics for #abbr.a[TTS] evaluation we compare it against and is robust across time, domains, systems and languages. However, some of our findings provide more questions than answers, especially when it comes to subjective evaluation. While traditional subjective evaluation still can detect differences between systems, they are becoming smaller and smaller. There is also the even bigger problem of only sample-wise comparisons being conducted for subjective evaluations, when we predict that soon diversity of synthetic speech, such as being able to generate many variations of the same utterance, will be valued more. While our objective evaluation methods addresses some of these issues, better subjective evaluation methods are necessary to inform us on the actual preferences and impressions of the listeners which will ultimately interact and be exposed to synthetic speech systems.
