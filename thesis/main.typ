@@ -51,7 +51,8 @@
   ("RIR", "Room Impulse Response"),
   ("VC", "Voice Conversion"),
   ("LLM", "Large Language Model"),
-  ("TTSDS", "Text-to-Speech Distribution Score")
+  ("TTSDS", "Text-to-Speech Distribution Score"),
+  ("FLAC", "Free Lossless Audio Codec")
 )
 
 // CONFIG
@@ -239,9 +240,14 @@ In light of these findings, we continue to investigate the problem from the othe
             #it.body()
           ])
        } else {
+         if it.body().text.contains("Bibliography") {
+           // pagebreak()
+         }
          [
-           #it.body()
-           
+           #it.body() 
+           #box(width: 1fr, repeat[.])
+           #text(font: "Noto Sans", size: 12pt)[#it.page()]
+           #linebreak()
          ]
        }
       } else {
@@ -249,10 +255,10 @@ In light of these findings, we continue to investigate the problem from the othe
           set text(font: "Crimson Pro", size: 15pt)
           c-page.update(it.page())
           context if c-page.get() != p-page.get() {
-            it.indented(it.prefix(), [#it.body() #h(2em) #it.page()])
+            it.indented(it.prefix(), [#it.body() #box(width: 1fr, repeat[.]) #text(font: "Noto Sans", size: 12pt)[#it.page()]])
           }
           context if c-page.get() == p-page.get() {
-            it.indented(it.prefix(), [#it.body() #h(2em)])
+            it.indented(it.prefix(), [#it.body() #h(1fr)])
           }
           p-page.update(it.page())
         }
@@ -260,10 +266,11 @@ In light of these findings, we continue to investigate the problem from the othe
           set text(font: "Crimson Pro", size: 14pt)
           c-page.update(it.page())
           context if c-page.get() != p-page.get() {
-            it.indented(it.prefix(), [#it.body() #h(2em) #it.page()])
+            it.indented(it.prefix(), [#it.body() #box(width: 1fr, repeat[.]) #text(font: "Noto Sans", size: 12pt)[#it.page()]])
           }
           context if c-page.get() == p-page.get() {
-            it.indented(it.prefix(), [#it.body() #h(2em)])
+            // it.indented(it.prefix(), [#it.body() #h(1fr)])
+            it.indented(it.prefix(), [#it.body() #box(width: 1fr, repeat[.]) #text(font: "Noto Sans", size: 12pt)[#it.page()]])
           }
           p-page.update(it.page())
         }
@@ -286,7 +293,6 @@ In light of these findings, we continue to investigate the problem from the othe
   level: 1
 ): set block(above: 1em)
 #show outline: set heading(level: 2)
-
 #outline()
 
 #show heading.where(level: 2): set heading(numbering: "1", level: 1)

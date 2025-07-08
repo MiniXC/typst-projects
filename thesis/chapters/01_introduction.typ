@@ -111,7 +111,7 @@ If we compare this with speech in the real world, there is no speech without com
 #figure(
   image(
     "../figures/1/syntpp_figure.png",
-    alt: ""
+    alt: "A line graph comparing synthetic data distribution (green curve) and true data distribution (black curve). The synthetic distribution peaks earlier than the true distribution and does not fully cover its range. The x-axis is divided into four labelled regions: 'artifacts' on the far left where only the synthetic distribution has values, 'over-sampled' where the synthetic peak is higher than the true distribution, 'under-sampled' where the true distribution peak is higher than the synthetic distribution, and 'missing samples' on the far right where only the true distribution has values."
   ),
   caption: [Visualisation of hypothesised distribution of synthetic speech compared to real speech. Some speech is completely unrealistic (artifacts), while some is over- or undersampled, or cannot be generated at all. Figure by #citep(<hu_syntpp_2022>).],
   placement: none,
