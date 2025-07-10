@@ -1,0 +1,4 @@
+#let Syn = $attach(S, t: tilde, tr:"")$
+#let syn = $attach(s, t: tilde, tr:"")$
+#let stheta = $attach(theta, t: tilde, tr:"")$
+#let swer = $attach("WER", t: tilde, tr:"")$

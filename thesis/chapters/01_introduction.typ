@@ -1,5 +1,6 @@
 #import "../abbr.typ" 
 #import "../quote.typ": *
+#import "../math.typ": *
 #import "@preview/fletcher:0.5.7" as fletcher: diagram, node, edge
 #import fletcher.shapes: house, hexagon
 #let blob(pos, label, tint: white, width: 26mm, ..args) = node(
@@ -35,16 +36,24 @@ In #link(<part_02>, [Part III]) our main contributions are:
 
 === Notation
 
-#let Syn = $attach(S, t: tilde, tr:"")$
-#let syn = $attach(s, t: tilde, tr:"")$
-#let stheta = $attach(theta, t: tilde, tr:"")$
-#let swer = $attach("WER", t: tilde, tr:"")$
-
 In machine learning, it is convention to denote $X$ as model input and $Y$ as model output, with a model $f$ with parameters $theta$ predicting $Y$ using $X$, such that $Y=f_theta (X)$. However, with speech synthesis and recognition in the same context, this can be ambiguous, as $X$ and $Y$ can either represent speech signals or transcripts. To maintain clarity throughout this work, we will denote speech signals as $𝑆$ and transcripts as $𝑇$. 
 
 When both synthetic and real data are addressed in the same context, we use $tilde$ to denote the synthetic counterpart, for example $Syn$ for a set of speech signals or $stheta$ for #abbr.a[ASR] model parameters derived from synthetic speech.
 
-Whenever we use more than just text transcripts ($T$) to condition speech generation with, we group all secondary conditioning sets into $cal(C)$. These input sets' notation is based on their modality. Embedding-based ones are denoted as $E_dots$ (e.g. $E_"SPK"$ for speaker embeddings), audio-based as $A_dots$ (e.g. $A_"REF"$ for reference speech in lieu of speaker embeddings) textual ones as $T_dots$ (e.g. textual "style prompts" in ParlerTTS by #citea(<lyth_parler_2024>) are $T_"PRM"$) and numerical ones as $F_dots$ (e.g. $F_"F0"$ for pitch).
+==== Representations as transformations
+
+We consider the raw audio waveform as the fundamental representation of a speech signal $S$ -- these can have different fidelity, in the form of sampling rate and bit depth. All other representations are derived by applying a transformation function, denoted as $cal(R)$, to this waveform. These transformations are categorized by the nature and purpose of the resulting representation.
+
+
+*Invertible Transformations:* These are lossless transformations where the original waveform can be perfectly reconstructed, i.e., $cal(R)^(-1)(cal(R)(S)) = S$. An example is the Short-Time Fourier Transform (#abbr.a[STFT]), which retains both magnitude and phase, allowing for perfect reconstruction via the inverse #abbr.a[STFT].
+
+*Reconstructible Transformations:* These transformations are intentionally lossy but are designed to retain sufficient information for a high-fidelity, perceptually similar waveform to be synthesized. The inverse operation is an approximation, often performed by a dedicated model or algorithm $f_theta$ (e.g., a vocoder or decoder), such that $f_theta (cal(R)(S)) = Syn$. Note the resulting speech is now classed as synthetic, since it is not reconstructed perfectly and subject to change based on the model or algorithm used. Examples of such transformations are Mel spectrograms or autoencoder-based audio codecs @defossez_encodec_2023@kumar_dac_2023.
+
+*Reductive Transformations:* These transformations distill specific attributes from the signal into a representation that is not intended for direct audio reconstruction. The output can range from a time-series of vectors to a single scalar value. This could be a series of embeddings extracted from a #abbr.a[SSL] model, a single speaker embedding, the detected pitch over time or even written description of the audio by a human.
+
+==== Conditioning
+
+Whenever we use more than just text transcripts ($T$) to condition speech generation with, we group all secondary conditioning sets into $cal(C)$. They are usually reductive transformations of the signal as outlined above. We denote embedding-based ones as $E_dots$ (e.g. $E_"SPK"$ for speaker embeddings), audio-based as $A_dots$ (e.g. $A_"REF"$ for reference speech in lieu of speaker embeddings) textual ones as $T_dots$ (e.g. textual "style prompts" in ParlerTTS by #citea(<lyth_parler_2024>) are $T_"PRM"$) and numerical ones as $F_dots$ (e.g. $F_"F0"$ for pitch).
 
 
 === Text-to-speech

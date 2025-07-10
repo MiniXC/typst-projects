@@ -52,7 +52,10 @@
   ("VC", "Voice Conversion"),
   ("LLM", "Large Language Model"),
   ("TTSDS", "Text-to-Speech Distribution Score"),
-  ("FLAC", "Free Lossless Audio Codec")
+  ("FLAC", "Free Lossless Audio Codec"),
+  ("MPM", "Masked Prosody Model"),
+  ("CWT", "Continous Wavelet Transform"),
+  ("STFT", "Short-time Fourier transform")
 )
 
 // CONFIG
@@ -203,7 +206,7 @@
 #set page(numbering: "i", number-align: center)
 #counter(page).update(1)
 
-#set text(top-edge: if review {1em} else {"cap-height"}, bottom-edge: if review {-.8em} else {"baseline"})
+#set text(top-edge: if review {1em} else {"cap-height"}, bottom-edge: if review {-.8em} else {-.2em})
 
 // Abstract
 #frontmatter-heading([Abstract])
@@ -302,7 +305,7 @@ In light of these findings, we continue to investigate the problem from the othe
 #set page(numbering: "1", number-align: center)
 #context counter(page).update(1)
 
-#set text(top-edge: if review {1em} else {"cap-height"}, bottom-edge: if review {-.8em} else {"baseline"})
+#set text(top-edge: if review {1em} else {"cap-height"}, bottom-edge: if review {-.8em} else {-.25em})
 
 #include "chapters/01_introduction.typ"
 
@@ -388,6 +391,8 @@ Since our work in TTS-for-ASR suggested a large discrepancy between expected and
   ),
   style: "american-anthropological-association"
 )
+
+#set text(top-edge: if review {1em} else {"cap-height"}, bottom-edge: if review {-.8em} else {"baseline"})
 
 = Appendix
 
