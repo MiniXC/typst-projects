@@ -3,11 +3,11 @@
 
 == Scaling properties for TTS-for-ASR <07_scaling>
 
-// #q(
-//   [#citep(<sutton_bitter_2019>)],
-//   [#emph[The Bitter Lesson]],
-//   [The biggest lesson that can be read from 70 years of AI research is that general methods that leverage computation are ultimately the most effective, and by a large margin.]
-// )
+#q(
+  [#citep(<sutton_bitter_2019>)],
+  [#emph[The Bitter Lesson]],
+  [The biggest lesson that can be read from 70 years of AI research is that general methods that leverage computation are ultimately the most effective, and by a large margin.]
+)
 
 
 The performance of deep learning models has been shown to improve predictably with scale. This phenomenon, formalized as *neural scaling laws*, describes a power-law relationship between a model's performance and factors such as the number of model parameters, the amount of compute, and, most crucially for this work, the size of the training dataset @kaplan_scaling_2020@bahri_scaling_2024. These laws have been empirically verified across numerous domains, including natural language processing @kaplan_scaling_2020, computer vision @fan_images_2024, and spoken language modeling @cuervo_language_2024.

@@ -14,12 +14,6 @@
 
 == Text-to-Speech <03_tts>
 
-#q(
-  [#citep(<sutton_bitter_2019>)],
-  [#emph[The Bitter Lesson]],
-  [The biggest lesson that can be read from 70 years of AI research is that general methods that leverage computation are ultimately the most effective, and by a large margin.]
-)
-
 As outlined in @01_intro[Chapter], we constrain this work to multi-speaker voice-cloning #abbr.a[TTS], in which there are two inputs; a speaker representation derived from a reference recording, which is most commonly a speaker embedding (see @02_speaker), but could also be a Mel Spectrogram or any other representation containing information about the given speaker @eskimez_e2_2024, like a text prompt describing their characteristics @lyth_parler_2024. Mapping these inputs to an acoustic realisation is a complex "one-to-many" problem @ren_revisiting_2022@blumstein_phonetic_1981.
 
 === History of TTS
