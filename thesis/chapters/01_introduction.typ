@@ -22,7 +22,7 @@
   be made.]
 )
 
-Substantial progress has been made in #abbr.a[TTS] -- it is now often impossible to tell if a computer or human is talking to listeners -- at the outset of our research, this was not necessarily the case, but since then, several works have claimed to reach parity with real speech @tan_naturalspeech_2024@chen_vall-e_2024@eskimez_e2_2024. The main lens we view synthetic speech as in this work is as a distribution -- and the way human parity is defined by previous work is devoid of that concept. This, in our opinion, incomplete definition might lead to speech that on an individual, utterance-by-utterance level is on par with real speech, but fails to capture the breadth and diversity present in reality. 
+Since the leading quote by Taylor, substantial progress has been made in #abbr.a[TTS] -- it is now often impossible to tell if a computer or human is talking to listeners -- at the outset of our research, this was not necessarily the case, but since then, several works have claimed to reach parity with real speech @tan_naturalspeech_2024@chen_vall-e_2024@eskimez_e2_2024. The main lens we view synthetic speech as in this work is as a distribution -- and the way human parity is defined by previous work is devoid of that concept. This, in our opinion, incomplete definition might lead to speech that on an individual, utterance-by-utterance level is on par with real speech, but fails to capture the breadth and diversity present in reality. 
 
 #link(<part_01>, [Part I]) introduces background information necessary for this work, in the form of speech representations (@02_factors), #abbr.a[TTS] (@03_tts) and #abbr.a[ASR] (@04_asr).
 
@@ -93,7 +93,7 @@ Whenever we use more than just text transcripts ($T$) to condition speech genera
     edge((2,2), (2,1), "-|>"),
     node((2,1), $Syn$)
   ),
-  placement: none,
+  placement: top,
   caption: "Text-to-Speech (TTS) inputs and output.",
 ) <fig_tts>
 
@@ -123,7 +123,7 @@ If we compare this with speech in the real world, there is no speech without com
     alt: "A line graph comparing synthetic data distribution (green curve) and true data distribution (black curve). The synthetic distribution peaks earlier than the true distribution and does not fully cover its range. The x-axis is divided into four labelled regions: 'artifacts' on the far left where only the synthetic distribution has values, 'over-sampled' where the synthetic peak is higher than the true distribution, 'under-sampled' where the true distribution peak is higher than the synthetic distribution, and 'missing samples' on the far right where only the true distribution has values."
   ),
   caption: [Visualisation of hypothesised distribution of synthetic speech compared to real speech. Some speech is completely unrealistic (artifacts), while some is over- or undersampled, or cannot be generated at all. Figure by #citep(<hu_syntpp_2022>).],
-  placement: none,
+  placement: top,
 )
 
 A frequently-mentioned difficulty of matching the distributions of the real and synthetic speech is the one-to-many problem @ren_fastspeech_2019 -- one combination of speaker identity and text can have many possible realisations. The fundamental impossibility of modelling all possible realisations without having a perfect model of each speaker leads to some fundamental differences between real and synthetic speech distributions: some speech might be produced which could never be uttered by a human -- think the classic robotic sound caused by certain vocoders @hu_syntpp_2022, but these could also be more subtle and imperceptible by listeners such as is explicitly the goal for speech watermarking @nematollahi_watermarking_2013. Some speech might be more common in the synthetic data distribution than the real data distribution. And yet more speech might be present in the real distribution but not, or rarely, in the synthetic one.

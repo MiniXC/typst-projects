@@ -15,7 +15,7 @@ computer vision problem with a neural network, synthetic data appeared.]
 Using synthetic data for training has been around almost as long real training data -- its first recorded use was for training the self-driving neural network behind ALVINN in 1988, for which the authors "developed a simulated road generator which creates road images to be used as training exemplars for the network" since "changes in parameters such as
 camera orientation would require collecting an entirely new set of road images" @pomerleau_alvinn_1988. 
 
-The motivation behind using #abbr.a[TTS]-generated data for ASR in today's very different deep-learning landscape is similar -- if some parameters change it could be more efficient to generate said data, rather than go out and collect it. Instead of camera orientation, for ASR, these parameters could be speaker identity @du_speaker_2020@casanova_singlespeaker_2022, lexical content @rosenberg_speechaug_2019@fazelSynthASRUnlockingSynthetic2021 or even duration of the phones in the speech @rossenbach_duration_2023. The usual approach is to use real and synthetic data in conjunction (since it is rare that no real data is available) to gain a small improvement @li_synthaug_2018. When augmenting an existing real dataset in this way, a crucial consideration is the ratio of real to synthetic data. Several works have found a 50:50 split to be an effective and robust choice @li_synthaug_2018 @rosenberg_speechaug_2019 @wang_improving_2020. However, this is not a fixed rule; when the synthetic speech offers significantly increased style diversity, for example through a #abbr.a[VAE], a much smaller proportion of real data can be effective. For instance, @sun_generating_2020 demonstrated a 16% relative WER improvement with a split of only 9% real data to 91% synthetic data.
+The motivation behind using #abbr.a[TTS]-generated data for ASR in today's very different deep-learning landscape is similar -- if some parameters change it could be more efficient to generate said data, rather than go out and collect it. Instead of camera orientation, for ASR, these parameters could be speaker identity @du_speaker_2020@casanova_singlespeaker_2022, lexical content @rosenberg_speechaug_2019@fazel_synthasr_2021 or even duration of the phones in the speech @rossenbach_duration_2023. The usual approach is to use real and synthetic data in conjunction (since it is rare that no real data is available) to gain a small improvement @li_synthaug_2018. When augmenting an existing real dataset in this way, a crucial consideration is the ratio of real to synthetic data. Several works have found a 50:50 split to be an effective and robust choice @li_synthaug_2018 @rosenberg_speechaug_2019 @wang_improving_2020. However, this is not a fixed rule; when the synthetic speech offers significantly increased style diversity, for example through a #abbr.a[VAE], a much smaller proportion of real data can be effective. For instance, @sun_generating_2020 demonstrated a 16% relative WER improvement with a split of only 9% real data to 91% synthetic data.
 
 The data most commonly used for TTS-for-ASR is read audiobook speech, such as LibriSpeech @panayotov_librispeech_2015 and LibriTTS @zen_libritts_2019.
 
@@ -30,22 +30,29 @@ The data most commonly used for TTS-for-ASR is read audiobook speech, such as Li
       cell-size: (4mm, 10mm),
   
       // legend
-      node((0,1.5), align(left)[1 #sym.arrow @li_synthaug_2018], width: 100mm),
-      node((0,2), align(left)[2 #sym.arrow @rosenberg_speechaug_2019], width: 100mm),
-      node((0,2.5), align(left)[3 #sym.arrow @rossenbach_synthattention_2020], width: 100mm), 
-      node((0,3), align(left)[4 #sym.arrow @casanova_singlespeaker_2022], width: 100mm),
-      node((0,3.5), align(left)[5 #sym.arrow @hu_syntpp_2022], width: 100mm), 
-      node((0,4), align(left)[6 #sym.arrow @karakasidis_multiaccent_2023], width: 100mm), 
-      node((0,4.5), align(left)[7 #sym.arrow @rossenbach_duration_2023], width: 100mm), 
-      node((0,5), align(left)[8 #sym.arrow @yuen_adaptation_2023], width: 100mm),
-      node((0,5.5), align(left)[9 #sym.arrow @rossenbach_model_2024], width: 100mm),
+      node((0,1.5), align(left)[1 #sym.arrow #citep(<li_synthaug_2018>)], width: 100mm),
+      node((0,2), align(left)[2 #sym.arrow #citep(<rosenberg_speechaug_2019>)], width: 100mm),
+      node((0,2.5), align(left)[3 #sym.arrow #citep(<rossenbach_synthattention_2020>)], width: 100mm), 
+      node((0,3), align(left)[4 #sym.arrow #citep(<casanova_singlespeaker_2022>)], width: 100mm),
+      node((0,3.5), align(left)[5 #sym.arrow #citep(<hu_syntpp_2022>)], width: 100mm), 
+      node((0,4), align(left)[6 #sym.arrow #citep(<karakasidis_multiaccent_2023>)], width: 100mm), 
+      node((0,4.5), align(left)[7 #sym.arrow #citep(<rossenbach_duration_2023>)], width: 100mm), 
+      node((0,5), align(left)[8 #sym.arrow #citep(<yuen_adaptation_2023>)], width: 100mm),
+      node((0,5.5), align(left)[9 #sym.arrow #citep(<rossenbach_model_2024>)], width: 100mm),
       node((0,6),[],width: 100mm),
     )
   ),
+  placement: top,
   caption: "TTS-for-ASR performance in terms of WERR over time.",
 ) <fig_werr>
 
-=== Methods for synthetic data diversity
+=== For lexical diversity
+
+One of the primary applications of TTS-for-ASR is to expand the lexical coverage of the training data. This is particularly useful for lexical domain transfer, where an ASR system needs to be adapted to a new domain with a specialized vocabulary for which little to no paired audio data exists. For example, @fazel_synthasr_2021 demonstrated successfully transferring a general-purpose ASR system to the medical domain by synthesizing speech for medical transcripts.
+
+To generate lexically diverse content, some approaches employ separate language models to generate novel text prompts for the TTS system, often with diversity constraints to avoid repetition @huang_personalized_2020. Another technique involves starting with a massive text dataset and applying filtering methods, such as contrastive selection, to curate a high-quality subset of sentences for synthesis @chen_textselection_2020.
+
+=== For speech diversity
 
 A variety of techniques have been developed to generate synthetic speech that is not just natural-sounding, but also diverse and robust enough for ASR training.
 
@@ -61,4 +68,3 @@ However, a more fundamental question is how well synthetic speech can be used to
 As can be seen in @fig_werr, this is not the case, with #abbr.pla[WERR], defined as the ratio between #abbr.pla[WER] when training on synthetic compared to real speech, tending towards $2$ rather than $1$ as would be expected if they were truly equivalent -- even with the methods outline in  To illustrate this, we can compute the ratio of Mean Opinion Scores (MOS) as well. Using this measure, Tacotron 2 @shen_natural_2018, which was published a year prior to the earliest system in @fig_werr, achieves a subjective score ratio of $approx 1.02$, still $0.65$ lower than the best reported TTS-for-ASR systems' #abbr.a[WERR].
  
 This observation sets up much of the exploration in #link(<part_01>, [Part I]) of this work. Somehow, listeners seem to give favorable ratings to synthetic speech which consistently produces close to #emph[$2$ times] the #abbr.a[WER] of real speech. What is missing in the speech that explains this gap? We seek to answer this question in the following Chapters.
-

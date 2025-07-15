@@ -23,9 +23,9 @@
 In speech technology, the acoustic signals which make up speech, denoted as $S$, are represented in a number of different ways. Due to the continuous, large, and highly redundant nature of the raw waveform of $S$, various representations $cal(R)(S)$ have been used from the onset. These include reconstructible transformations like Mel spectrograms and reductive ones like #abbr.pla[MFCC], both to more closely align with human perception and to compress the signal @flanagan_speech_1971. Since then, representations at #emph[several levels of description] have been introduced -- often aiming to encode a particular aspect of speech. In this chapter, we discuss these representations and how they relate to human perception, as well as our own contribution of a self-supervised prosodic representation model.
 
 #figure(
-  scale(x: 87%, y: 87%)[
+  scale(x: 85%, y: 85%)[
   #diagram(
-    spacing: 5pt,
+    spacing: 7pt,
     cell-size: (8mm, 10mm),
     edge-stroke: 1pt,
     edge-corner-radius: 5pt,
@@ -118,7 +118,7 @@ In speech technology, the acoustic signals which make up speech, denoted as $S$,
       #sym.dots
     ]),
   )],
-  placement: none,
+  placement: top,
   caption: "Overview of representations of speech",
 ) <representations>
 

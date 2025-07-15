@@ -14,15 +14,6 @@ As we have established throughout this work, it is useful to think of speech as 
 
 === Audio & speech distributions
 
-#figure(
-  image(
-    "../figures/9/xvector.svg",
-    alt: "Three 3D surface plots showing kernel density estimates of X-Vector speaker embeddings projected into 2D PCA space. The first plot, labeled 'Ground Truth,' shows two distinct high-density peaks. The second plot, labeled 'Synthetic,' has a similar distribution with slightly smoother peaks. The third plot, labeled 'Noise,' shows a single narrow peak, which is approximately 5 times higher than the peaks in the other figures."
-  ),
-  caption: [#abbr.pls[KDE] of X-Vector speaker representations projected into a 2-dimensional #abbr.s[PCA] space, shown for (left to right) ground truth, synthetic, and noise data. The density is normalized and scaled by $times 10^(-5)$.],
-  placement: none,
-)
-
 If we think of the set of all possible speech recordings with some specific constraints, the difficulty of matching the real speech distribution becomes clear. Even if we constrain utterances to never exceed 60 seconds, and allow each data point within an utterance to only be one of $2^16$ values (referred to as a bit depth of 16) and set the sampling rate to 16kHz, this results in $16,000*60=960,000$ values per recording. The resulting number of possible recordings is hard to fathom: $2^(16 times 960,000)$ -- however, to human listeners, the vast majority of these recordings would sound like meaningless noise.
 
 // Of course, the number of possible sentences, even in English alone, is similarly large: If we assume vocabulary of 100,000 unique words, which cannot be formed by combining two or more words, if we assume a maximum number of $256$ words per sentence, we arrive at $2^(8*100,000)$ -- although again, just as with recordings, the majority of these combinations would not be perceived as well-formed sentences by most humans.
@@ -30,6 +21,15 @@ If we think of the set of all possible speech recordings with some specific cons
 When creating a system capable of producing synthetic speech, we should aim to model the real speech distribution "hidden" within this impossibly large possible recording space -- however, if we knew said distribution, we would not need to model it in the first place. We therefore usually settle for estimating the distribution from data, and verify our models learned something approximating the real distribution by asking listeners to quantify their subjective perceptions as outlined in @08_eval[Chapter]. However, we can also quantify how closely the synthetic distribution resembles the real distribution as outlined in the remainder of this Chapter.
 
 === Earth movers distance
+
+#figure(
+  image(
+    "../figures/9/xvector.svg",
+    alt: "Three 3D surface plots showing kernel density estimates of X-Vector speaker embeddings projected into 2D PCA space. The first plot, labeled 'Ground Truth,' shows two distinct high-density peaks. The second plot, labeled 'Synthetic,' has a similar distribution with slightly smoother peaks. The third plot, labeled 'Noise,' shows a single narrow peak, which is approximately 5 times higher than the peaks in the other figures."
+  ),
+  caption: [#abbr.pls[KDE] of X-Vector speaker representations projected into a 2-dimensional #abbr.s[PCA] space, shown for (left to right) ground truth, synthetic, and noise data. The density is normalized and scaled by $times 10^(-5)$.],
+  placement: top,
+)
 
 An inuitive way to measure the distance between two distributions is the #abbr.a[EMD], named and first introduced for the purpose of determining perceptual similarity for image retrieval by @rubner_earth_2000 and is derived from the Wasserstein distance @vaserstein_markov_1969 which in turn makes use of the Kantorovich–Rubinstein metric @kantorovich_planning_1939. Its motivation is explained as follows:
 

@@ -7,7 +7,7 @@
 
 #set quote(block: true)
 #set cite(style: "american-anthropological-association")
-
+#set math.equation(numbering: "(1)")
 
 #abbr.make(
   ("KDE", "Kernel Density Estimation", "Kernel Density Estimates"),
@@ -55,7 +55,13 @@
   ("FLAC", "Free Lossless Audio Codec"),
   ("MPM", "Masked Prosody Model"),
   ("CWT", "Continous Wavelet Transform"),
-  ("STFT", "Short-time Fourier transform")
+  ("STFT", "Short-time Fourier transform"),
+  ("NLL", "Negative log-liklihood"),
+  ("SLM", "Speech Language Model"),
+  ("GMM", "Gaussian Mixture Model"),
+  ("JSD", "Jensen-Shannon Divergence"),
+  ("MWERR", "Mean Word Error Rate Ratio"),
+  ("TDNN", "Time-delay Neural Network")
 )
 
 // CONFIG
