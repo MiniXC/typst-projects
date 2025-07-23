@@ -7,7 +7,9 @@
 
 #set quote(block: true)
 #set cite(style: "american-anthropological-association")
-#set math.equation(numbering: "(1)")
+#show heading: counter(math.equation).update(0)
+#set math.equation(numbering: num =>
+  "(" + (counter(heading).get() + (num,)).map(str).join(".") + ")")
 
 #abbr.make(
   ("KDE", "Kernel Density Estimation", "Kernel Density Estimates"),

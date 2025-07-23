@@ -1,10 +1,11 @@
 #let space-default = sym.space.nobreak.narrow
-#let style-default(short) = {
-	let val = if text.weight <= "medium" { 15% } else { 30% }
-	set text(fill: black.lighten(val))
-	show: strong
-	short
-}
+// #let style-default(short) = {
+// 	let val = if text.weight <= "medium" { 15% } else { 30% }
+// 	set text(fill: black.lighten(val))
+// 	show: strong
+// 	short
+// }
+#let style-default(short) = {short}
 
 #let abbr = state("abbr", (:))
 #let abbr-first = state("abbr-first", ())
@@ -28,7 +29,7 @@
 	return (key, entry)
 }
 
-#let warn(short) = [*(?? #short ??)*]
+#let warn(short) = [(?? #short ??)]
 
 #let mark-first(key) = {
 	if not key in abbr-first.get() { return }
