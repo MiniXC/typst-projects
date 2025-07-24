@@ -23,24 +23,33 @@
   be made.]
 )
 
-Synthetic speech is any speech that is artificially generated, without the use of a human's vocal tract. It has been used in assistive technology, entertainment, and education for decades @taylor_tts_2009. The most common paradigm is #abbr.l[TTS], the goal of which is to automatically convert a sequence of text into a natural-sounding utterance. Formally, let $cal(T)$ be the space of all text sequences and $cal(S)$ be the space of all utterances. The objective of TTS is to model the true conditional probability distribution $P(s|t)$ for any given pair $(t, s)$ where $t in cal(T)$ and $s in cal(S)$. This is achieved by training a generative model $f$, parameterized by $theta$, on a pairs $(t,s)$ sampled from this true distribution. The model is thereby optimized to learn an approximation of this distribution $P_theta$ which can then be used to sample a synthetic utterance $makesyn(s)$ from an arbitrary input text $makesyn(t)$:
+Synthetic speech is any speech that is artificially generated, without the use of a human's vocal tract. It has been used in assistive technology, entertainment, and education for decades @taylor_tts_2009. The most common paradigm is #abbr.l[TTS], the goal of which is to automatically convert a sequence of text into a natural-sounding utterance. Formally, let $cal(T)$ be the space of all text sequences and $cal(S)$ be the space of all utterances. The objective of TTS is to model the true conditional probability distribution $P(s|t)$ for any given pair $(t, s)$ where $t in cal(T)$ and $s in cal(S)$. This is achieved by training a generative model $f$, parameterized by $theta$, on a pairs $(t,s)$ sampled from this true distribution. The model is thereby optimized to learn an approximation of this distribution $P_theta$ which can then be used to sample a synthetic utterance $tilde(s)$ from an arbitrary input text $tilde(t)$:
 
 $
-makesyn(s) ~ P_theta (s|makesyn(t))
+tilde(s) ~ P_theta (s|tilde(t))
+$ <tts_formula>
+
+While @tts_formula is the simplest case of #abbr.a[TTS], $tilde(t)$ is usually not the only variable $s$ is conditioned on. These are derived by applying a reductive transformation function $r(s)$ from the the space of all such transforms $cal(R)$. Since the function is reductive, neither $s$ nor $t$ can be reconstructed from the representation -- however, they should hold salient, yet abstracted, information of the speech.
+
+$
+tilde(s) ~ P_theta (s | tilde(t), z) " where " z = r(s) " for some " r in cal(R)
 $
 
-Conversely, the goal of #abbr.l[ASR] is to automatically transcribe a speech utterance into its corresponding text sequence. Therefore, the objective of ASR is to model the conditional probability distribution $P(t|s)$
+The most comm on example of $z$ is the identity of the speaker in form of a learned vector, simple numeral or reference utterance, in which case we refer to voice-cloning TTS. However, TTS can be conditioned on any number and kinds of $z$.
+
+Evaluation of how well the real distribution is modeled is usually done by synthesising a number of utterances from a test set such that for each $(tilde(s),tilde(t))$ pair there is a matching $(s,t)$ -- then human judges are asked to rate both synthetic and real speech (without knowing which is which), based on attributes such as #emph[naturalness] or #emph[quality]. Recent works have confirmded that #citea(<taylor_tts_2009>)'s leading quote from 2009 does no longer apply, with synthetic utterances now often receiving ratings statistically inseparable from real ones @chen_vall-e_2024@tan_naturalspeech_2024@eskimez_e2_2024.
+The inverse of #abbr.a[TTS], is #abbr.l[ASR], which aims to automatically transcribe a speech utterance into its corresponding text sequence. Therefore, the objective of ASR is to model the conditional probability distribution $P(t|s)$
 This is typically framed as a prediction task, where a model $f^"ASR"$ with parameters $Phi$ is trained on $(t,s)$ pairs to learn an approximation of this distribution. This model can then be used to infer the most probable text sequence $hat(t)$ for a given input utterance $hat(s)$:
 
 $ hat(t) = argmax_(t in cal(T)) P_Phi (t|hat(s)) $
 
-Since augmenting datasets is a tried-and-tested way to improve robustness and performance, and synthetic data is easier to aquire and label than real data @pomerleau_alvinn_1988, advances in #abbr.a[TTS] inspired a number of works to use synthetic data for training #abbr.l[ASR] systems @li_synthaug_2018@rosenberg_speechaug_2019@thai_lrasr_2019, which we refer to as TTS-for-ASR.
+Since augmenting datasets is a tried-and-tested way to improve robustness and performance, and synthetic data is easier to acquire and label than real data @pomerleau_alvinn_1988, the high ratings of #abbr.a[TTS]-generated speech inspired a number of works to use synthetic data for training #abbr.l[ASR] systems @li_synthaug_2018@rosenberg_speechaug_2019@thai_lrasr_2019, which we refer to as TTS-for-ASR.
+In this work, we first continue this line of TTS-for-ASR research, and, in line with prior works @li_synthaug_2018@hu_syntpp_2022@rossenbach_duration_2023 find that the aforementioned high human ratings do not directly translate to suitability for #abbr.a[ASR] training. Instead of being within a few percentage points of the real speech as in human evaluation @wang_tacotron_2017 real speech usually outperforms synthetic by a factor of 2 or more for #abbr.a[ASR] training @casanova_singlespeaker_2022.
+We make explaining this gap in performance our objective for this thesis.
 
-// deep dive into TTS-for-ASR
+=== Contributions
 
-Additionally, #citea(<taylor_tts_2009>)'s leading quote from 2009 does not apply any longer, with synthetic utterances are now often being indistinguishable from real ones @chen_vall-e_2024@tan_naturalspeech_2024@eskimez_e2_2024 -- indicating $P_theta$ being more representative of the real distribution than ever, making it more salient for ASR training.
 
-In this work, we first continue the line of TTS-for-ASR research,
 
 // TTS-for-ASR improvements to close the gap
 
