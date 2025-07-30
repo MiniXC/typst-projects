@@ -27,7 +27,7 @@ While synthetic data is frequently used to augment real datasets, the primary pe
 
 === Augmenting Real Data
 
-Synthetic data often serves to enhance existing real datasets, introducing targeted diversity that can improve ASR robustness. Before delving into specifics, it's worth noting why this augmentation is effective: real speech datasets, while authentic, may lack coverage in areas like rare vocabularies or speaking styles. TTS can fill these voids by generating tailored samples, but the key lies in balancing the mix to avoid diluting the realism of the original data.
+Synthetic data often serves to enhance existing real datasets, introducing targeted diversity that can improve ASR robustness. Augmentation is this effective due to real speech datasets, while authentic, potentially lacking coverage in areas like rare vocabularies or speaking styles. TTS can fill these voids by generating tailored samples, but the key lies in balancing the mix to avoid diluting the original data and skewing the distribution.
 
 A common strategy is to supplement a real dataset $S$ with synthetic speech $tilde(S)$, particularly for lexical adaptation. For instance, synthesizing speech from out-of-domain transcripts $T$ allows ASR models to adapt to specialized vocabularies, as explored in works adapting to medical terminology @fazel_synthasr_2021.
 
@@ -43,9 +43,9 @@ Our findings, echoed in prior work, show this parity is elusive. The Word Error 
 
 === What is Synthetic Speech Missing?
 
-The observed performance gap stems from synthetic speech's narrower distribution, often lacking the prosodic, speaker, and environmental variability of real speech. Before exploring solutions, an overview of key methods reveals a progression from unsupervised latent capture to targeted control and post-hoc simulation.
+The observed performance gap stems from synthetic speech's narrower distribution, often lacking the prosodic, speaker, and environmental variability of real speech.
 
-A primary approach introduces variation through latent variables, learning styles independent of text. Global Style Tokens (GST) discretize styles via attention-weighted embeddings @wang_style_2018, while Variational Autoencoders (VAE) model continuous distributions for sampling novel variations @kingma_auto-encoding_2013, proving effective for TTS-for-ASR @sun_generating_2020.
+A common approach introduces variation through latent variables, learning styles independent of text. Global Style Tokens (GST) discretise styles via attention-weighted embeddings @wang_style_2018, while Variational Autoencoders (VAE) model continuous distributions for sampling novel variations @kingma_auto-encoding_2013, proving effective for TTS-for-ASR @sun_generating_2020.
 
 More direct control comes from explicit conditioning on measurable attributes (e.g., pitch, energy), often via variance adapters in non-autoregressive models @ren_fastspeech_2019. Post-generation augmentation simulates real-world conditions by adding noise or reverberation @rossenbach_synthattention_2020. These complementary techniques—latent, explicit, and augmentative—aim to close the gap, but their efficacy requires objective evaluation, as detailed next.
 
@@ -59,7 +59,7 @@ $ <eq_werr>
 
 Here, $Theta(S,T)$ denotes ASR weights trained on speech $S$ and transcripts $T$; seen/unseen splits ensure fair comparison. A WERR of 1 indicates synthetic equivalence; values >1 reveal gaps. While ASR language models (LMs) can influence WER, our hybrid HMM-TDNN setup minimizes this by emphasizing acoustic modeling with minimal LM interference.
 
-#comic.comic((80mm, 40mm), "Comic explaining WERR calculation with real/synthetic splits", green) <fig_werr_calc>
+#comic.comic((80mm, 40mm), "WERR calculation with real/synthetic splits", green) <fig_werr_calc>
 
 === WERR as Distance Metric
 
@@ -85,7 +85,5 @@ caption: "Results when training on synthetic and evaluating on real and vice ver
 ) <tab_cross_ttsasr>
 
 However, MWERR lacks the triangle inequality, as WER emerges from non-linear optimization, not direct distribution comparison. Augmentation experiments further highlight limitations: Techniques like SpecAugment improve ASR but distort distributions away from real speech @park_specaugment_2019. Thus, MWERR is a task-specific heuristic for dissimilarity, not a true metric.
-
-#comic.comic((80mm, 40mm), "Comic illustrating MWERR symmetry with real/synthetic swaps", blue) <fig_mwerr_symmetry>
 
 Having quantified the gap via WERR, we now empirically test methods to enhance synthetic diversity in the next chapter.

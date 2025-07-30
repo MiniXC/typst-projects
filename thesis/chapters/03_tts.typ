@@ -18,7 +18,7 @@ As outlined in @01_intro[Chapter], we constrain this work to multi-speaker voice
 
 === History of TTS
 
-The evolution of TTS reflects advancements in signal processing, machine learning, and deep learning. Early systems relied on rule-based or concatenative methods, progressing to statistical parametric approaches, and finally to neural-based models. For a detailed historical survey, see #citep(<tan_survey_2021>).
+The evolution of TTS reflects advancements in signal processing, machine learning, and deep learning. Early systems relied on rule-based or concatenative methods, statistical parametric approaches, as well as neural-based models. For a detailed historical survey, see #citep(<tan_survey_2021>).
 
 Before the compute and data resources for #abbr.a[DNN]-based methods were available, three main approaches were used for #abbr.a[TTS].
 
@@ -30,7 +30,7 @@ Before the compute and data resources for #abbr.a[DNN]-based methods were availa
 
 *Hybrid models* represented the state-of-the-art prior to the deep learning revolution by combining the strengths of both approaches @ling_hybrid_2007. In a typical hybrid system, an #abbr.a[HMM]-based model would first generate the target acoustic parameter trajectories, providing flexible and natural prosody. Then, a unit selection component would search the database for waveform units that best matched these #abbr.a[HMM]-generated targets, rather than targets derived from simpler rules. This allowed for the high segmental quality of concatenative synthesis while leveraging the superior prosodic modelling of statistical methods.
 
-#comic.comic((150mm, 80mm), "Comic timeline showing evolution from concatenative (pre-recorded units pieced together) to statistical parametric (parameter trajectories) to hybrid systems", blue) <fig_tts_history>
+#comic.comic((150mm, 80mm), "timeline showing evolution of tts over time", blue) <fig_tts_history>
 
 === TTS Frontends
 
@@ -50,9 +50,9 @@ Beyond text-conditioned synthesis, unconditional generation models produce speec
 
 Seeing #abbr.a[TTS] as a *hierarchical pipeline* breaks the problem into a series of steps and representations, moving from the utterance-level information such as speaker @stanton_speaker_2022 and lexical content, to phone level, frame level (i.e. mel spectrogram or MFCC frames) to sample level. The precise levels might differ in their definition and purpose between systems, but generally there is a gradual transformation from lower- to higher-resolution representations, ending in the raw waveform. The individual transformations might be accomplished using #abbr.pla[DNN], other learned modules or rule-based systems.
 
-The second paradigm is the #abbr.a[E2E] approach in which a #abbr.a[DNN] directly predicts the output from the input. In many other domains, this approach has lead to consistently better results, however, for the high-resolution, continuous and highly inter-correlated nature of audio signals, this does not necessarily seem to be the case at the time of writing. Even the most recent #abbr.a[E2E] systems often use one or two components of the hierarchical approach, most commonly the #emph[vocoder], which converts mel spectrograms or other intermediate representations to raw waveforms @eskimez_e2_2024@chen_vall-e_2024, as well as the #abbr.a[g2p] conversion module @casanova_xtts_2024. Thus, TTS architectures exist on a spectrum, blending hierarchical and E2E elements for optimal performance @tan_survey_2021.
+The second paradigm is the #abbr.a[E2E] approach in which a #abbr.a[DNN] directly predicts the output from the input. In many other domains, this approach has lead to consistently better results, however, for the high-resolution, continuous and highly inter-correlated nature of audio signals, this does not necessarily seem to be the case at the time of writing. Even the most recent #abbr.a[E2E] systems often use one or two components of the hierarchical approach, most commonly the #emph[vocoder], which converts mel spectrograms or other intermediate representations to raw waveforms @eskimez_e2_2024@chen_vall-e_2024, as well as the #abbr.a[g2p] conversion module @casanova_xtts_2024.
 
-#comic.comic((150mm, 80mm), "Comic spectrum showing hierarchical TTS (step-by-step pipeline) blending into fully E2E TTS (direct text-to-waveform)", purple) <fig_hier_e2e>
+#comic.comic((150mm, 80mm), "hierarchical TTS vs fully E2E TTS", purple) <fig_hier_e2e>
 
 === #abbr.l[AR] #sym.arrow.l.r #abbr.l[NAR] <03_ar_nar>
 
@@ -68,7 +68,7 @@ In contrast *#abbr.l[NAR] models* assume conditional independence between output
 
 $ p(bold(S)|bold(T),bold(e)_S) = product_(i=1)^n p(s_i|bold(T),bold(e)_S) $
 
-#comic.comic((150mm, 80mm), "Comic comparison of AR generation (sequential, step-by-step) vs. NAR (parallel, all-at-once)", green) <fig_ar_nar>
+#comic.comic((150mm, 80mm), "comparison of AR generation (sequential, step-by-step) vs. NAR (parallel, all-at-once)", green) <fig_ar_nar>
 
 === Objectives
 
@@ -98,7 +98,7 @@ Another way to generate synthetic speech is emerging, inspired by #abbr.pla[LLM]
 
 The model is then trained to predict each token $s_i$ given the preceding tokens $bold(s)_(<i)$ and conditioning information $c$. The loss is the sum of the #abbr.pla[NLL] over the entire sequence:
 
-$ cal(L)_(text("NLL"))(theta) = EE_(bold(s), c) [ - sum_(i=1)^L log p_theta(s_i | bold(s)_(<i), c) ] $
+$ cal(L)_(text("NLL"))(theta) = EE_(bold(s), c) [ - sum_(i=1)^L log p_theta (s_i | bold(s)_(<i), c) ] $
 
 Here, $p_theta(s_i | bold(s)_(<i), c)$ is the probability assigned by the model to the correct token $s_i$ at timestep $i$. By minimizing this loss, the model learns the conditional probability distribution of the discrete speech representation. For unconditional generation, $c$ can be omitted, reducing to $p_theta(s_i | bold(s)_(<i))$, allowing free-form speech synthesis without input constraints @tan_survey_2021.
 
@@ -106,6 +106,6 @@ Here, $p_theta(s_i | bold(s)_(<i), c)$ is the probability assigned by the model 
 
 === Developments in modern TTS
 
-While for #abbr.pla[LLM], a specific (decoder-only) architecture and training paradigm has emerged @naveed_llmoverview_2023, there is great diversity in the approaches to #abbr.a[TTS]. First, it is important to note that for #abbr.a[TTS] *Hierarchical* and #abbr.a[E2E] as well as #abbr.a[NAR] and #abbr.a[AR] exist on a spectrum, where systems blend elements of both to balance efficiency and quality @tan_survey_2021. For example, a model which generates Mel spectrograms and uses a separate vocoder to convert them to waveforms is #emph[mostly] #abbr.a[E2E], but still has the one hierarchical component of the vocoder. On the side of #abbr.a[NAR] and #abbr.a[AR], there is also the possibility of hybrid models which solve part of the #abbr.a[TTS] task in a #abbr.a[NAR] fashion while solving another part using an #abbr.a[AR] approach @wang_slmeval_2024. Modern #abbr.a[AR] approaches mostly predict tokens or speech codes and are often referred to as #abbr.pla[SLM]. These models greatly benefit from scale of data and model parameters, but can suffer in the areas of speaker identity and intelligibility, and sometimes hallucinate, meaning they generate speech not present in the transcript @wang_slmeval_2024. On the other hand purely #abbr.a[NAR] models have evolved as well, with the most popular recent approach abandoning both explicit alignment and #abbr.a[g2p] -- they do this by providing the transcript a sequence of characters as input to the model. Instead of phone- or word-level duration prediction, only the overall length of the utterance is predicted, and the input sequence padded to match this duration. The output representation of these models are usually Mel spectrograms, and they are trained using diffusion @eskimez_e2_2024@chen_f5_2024.
+While for #abbr.pla[LLM], a specific (decoder-only) architecture and training paradigm has emerged @naveed_llmoverview_2023, there is great diversity in the approaches to #abbr.a[TTS]. *Hierarchical* and #abbr.a[E2E] as well as #abbr.a[NAR] and #abbr.a[AR] can be combined, where systems blend elements of both to balance efficiency and quality @tan_survey_2021. For example, a model which generates Mel spectrograms and uses a separate vocoder to convert them to waveforms is #emph[mostly] #abbr.a[E2E], but still has the one hierarchical component of the vocoder. On the side of #abbr.a[NAR] and #abbr.a[AR], there is also the possibility of hybrid models which solve part of the #abbr.a[TTS] task in a #abbr.a[NAR] fashion while solving another part using an #abbr.a[AR] approach @wang_slmeval_2024. Modern #abbr.a[AR] approaches mostly predict tokens or speech codes and are often referred to as #abbr.pla[SLM]. These models greatly benefit from scale of data and model parameters, but can suffer in the areas of speaker identity and intelligibility, and sometimes hallucinate, meaning they generate speech not present in the transcript @wang_slmeval_2024. On the other hand purely #abbr.a[NAR] models have evolved as well, with the most popular recent approach abandoning both explicit alignment and #abbr.a[g2p] -- they do this by providing the transcript a sequence of characters as input to the model. Instead of phone- or word-level duration prediction, only the overall length of the utterance is predicted, and the input sequence padded to match this duration. The output representation of these models are usually Mel spectrograms, and they are trained using diffusion @eskimez_e2_2024@chen_f5_2024.
 
-#comic.comic((150mm, 150mm), "A figure showing schematics of the most common TTS architectures, namely nonautoregressive-with-correlates, mel-autoregressive, token-based, token-based hierarchical, diffusion-nonautoregressive, ...", green) <fig_tts_arch>
+#comic.comic((150mm, 150mm), "most common TTS architectures, nonautoregressive-with-correlates, token-based, token-based, ...", green) <fig_tts_arch>

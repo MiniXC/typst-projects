@@ -18,7 +18,7 @@ Building on the gaps identified and quantified via WERR in Chapter 5, this chapt
 
 === Learning Latent Representations
 
-Latent representations offer an unsupervised way to capture and inject stylistic variability into synthetic speech, addressing the one-to-many challenge without explicit attribute extraction. Before examining specific techniques, consider their shared motivation: real speech varies subtly in ways not captured by text alone (e.g., emphasis or emotion), and latent spaces learn these patterns from data, enabling sampling for diverse outputs. This paradigm has proven valuable in TTS-for-ASR, where broader coverage improves model robustness @sun_generating_2020. Mathematically, these methods model a latent variable $z$ such that the TTS distribution becomes $Q_theta (tilde(s) | t, z)$, with $z$ inferred from training data to approximate real variability.
+Latent representations offer an unsupervised way to capture and inject stylistic variability into synthetic speech, addressing the one-to-many challenge without explicit attribute extraction. Real speech varies subtly in ways not captured by text alone (e.g., emphasis or emotion), and latent spaces learn these patterns from data, enabling sampling for diverse outputs. This paradigm has proven valuable in TTS-for-ASR, where broader coverage improves model robustness @sun_generating_2020. Mathematically, these methods model a latent variable $z$ such that the TTS distribution becomes $Q_theta (tilde(s) | t, z)$, with $z$ inferred from training data to approximate the real distribution better.
 
 ==== Global Style Tokens
 
@@ -56,13 +56,13 @@ The baseline is a multi-speaker FastSpeech 2 @ren_fastspeech_2021, conditioned o
 
 The Attributes system conditions on GMM-sampled utterance-level means for pitch ($F_("F0")$), energy, duration, SRMR, and SNR (2 components per GMM, variance floor 10^{-3}). An Oracle uses ground-truth values. Augmentation applies Gaussian noise (SNR 5-40 dB) and RIRs (RT60 0.15-0.8s, probability 0.8) post-synthesis via audiomentations.
 
-#comic.comic((80mm, 40mm), "Comic of TTS system with attribute conditioning and augmentation pipeline", blue) <fig_tts_aug>
+#comic.comic((80mm, 40mm), "TTS system with attribute conditioning and augmentation pipeline", blue) <fig_tts_aug>
 
 === Results and Discussion
 
 Results reveal targeted enhancements reduce the gap, though not fully, with detailed per-domain analysis highlighting strengths and limitations. The baseline yields a WERR of 3.66 (cross-referenced from Chapter 5), confirming limited variability. The Attributes system drops it to 3.55, showing varied prosody/acoustics help. Augmentation further reduces to 3.31 (10% relative gain), emphasizing environmental simulation's impact. The Oracle (3.24) bounds potential, highlighting GMM limitations.
 
-#comic.comic((120mm, 120mm), "TTS-for-ASR results, evaluated via WERR. W2 metrics per domain show reductions, with augmentation yielding the largest overall gain.", blue) <tbl_werr_results>
+#comic.comic((120mm, 120mm), "TTS-for-ASR results, evaluated via WERR", blue) <tbl_werr_results>
 
 
 While ASR language models can influence WER, our setup minimizes this by prioritizing acoustic modeling with minimal LM interference. Augmentation outperforms conditioning likely due to better real-world robustness; ablating attributes shows prosody contributes most. However, gaps persist, suggesting inherent TTS limits—diminishing returns motivate exploring scaling in Chapter 7.

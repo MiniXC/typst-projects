@@ -21,7 +21,7 @@ For many machine learning tasks, the relationship between the test error and the
 
 $ text("WER")(D) = (D_c/D)^alpha $
 
-where $D_c$ and $alpha$ are positive constants that are empirically determined for a given task and model architecture. This law implies that, for a given data distribution, performance will continue to improve as more training data is provided, following a predictable trajectory.
+where $D_c$ and $alpha$ are positive constants that are empirically determined for a given task and model architecture. This law implies that, for a given data distribution, performance will continue to improve as more training data is provided in a predictable way.
 
 === Challenges in scaling with synthetic data
 
@@ -37,7 +37,7 @@ As discussed in Section 3.1, #abbr.s[TTS] models trained to minimize MSE implici
 
 In contrast, Denoising Diffusion Probabilistic Models (#abbr.pla[DDPM]) are designed to model the entire data distribution by learning to reverse a stochastic noising process @ho_denoising_2020. While this allows them to capture greater variability, their ability to do so faithfully is highly dependent on sufficient training data. In low-data scenarios, #abbr.pla[DDPM] may struggle to learn the complete reverse process, potentially leading to noisy or mode-collapsed outputs @lin_common_2024.
 
-This initial mismatch between the synthetic and real distributions, which varies with data scale and model objective, is not captured by the standard power law. Therefore, to accurately model the performance of #abbr.s[ASR] systems trained on synthetic data, a more nuanced framework is required that can account for the quality and coverage of the synthetic data distribution, especially in the critical low-data regime.
+This initial mismatch between the synthetic and real distributions, which varies with data scale and model objective, is not captured by the standard power law. To accurately model the performance of #abbr.s[ASR] systems trained on synthetic data, a more nuanced framework is required that can account for the quality and coverage of the synthetic data distribution, especially in the critical low-data regime.
 
 === Methodology
 
@@ -49,7 +49,7 @@ Datasets are derived from the LibriHeavy corpus, creating subsets varying in siz
 
 TTS models are trained for 500,000 iterations with specific hyperparameters (e.g., batch size 16, cosine learning rate). Inference uses DDIM sampling for DDPM. ASR evaluation employs a Conformer-CTC model, computing WERR as the ratio of synthetic-trained WER to real-trained WER on real test data.
 
-#comic.comic((80mm, 40mm), "Comic representation of TTS model architecture with U-Nets for prosody and Mel spectrogram generation", blue) <fig_tts_arch>
+#comic.comic((80mm, 40mm), "TTS model architecture with U-Nets for prosody and Mel spectrogram generation", blue) <fig_tts_arch>
 
 === Results
 
@@ -57,7 +57,7 @@ Our experiments reveal distinct scaling behaviors for MSE and DDPM models. MSE p
 
 Speaker diversity amplifies DDPM's advantages: at 5000 hours, high diversity yields 4% better WERR than low diversity, though gains diminish (from 8% at 100 hours to 4% at 5000 hours). MSE shows inconsistent diversity benefits, sometimes degrading with more speakers.
 
-#comic.comic((80mm, 40mm), "Comic plot of WERR vs. dataset size for DDPM and MSE models, showing DDPM's better scaling", green) <fig_werr_scaling>
+#comic.comic((80mm, 40mm), "WERR vs. dataset size for DDPM and MSE models", green) <fig_werr_scaling>
 
 === Proposed Scaling Law
 
@@ -67,7 +67,7 @@ $ text("WERR")(D) prop D^(-alpha) + D^(-gamma) $
 
 Here, α parametrizes early gains, and γ the long-term limit. Fitting to data, DDPM shows α=1.86, γ=0.06 (slower initial but sustained scaling); MSE has α=2.93, γ=0.01 (faster start but quicker plateau). Even optimistically, DDPM requires ~1 million hours to match real data performance.
 
-#comic.comic((80mm, 40mm), "Comic illustration of two-term power law curves for DDPM and MSE, with phases labeled", red) <fig_scaling_law>
+#comic.comic((80mm, 40mm), "two-term power law curves for DDPM and MSE", red) <fig_scaling_law>
 
 === Discussion
 
