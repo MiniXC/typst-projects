@@ -9,7 +9,7 @@ Automatic Speech Recognition (#abbr.a[ASR]) is the task of automatically transcr
 
 $ hat(T) = argmax_(T in cal(T)) P_Phi (T|hat(S)) $
 
-Modern high-performance #abbr.a[ASR] systems are almost exclusively trained using discriminative objectives. In contrast to generative approaches that might model the probability of an acoustic sequence given a text, discriminative models are optimized to directly model the posterior probability $P(T|S)$, maximizing the score of the correct transcription while simultaneously minimizing the scores of all incorrect competing hypotheses. This approach has proven more effective at achieving low Word Error Rates (#abbr.a[WER]). The two dominant paradigms for discriminative #abbr.a[ASR] training are hybrid HMM-DNN systems and end-to-end models. For a comprehensive review of #abbr.a[E2E] #abbr.a[ASR] models, see @prabhavalkar_survey_2023.
+Modern high-performance #abbr.a[ASR] systems are almost exclusively trained using discriminative objectives. In contrast to generative approaches that might model the probability of an acoustic sequence given a text, discriminative models are optimized to directly model the posterior probability $P(T|S)$, maximizing the score of the correct transcription while simultaneously minimizing the scores of all incorret competing hypotheses. This approach has proven more effective at achieving low Word Error Rates (#abbr.a[WER]). The two dominant paradigms for discriminative #abbr.a[ASR] training are hybrid HMM-DNN systems and end-to-end models. For a comprehensive review of #abbr.a[E2E] #abbr.a[ASR] models, see @prabhavalkar_survey_2023.
 
 #comic.comic((80mm, 40mm), "Comic overview of ASR pipeline: from acoustic signal to text transcription", blue) <fig_asr_overview>
 
@@ -21,7 +21,7 @@ $ P(q_t | s_t; theta) $
 
 While this acoustic model can be trained with a simple cross-entropy loss against frame-level alignments, system performance is substantially improved through sequence-level discriminative training. The state-of-the-art objective for this is #abbr.a[LF-MMI] @povey_purely_2016. The MMI criterion aims to maximize the mutual information between the observation sequence $S$ and the reference word sequence $T$. This is achieved by maximizing the log-likelihood of the correct transcription (numerator) while minimizing the log-likelihood of all possible transcriptions (denominator):
 
-$ cal(L)_(text("MMI"))(theta) = log (P_theta(S | cal(M)_T) P(T)) / (sum_(T') P_theta(S | cal(M)_(T')) P(T')) $
+$ cal(L)_(text("MMI"))(theta) = log (P_theta (S | cal(M)_T) P(T)) / (sum_(T') P_theta (S | cal(M)_(T')) P(T')) $
 
 Here, $cal(M)_(T')$ is the HMM corresponding to a word sequence $T'$, and $P(T')$ is a language model probability. The numerator represents the likelihood of the correct transcription, while the denominator sums over the likelihoods of all possible transcriptions, explicitly creating a margin that pushes down the scores of incorrect hypotheses. The "Lattice-Free" component streamlines this process by using a simpler phone-level decoding graph, allowing for more efficient end-to-end discriminative training.
 

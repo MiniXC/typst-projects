@@ -12,143 +12,67 @@
 )
 #import "../comic.typ"
 
-== Increasing Synthetic Diversity <06_attr>
+== Enhancing Synthetic Speech Diversity <06_attr>
 
-As established in the preceding chapter, a notable discrepancy exists between synthetic and real speech. While modern #abbr.a[TTS] systems can achieve high subjective naturalness, the resulting speech often exhibits a more narrow distribution, lacking the rich diversity inherent in human expression @hu_syntpp_2022. This limitation is hypothesised to be a primary cause for the performance gap observed when using synthetic data for #abbr.a[ASR] model training, where the #abbr.a[WERR] consistently remains well above the ideal value of 1.
+Building on the gaps identified and quantified via WERR in Chapter 5, this chapter details methods to increase the diversity of synthetic speech and presents experimental results evaluating their impact. As established, synthetic speech often lacks the variability of real speech, leading to suboptimal ASR performance. Here, we explore three complementary paradigms—latent representations, explicit conditioning, and post-generation augmentation—aiming to bridge this divide. By systematically enhancing diversity, we test whether these approaches can reduce the distributional distance, as measured by WERR. The chapter progresses from unsupervised latent capture to targeted control and simulation, culminating in empirical validation. Throughout, we formally define key processes using notation consistent with the introduction (e.g., $Q_theta$ for TTS approximations).
 
-To bridge this gap, it is not enough for synthetic speech to be merely natural-sounding; it must also be sufficiently diverse. This chapter surveys the main paradigms developed to increase the variability of synthetic speech, moving beyond the generation of a single, deterministic output for a given input. We will explore three principal approaches: learning latent representations of style, explicitly conditioning the model on measurable attributes, and applying post-generation data augmentation.
+=== Learning Latent Representations
 
-=== Learning latent representations of style
+Latent representations offer an unsupervised way to capture and inject stylistic variability into synthetic speech, addressing the one-to-many challenge without explicit attribute extraction. Before examining specific techniques, consider their shared motivation: real speech varies subtly in ways not captured by text alone (e.g., emphasis or emotion), and latent spaces learn these patterns from data, enabling sampling for diverse outputs. This paradigm has proven valuable in TTS-for-ASR, where broader coverage improves model robustness @sun_generating_2020. Mathematically, these methods model a latent variable $z$ such that the TTS distribution becomes $Q_theta (tilde(s) | t, z)$, with $z$ inferred from training data to approximate real variability.
 
-A primary approach for introducing diversity is to have the model learn a latent space that captures stylistic variations from the training data in an unsupervised manner. During inference, this space can be sampled to generate varied outputs. The two most common methods for this are #abbr.a[GST] and #abbr.a[VAE].
+==== Global Style Tokens
 
-==== Global style tokens
+Global Style Tokens (GST) provide a discrete approach to style modeling, learning a fixed set of embeddings that represent different speaking styles @wang_style_2018. During training, an attention mechanism weighs these tokens based on reference audio, encoding the utterance's style as a weighted combination. Formally, given reference speech $s$, GST computes a style vector as a convex combination of $K$ learned tokens $G = {g_1, ..., g_K}$: $z = sum_k alpha_k g_k$, where $alpha_k$ are attention weights. At inference, tokens can be selected or interpolated to control output style, such as making speech more expressive or neutral. While effective for categorical style shifts, GST's discrete nature limits fine-grained variation compared to continuous methods.
 
-#abbr.a[GST] learn a set of discrete, interpretable "style" embeddings from the reference audio @wang_style_2018. The model, typically through an attention mechanism, learns to represent the style of an utterance as a combination of these tokens. At inference time, the style tokens can be selected or sampled, allowing for control over the speaking style of the generated speech. While powerful, this approach models variation as a discrete set of styles.
+==== Variational Autoencoder
 
-==== Variational autoencoder
+Variational Autoencoders (VAE) extend this by learning a continuous latent distribution, allowing for smoother and more nuanced sampling @kingma_auto-encoding_2013. A VAE encodes reference speech $s$ into parameters of a Gaussian posterior $q_phi(z | s) = cal(N)(mu_phi(s), sigma_phi(s))$, approximating the true posterior via the evidence lower bound (ELBO): $cal(L)_"ELBO" = EE_(q_phi(z|s)) [log p_theta (s | z)] - "KL"(q_phi (z|s) || p(z))$, where $p(z)$ is a standard Gaussian prior. The TTS decoder then reconstructs $tilde(s) approx p_theta (s | z)$. By regularizing the latent space, inference-time sampling from $p(z)$ generates novel styles. This flexibility has made VAEs a go-to for TTS-for-ASR, yielding up to 16% WER improvements in low-real-data scenarios @sun_generating_2020. However, VAEs can suffer from posterior collapse if not carefully tuned, reducing effective diversity.
 
-A more flexible approach is to use a #abbr.a[VAE] to learn a continuous latent distribution of style @kingma_auto-encoding_2013. A #abbr.a[VAE] is trained to encode reference speech into a latent vector, which is then used by the #abbr.a[TTS] decoder to reconstruct the original speech. By enforcing that the latent space follows a simple prior distribution (typically a standard Gaussian), we can sample from this prior at inference time to generate speech with novel stylistic variations. This method has proven to be an effective solution for generating diverse speech for the #abbr.a[TTS]-for-#abbr.a[ASR] task @sun_generating_2020.
+=== Explicit Conditioning on Attributes
 
-=== Explicit conditioning on attributes
+For more interpretable and targeted diversity, explicit conditioning directly incorporates measurable speech attributes into the TTS process. Unlike latent methods, which infer styles abstractly, this approach specifies desired traits (e.g., fast speaking rate), ensuring generated speech aligns with real distributions. This is particularly useful for TTS-for-ASR, where controlling prosody or acoustics can mimic real-world variability @rossenbach_duration_2023. Formally, the TTS model $f^"TTS"_theta$ is trained to minimize a loss over conditioned outputs: $cal(L)(theta) = EE_(t,s,z) [l(f_theta (t,z), s)]$, where $z$ are extracted attributes and $l$ is a reconstruction loss (e.g., MSE).
 
-In contrast to learning an abstract latent space, an alternative paradigm offers more direct and interpretable control by explicitly conditioning the synthesis process on specific, measurable attributes of the speech signal.
+==== Variance Adapter
 
-==== Variance adapter
+Modern non-autoregressive models often implement this via a variance adapter, inserted between the text encoder and spectrogram decoder @ren_fastspeech_2019@ren_fastspeech_2021. Let $h$ be the encoder's hidden representation of text $t$. The adapter predicts and embeds attributes $z$ (e.g., pitch, energy), adding them to $h$: $h' = h + "embed"(z)$. During training, ground-truth $z$ from $s$ are used; at inference, predicted or sampled $z$ enable diversity. Without inputs, it defaults to mean values, causing collapse—supplying varied $z$ unlocks control, enabling diverse synthesis.
 
-In modern non-autoregressive architectures, this control is often implemented via a *variance adapter* @ren_fastspeech_2019@ren_fastspeech_2021. This module is typically inserted between the text encoder and the spectrogram decoder. During training, it is given ground-truth values for various attributes, which it learns to embed and add to the hidden text representations. This enriches the information available to the decoder, which learns to generate a spectrogram conditioned on both the phoneme sequence and the desired attributes.
+==== Controllable Attributes <06_prosodic_correlates>
 
-At inference time, the model must be provided with target attribute values. If none are given, the adapter typically predicts the mean values seen during training, leading to a collapse in diversity. True control is therefore achieved by supplying the desired attribute values as an input to the model.
+Attributes are typically perceptual correlates (detailed in Chapter 2), enabling fine-tuned generation. Prosody includes pitch (F0 from PyWORLD @morise_world_2016), energy (RMS of Mel frames), and duration (speaking rate via forced alignment @mcauliffe_montreal_2017). Acoustic environment uses SRMR for reverberation @kinoshita_reverb_2013 and WADA SNR for noise @kim_wada_2008. By conditioning on these, TTS systems generate speech matching specific contours or environments, enhancing ASR training data realism. To generate realistic $z$ at inference, we use speaker-dependent Gaussian Mixture Models (GMMs): Fit a GMM per speaker on training attributes, then sample $z tilde "GMM"$ for synthesis, approximating real variability.
 
-==== Controllable attributes <06_prosodic_correlates>
+=== Post-Generation Data Augmentation
 
-The attributes used for conditioning are typically correlates of perceptually relevant phenomena, as detailed in @02_perceptual[Chapter]. Key examples include:
+Post-generation augmentation complements internal methods by transforming clean synthetic output to simulate external variability. This external approach is straightforward yet powerful for TTS-for-ASR, as it directly addresses environmental mismatches without altering the core synthesis model @rossenbach_synthattention_2020. Formally, given synthetic $tilde(s) = f_theta (t, z)$, apply augmentations $a(tilde(s))$ (e.g., noise addition) to produce $tilde(s)' approx Q_theta (s | t, z, z_"env")$, where $z_"env"$ models real acoustics.
 
--   *Prosody*: Features such as pitch (F0), energy (loudness), and phoneme duration (speaking rate) are fundamental to speaking style. Architectures like FastSpeech 2 and FastPitch explicitly model and predict these attributes at the frame or phoneme level @ren_fastspeech_2019@ren_fastspeech_2021@lancucki_fastpitch_2021.
--   *Acoustic Environment*: For #abbr.a[ASR] robustness, it is beneficial to model environmental factors. These can be quantified using metrics like the #abbr.a[SRMR] @kinoshita_reverb_2013 and the #abbr.a[SNR], which can be estimated non-intrusively using methods like #abbr.a[WADA] @kim_wada_2008.
-
-By conditioning on such attributes, a #abbr.a[TTS] system can be guided to generate speech with specific prosodic contours or as if it were recorded in a particular acoustic environment.
-
-=== Post-generation data augmentation
-
-The third paradigm for increasing diversity operates not within the #abbr.a[TTS] model itself, but on its output. Post-generation data augmentation involves taking clean, synthesized speech and applying transformations to simulate real-world variability. This is a common and effective technique for making training data more robust for #abbr.a[ASR].
-
-This typically involves adding simulated background noise from various sources or convolving the clean waveforms with #abbr.pla[RIR] to simulate different acoustic spaces and reverberation characteristics @rossenbach_synthattention_2020. While this approach is highly effective for modeling the acoustic environment, it cannot introduce variation in the underlying prosody or speaker characteristics of the source synthesis. These three approaches are therefore complementary, and are often used in combination to create synthetic data that is both natural and diverse.
-
-=== Evaluating diversity through #abbr.a[ASR]
-
-Of the aforementioned paradigms, explicit conditioning via a variance adapter and post-generation augmentation are the most direct methods for targeting specific, known sources of variability. To quantify the impact of these approaches on the distribution gap, we adopt the task of training an #abbr.a[ASR] system on synthetic speech as a rigorous, objective proxy for evaluating diversity.
-
-Subjective listening tests, while valuable for assessing naturalness, are not well-suited to measuring distributional coverage. A synthetic utterance can sound perfectly human yet represent only a narrow, oversampled region of the real speech distribution. #abbr.a[ASR] model training, however, is highly sensitive to this lack of diversity; models trained on data with limited variability generalise poorly to the rich variation of real-world speech @wang_improving_2020.
-
-We can quantify this performance gap using the #abbr.a[WER] of two #abbr.a[ASR] models trained on identical scripts, one using real speech $S$ and the other using synthetic speech $Syn$. The ratio between their respective error rates on a common, real-speech test set gives us the #abbr.a[WERR], as formalised in @eq_werr.
-
-Both real and synthetic speech have a seen and unseen split, $S$ and $s$, and $Syn$ and $syn$ respectively. They are paired with seen and unseen transcripts $T$ and $t$. $Theta(S,T)$ yields the weights of an ASR model given the speech and transcripts, and $"WER"$ is the Word Error Rate achieved when a certain set of ASR weights is evaluated on a different set of speech and transcripts
-
-$
-"WERR"(Syn parallel S) = "WER"[(s,t) parallel Theta(Syn,T)] / "WER"[(s,t) parallel Theta(S,T)]
-$ <eq_werr>
-
-A #abbr.a[WERR] of 1.0 would indicate that the synthetic speech is as effective as real speech for #abbr.a[ASR] training, implying that its distribution sufficiently covers the variations relevant for the task. Previous work consistently shows this ratio to be significantly higher than 1.0, often between 3 and 5, highlighting a substantial distribution gap @minixhofer_evaluating_2023 @casanova_singlespeaker_2022. Reducing this ratio is therefore a primary objective in our efforts to increase synthetic diversity.
+Techniques include adding background noise from diverse sources or convolving with Room Impulse Responses (RIRs) to mimic reverberation in varied spaces (e.g., RT60 0.15-0.8s, probability 0.8). Tools like audiomentations enable probabilistic application (e.g., Gaussian noise with SNR 5-40 dB). While excellent for acoustics, it cannot retroactively adjust prosody or speaker traits, making it synergistic with latent/explicit methods for comprehensive diversity.
 
 === Experimental Design
 
-To investigate the effects of explicit conditioning and augmentation, we designed a series of experiments based on a controllable, multi-speaker #abbr.a[TTS] system. Our goal is to incrementally add components that target different sources of variation and measure their impact on the #abbr.a[WERR].
+We test these paradigms via controlled experiments, incrementally enhancing a baseline TTS system and evaluating via WERR (as defined in Chapter 5). The setup ensures differences stem from diversity improvements, not confounding factors. TTS training formally minimizes $cal(L)(theta) = EE_(t,s,z) [||s - f_theta (t, z)||^2_2]$ (MSE loss), approximating $Q_theta (s | t, z)$. ASR training uses LF-MMI on (speech, transcripts) pairs to learn $P_Phi (t | s)$, with WER as evaluation metric.
 
-#comic.comic((50mm, 80mm), "A visual explanation of the dataset splits.", blue) <data_splits>
+All experiments use the train-clean-360 split of LibriTTS @zen_libritts_2019, selecting speakers with >=100 utterances (684 total). Half utterances per speaker form the TTS training set; the other half is reserved for inference (test set: unseen utterances for evaluation). Transcripts are selected to balance across speakers, generating 10 hours of synthetic audio with equal transcripts and speakers for fair comparison. Seen/unseen splits ensure no overlap, with unseen transcripts paired to probe generalization.
 
-==== Dataset and Models
+The baseline is a multi-speaker FastSpeech 2 @ren_fastspeech_2021, conditioned on d-vector embeddings ($E_text("SPK")$) @wan_generalized_2018. A HiFi-GAN vocoder converts Mel spectrograms to waveforms @kong_hifigan_2020. ASR uses a 6-layer hybrid HMM-TDNN with LF-MMI @povey_kaldi_2011 (4 epochs, ~3-4 hours on 4 GTX 1080 Ti), kept minimal to attribute results to data quality.
 
-All experiments utilise the `train-clean-360` split of the LibriTTS corpus @zen_libritts_2019. We selected speakers with at least 100 utterances, resulting in a set of 684 speakers. For each experiment, we generate 10 hours of synthetic audio with balanced transcripts and speakers.
+The Attributes system conditions on GMM-sampled utterance-level means for pitch ($F_("F0")$), energy, duration, SRMR, and SNR (2 components per GMM, variance floor 10^{-3}). An Oracle uses ground-truth values. Augmentation applies Gaussian noise (SNR 5-40 dB) and RIRs (RT60 0.15-0.8s, probability 0.8) post-synthesis via audiomentations.
 
-Our baseline #abbr.a[TTS] system is a multi-speaker version of FastSpeech 2 @ren_fastspeech_2021. Speaker identity is provided via d-vector embeddings ($E_text("SPK")$) extracted from a pretrained speaker verification model @wan_generalized_2018 and averaged per speaker. These embeddings are added to the phoneme-level hidden representations. A HiFi-GAN vocoder is used to convert the predicted Mel spectrograms into waveforms @kong_hifigan_2020.
-
-For evaluation, we train a 6-layer hybrid #abbr.a[HMM]-#abbr.a[TDNN] #abbr.a[ASR] system with the #abbr.a[LF-MMI] objective, a standard recipe in the Kaldi toolkit @povey_kaldi_2011. The architecture is kept minimal to ensure that performance differences are primarily attributable to the quality and diversity of the training data, not the #abbr.a[ASR] model's capacity to overcome data deficiencies.
-
-==== Attribute Conditioning with Generative Models
-
-To move beyond the mean-value predictions of a standard variance adapter, we introduce an *Attributes* system. This system is explicitly conditioned on utterance-level mean values for pitch ($F_("F0")$), energy, speaking rate (duration), #abbr.a[SRMR], and #abbr.a[SNR]. During training, these are ground-truth values extracted from the real speech signals.
-
-The central challenge is to generate realistic attribute values during inference. To this end, we model the joint distribution of these attributes for each speaker using a #abbr.a[GMM]. For each synthetic utterance, we sample a vector of target attributes from the corresponding speaker's #abbr.a[GMM] and provide it as conditioning to the #abbr.a[TTS] model. This encourages the model to generate speech with attribute distributions that more closely match the ground truth, rather than collapsing to the mean. @fig_attribute_system illustrates this architecture.
-
-#figure(
-  image("../figures/6/attr_tts_arch.png", width: 60mm),
-  caption: [A simplified diagram of the attribute-conditioned TTS system. During inference, speaker-specific #abbr.pla[GMM] generate target utterance-level attributes (e.g., pitch, speaking rate). These are passed to the FastSpeech 2 decoder, along with phoneme encodings, to guide the synthesis of a Mel spectrogram. A vocoder converts this to a waveform, which can then undergo optional augmentation.]
-) <fig_attribute_system>
-
-We compare this against an *Oracle* system, which is given the ground-truth attribute values at inference time. This provides a practical upper bound on performance, indicating the maximum potential improvement achievable if our #abbr.pla[GMM] could perfectly model the real attribute distributions.
-
-Finally, we test a dedicated *Augmentation* system, which applies post-generation augmentation to the output of the *Attributes* system. This involves adding simulated Gaussian noise (with a target #abbr.a[SNR] between 5 and 40 dB) and convolving the waveform with a #abbr.a[RIR] to simulate reverberation, using the `audiomentations` library #footnote[#link("https://github.com/iver56/audiomentations", [https://github.com/iver56/audiomentations])].
+#comic.comic((80mm, 40mm), "Comic of TTS system with attribute conditioning and augmentation pipeline", blue) <fig_tts_aug>
 
 === Results and Discussion
 
-The results of our #abbr.a[TTS]-for-#abbr.a[ASR] experiments are summarised in @tbl_werr_results. The baseline #abbr.a[TTS] system yields a #abbr.a[WERR] of 3.66, confirming that its output, while natural-sounding, is substantially less effective for #abbr.a[ASR] training than real speech. This establishes a clear benchmark for our diversity-enhancing techniques.
+Results reveal targeted enhancements reduce the gap, though not fully, with detailed per-domain analysis highlighting strengths and limitations. The baseline yields a WERR of 3.66 (cross-referenced from Chapter 5), confirming limited variability. The Attributes system drops it to 3.55, showing varied prosody/acoustics help. Augmentation further reduces to 3.31 (10% relative gain), emphasizing environmental simulation's impact. The Oracle (3.24) bounds potential, highlighting GMM limitations.
 
-#figure(
-  table(
-  columns: (1fr, 1fr, 1fr),
-  align: center,
-  [*System*], [#abbr.s[WER] (%)], [#abbr.s[WERR]],
-  [Real Data], [13.3 ± 0.29], [1.00],
-  [Baseline TTS], [48.6 ± 0.43], [3.66 ± 0.03],
-  [\+ Attributes], [47.2 ± 0.39], [3.55 ± 0.03],
-  [\+ Augmentation], [44.0 ± 0.33], [3.31 ± 0.02],
-  [Oracle], [43.0 ± 0.29], [3.24 ± 0.02],
-),
-caption: [#abbr.a[TTS]-for-#abbr.a[ASR] evaluation results. We report the #abbr.a[WER] and #abbr.a[WERR] for #abbr.a[ASR] models trained on data from different #abbr.a[TTS] systems. The best performing system achieves a 10% relative reduction in #abbr.a[WERR] compared to the baseline.],
-) <tbl_werr_results>
+#comic.comic((120mm, 120mm), "TTS-for-ASR results, evaluated via WERR. W2 metrics per domain show reductions, with augmentation yielding the largest overall gain.", blue) <tbl_werr_results>
 
-The *Attributes* system, which conditions on #abbr.a[GMM]-sampled utterance-level features, reduces the #abbr.a[WERR] to 3.55. This modest but significant improvement demonstrates that explicitly guiding the model to produce more varied prosody and acoustic characteristics helps to close the distribution gap. However, the gap between this system and the *Oracle* (#abbr.a[WERR] of 3.24) indicates that the #abbr.pla[GMM], while helpful, are not perfectly capturing the complex distributions of the real attributes.
 
-The most substantial improvement comes from the *Augmentation* system. By applying noise and reverberation as a post-processing step, the #abbr.a[WERR] is reduced to 3.31, a relative reduction of nearly 10% from the baseline. This result highlights the critical importance of acoustic environment diversity for robust #abbr.a[ASR] training. Crucially, it shows that even when the underlying speech synthesis is not perfect, simulating real-world recording conditions is a highly effective strategy for bridging the gap. While our #abbr.a[GMM]-based attribute conditioning and post-generation augmentation are complementary, these findings suggest that for the purposes of #abbr.a[TTS]-for-#abbr.a[ASR], matching the acoustic environment distribution yields the largest gains.
+While ASR language models can influence WER, our setup minimizes this by prioritizing acoustic modeling with minimal LM interference. Augmentation outperforms conditioning likely due to better real-world robustness; ablating attributes shows prosody contributes most. However, gaps persist, suggesting inherent TTS limits—diminishing returns motivate exploring scaling in Chapter 7.
 
-=== WERR as a distance metric
+In the speaker domain, Attributes reduces intra-speaker distance (FD-Intra) by 16.6% via GMM-sampled d-vectors, increasing variety. Inter-speaker distance (FD-Inter) improves 12.2%, possibly from better utterance matching during training. Augmentation slightly worsens these, but overall WR drops. The Oracle excels here, suggesting GMM limitations for speakers.
 
-Another question that arises is if #abbr.a[WERR] could qualify as a metric for the distance between the synthetic and real distributions. For a heuristic to be considered a formal distance metric, it must satisfy four key properties: non-negativity, identity (the distance from an object to itself is zero), symmetry (the distance from A to B is the same as from B to A), and the triangle inequality. Since non-negativity is already satisfied (a ratio of positive values cannot be negative) and identity can be trivially achieved by substracting 1, we investigate the latter two of these properties here.
+For prosody, baseline distributions diverge (e.g., bimodal F0, shifted energy, low-variance duration). Attributes mitigates this, reducing distances (e.g., F0 by ~89%), positively impacting WR. Oracle shows high energy distance yet low WR, indicating energy's lesser role in the overall gap.
 
-#figure(
-  table(
-  columns: (1fr, 1fr, 1fr),
-  align: center,
-  [*Training Data*], [*Evaluation Data*], [#abbr.s[WER] #sym.arrow.b],
-  [Real], [Real], [13.3 ± 0.29],
-  [Synthetic], [Real], [48.6 ± 0.43],
-  [Real], [Synthetic], [11.4 ± 0.69],
-  [Synthetic], [Synthetic], [3.0 ± 0.02],
-),
-caption: "Results when training on synthetic and evaluating on real and vice versa."
-) <tab_cross_ttsasr>
+Acoustic environment is crucial: Augmentation reduces WR by 6.7% (largest single gain), slashing SRMR (97%) and WADA SNR (60%). Environment prediction alone slightly increases WR, but with Attributes, SRMR drops 22.1%. WADA SNR shows minimal change, possibly due to inability to model Gaussian noise.
 
-Our ablation experiments shown in @tab_cross_ttsasr provide a preliminary insight into symmetry. The standard #abbr.a[WERR] from @eq_werr, which measures the performance drop when training on synthetic speech $Syn$ instead of real speech $S$ (both evaluated on real data), is $3.66$. We can also calculate a #abbr.a[WERR] in the reverse direction: measuring the performance drop when training on real data $S$ instead of synthetic data $Syn$, when evaluating on the *synthetic* test set $syn$. This gives a ratio of $"WER"[(syn,t) parallel Theta(S,T)] / "WER"[(syn,t) parallel Theta(Syn,T)]$, which is 3.75. While these values are remarkably close, suggesting a degree of symmetry in our specific setup, the inherent stochasticity of DNN training means this is not guaranteed to hold across different datasets or models. A truly robust metric should enforce this property by design.
+=== Limitations
 
-To ensure symmetry, we can follow the example of the #abbr.a[JSD] @lin_jsd_1991 and define a #abbr.a[MWERR]. By averaging the #abbr.a[WERR] calculated in both directions, we create a measure which is symmetric by definition:
-
-$
-"MWERR"(Syn parallel S) = 1/2"WER"[(s,t) parallel Theta(Syn,T)] / "WER"[(s,t) parallel Theta(S,T)] + 1/2"WER"[(syn,t) parallel Theta(S,T)] / "WER"[(syn,t) parallel Theta(Syn,T)]
-$ <eq_mwerr>
-
-While #abbr.a[MWERR] achieves symmetry, it cannot be proven to satisfy the triangle inequality, which is the final condition for a true distance metric (i.e., that the direct distance between two points is no greater than the distance taken via a third point, $d(A,C) <= d(A,B) + d(B,C)$). This limitation arises because its fundamental component, the #abbr.a[WER], is not a distance metric itself. #abbr.a[WER] is the outcome of a complex and highly non-linear optimization process—the training of an #abbr.a[ASR] model $Theta$—not a direct geometric or probabilistic comparison between two data distributions. 
-
-The relationship between a change in the data distribution and the resulting #abbr.a[WER] is not simple or predictable enough to guarantee that the "distance" between two distributions is always less than the sum of their intermediate "distances" via a third distribution.
-There is an additional shortcoming of #abbr.a[WERR], hinted at by our data augmentation experiments. Clean speech can be modified using methods such as SpecAugment @park_specaugment_2019 which often leads to better #abbr.a[ASR] performance. While our earlier statement about synthetic speech holds -- if synthetic speech achieves a #abbr.a[WERR] of 1.0 it is equivalent for #abbr.a[ASR] training, this does not mean it is perceptually equivalent. Many data augmentation methods help #abbr.a[ASR] training, but undoubtedly make the training data distribution dissimilar to real speech.
-Therefore, while #abbr.a[MWERR] is a more principled heuristic than #abbr.a[WERR], both should be interpreted as task-specific measures of distributional dissimilarity rather than a formal distance metrics.
+These methods enhance diversity but face limits: latent approaches may collapse modes, conditioning relies on accurate sampling, and augmentation ignores core synthesis flaws. Gains plateau, indicating a ceiling. While they improve WERR, full parity requires more data—scaling offers another avenue, explored next.

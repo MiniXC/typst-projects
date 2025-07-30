@@ -75,10 +75,10 @@
 #set page(
     paper: "a4",
     margin: (
-      top: 1.5cm,
-      bottom: 1.5cm,
-      inside: if review { 4.5cm } else {if print { 3.5cm } else { 3cm }},
-      outside: if review { 4.5cm } else {if print { 2.5cm } else { 3cm }},
+      top: 1.8cm,
+      bottom: 1.8cm,
+      inside: if review { 4.8cm } else {if print { 3.8cm } else { 3.4cm }},
+      outside: if review { 4.8cm } else {if print { 2.8cm } else { 3.4cm }},
     ),
     binding: left,
   )
