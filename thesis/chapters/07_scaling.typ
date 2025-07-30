@@ -1,5 +1,6 @@
 #import "../abbr.typ" 
 #import "../quote.typ": *
+#import "../comic.typ"
 
 == Scaling properties for TTS-for-ASR <07_scaling>
 
@@ -37,3 +38,37 @@ As discussed in Section 3.1, #abbr.s[TTS] models trained to minimize MSE implici
 In contrast, Denoising Diffusion Probabilistic Models (#abbr.pla[DDPM]) are designed to model the entire data distribution by learning to reverse a stochastic noising process @ho_denoising_2020. While this allows them to capture greater variability, their ability to do so faithfully is highly dependent on sufficient training data. In low-data scenarios, #abbr.pla[DDPM] may struggle to learn the complete reverse process, potentially leading to noisy or mode-collapsed outputs @lin_common_2024.
 
 This initial mismatch between the synthetic and real distributions, which varies with data scale and model objective, is not captured by the standard power law. Therefore, to accurately model the performance of #abbr.s[ASR] systems trained on synthetic data, a more nuanced framework is required that can account for the quality and coverage of the synthetic data distribution, especially in the critical low-data regime.
+
+=== Methodology
+
+To investigate the scaling properties of synthetic data in TTS-for-ASR, we systematically compare Denoising Diffusion Probabilistic Models (DDPM) to Mean Squared Error (MSE)-based models, focusing on how ASR performance (measured by Word Error Rate Ratio, WERR) evolves with increasing dataset size and speaker diversity.
+
+We employ an architecture consisting of two U-Net models: one for generating prosodic features (pitch, energy, and duration via Continuous Wavelet Transform) and another for producing Mel spectrograms. Both are trained using MSE and DDPM objectives. The prosody U-Net is conditioned on phone sequences and speaker identity (d-vectors), while the Mel U-Net additionally uses semantic features from a pre-trained Flan-T5-Base model.
+
+Datasets are derived from the LibriHeavy corpus, creating subsets varying in size (100 to 5000 hours) and speaker diversity (low: 25-1531 speakers; medium: 40-956; high: 62-1531). Subsets are split for TTS training, ASR training, and ASR evaluation, ensuring no transcript overlap and consistent speaker proportions.
+
+TTS models are trained for 500,000 iterations with specific hyperparameters (e.g., batch size 16, cosine learning rate). Inference uses DDIM sampling for DDPM. ASR evaluation employs a Conformer-CTC model, computing WERR as the ratio of synthetic-trained WER to real-trained WER on real test data.
+
+#comic.comic((80mm, 40mm), "Comic representation of TTS model architecture with U-Nets for prosody and Mel spectrogram generation", blue) <fig_tts_arch>
+
+=== Results
+
+Our experiments reveal distinct scaling behaviors for MSE and DDPM models. MSE performs well in low-data regimes (e.g., ~100 hours) but shows limited improvement with more data, plateauing due to oversmoothing. In contrast, DDPM underperforms initially but scales better, particularly with larger datasets and higher speaker diversity, achieving the lowest WERR of 1.46 (high diversity, 2500 hours).
+
+Speaker diversity amplifies DDPM's advantages: at 5000 hours, high diversity yields 4% better WERR than low diversity, though gains diminish (from 8% at 100 hours to 4% at 5000 hours). MSE shows inconsistent diversity benefits, sometimes degrading with more speakers.
+
+#comic.comic((80mm, 40mm), "Comic plot of WERR vs. dataset size for DDPM and MSE models, showing DDPM's better scaling", green) <fig_werr_scaling>
+
+=== Proposed Scaling Law
+
+We propose a two-term power law to model TTS-for-ASR scaling, capturing an initial variance-limited phase (rapid improvements as TTS learns core speech generation) and a resolution-limited phase (diminishing returns due to model complexity limits):
+
+$ text("WERR")(D) prop D^(-alpha) + D^(-gamma) $
+
+Here, α parametrizes early gains, and γ the long-term limit. Fitting to data, DDPM shows α=1.86, γ=0.06 (slower initial but sustained scaling); MSE has α=2.93, γ=0.01 (faster start but quicker plateau). Even optimistically, DDPM requires ~1 million hours to match real data performance.
+
+#comic.comic((80mm, 40mm), "Comic illustration of two-term power law curves for DDPM and MSE, with phases labeled", red) <fig_scaling_law>
+
+=== Discussion
+
+These findings indicate MSE's limitations in high-data regimes due to unimodal assumptions, while DDPM's stochasticity enables better use of scale and diversity. However, diminishing returns persist, suggesting inherent TTS model constraints. Future work could explore hybrid objectives or larger-scale datasets to further close the gap.

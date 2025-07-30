@@ -22,7 +22,9 @@
   be made.]
 )
 
-Since the leading quote by Taylor, substantial progress has been made in #abbr.a[TTS] -- it is now often impossible to tell if a computer or human is talking to listeners -- at the outset of our research, this was not necessarily the case, but since then, several works have claimed to reach parity with real speech @tan_naturalspeech_2024@chen_vall-e_2024@eskimez_e2_2024. The main lens we view synthetic speech as in this work is as a distribution -- and the way human parity is defined by previous work is devoid of that concept. This, in our opinion, incomplete definition might lead to speech that on an individual, utterance-by-utterance level is on par with real speech, but fails to capture the breadth and diversity present in reality. 
+Since the leading quote by Taylor, substantial progress has been made in #abbr.a[TTS] -- it is now often impossible to tell if a computer or human is talking to listeners -- at the outset of our research, this was not necessarily the case, but since then, several works have claimed to reach parity with real speech @tan_naturalspeech_2024@chen_vall-e_2024@eskimez_e2_2024.
+
+The main lens we view synthetic speech as in this work is as a distribution -- and the way human parity is defined by previous work is devoid of that concept. This, in our opinion, incomplete definition might lead to speech that on an individual, utterance-by-utterance level is on par with real speech, but fails to capture the breadth and diversity present in reality. 
 
 #link(<part_01>, [Part I]) introduces background information necessary for this work, in the form of speech representations (@02_factors), #abbr.a[TTS] (@03_tts) and #abbr.a[ASR] (@04_asr).
 

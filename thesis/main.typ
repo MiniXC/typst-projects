@@ -2,13 +2,15 @@
 
 #import "abbr.typ"
 #import "@preview/wordometer:0.1.4": word-count, total-words, total-characters
+#import "@preview/equate:0.3.2": equate
+
+#show: equate.with(breakable: false, sub-numbering: true)
+#set math.equation(numbering: "(1.1)")
 
 #show: word-count
 
 #set quote(block: true)
 #set cite(style: "american-anthropological-association")
-#set math.equation(numbering: num =>
-  "(" + (counter(heading).get() + (num,)).map(str).join(".") + ")")
 
 #abbr.make(
   ("KDE", "Kernel Density Estimation", "Kernel Density Estimates"),
@@ -224,6 +226,10 @@ In light of these findings, we continue to investigate the problem from the othe
 // Lay Summary
 #frontmatter-heading([Lay Summary])
 
+If you are reading this, you have probably heard Text-to-Speech voices before. It could be the one telling you to stay on the line when calling your GP, the voice giving directions in your car, or the voiceover in TikToks. The models making those voices need a lot of data and computing power -- and recently they have gotten enough of both to become really good. We now think that soon they will be impossible to tell apart from real voices.
+You have probably also heard of speech recognition, which is how your voice gets converted to text when speaking to Siri or dictating something to your phone, or how YouTube subtitles get generated. This also needs a lot of data.
+Since the Text-to-Speech voices are getting so good, we thought we could use them for helping with speech recognition, since these voices could give us good data to learn from.
+But unfortunately, while they sound very good, the voices were really bad for speech recognition. This made us think that maybe there is some differences between these voices and real speech that we can't detect by just listening to them. So instead of looking at single recordings, we took a bunch of Text-to-Speech recordings and a bunch of real recordings and compared how they were spread out in many different areas that researchers have looked into for a long time. These areas measure how we speak (for example, how loud or quiet), who is speaking and how easily we can understand the words. We found out that when we look at a bunch of recordings this way, we can see differences in how they are spread out in these different areas -- and real speech is actually still quite different to synthetic speech. And the Text-to-Speech systems that sound good when listening to them were spread out more similarly to the real speech than the ones that didn't sound so good -- and this still works if the speech has background noise, or if it's children speaking instead of adults. We also looked into multiple languages, and figured out how to apply this to 14 of them without big changes. This means our work is robust and can hopefully be extended to new settings quite easily. To summarise, our main point is that while Text-to-Speech is really good at this point, when we look at a bunch of recordings instead of single ones, we can see its not quite the same as real speech, and that explains why we can't yet use it in the same way. Our method can be used to measure how close new Text-to-Speech systems get to the real speech, to make sure they keep advancing.
 
 // Acknowledgements
 #frontmatter-heading([Acknowledgements])
@@ -318,9 +324,6 @@ In light of these findings, we continue to investigate the problem from the othe
 
 = Background <part_00>
 
-In this first part of our work, we explore how well-suited synthetic speech is for training speech recognition models.
-If the distribution of real speech was perfectly modeled, we would assume similar performance when training with synthetic speech as when training with real speech. However, this is not the case, suggesting systematic differences between synthetic and real speech, which we explore in the following chapters.
-
 #include "chapters/02_factors.typ"
 
 #include "chapters/03_tts.typ"
@@ -328,6 +331,10 @@ If the distribution of real speech was perfectly modeled, we would assume simila
 #include "chapters/04_asr.typ"
 
 = Synthetic speech for speech recognition <part_01>
+
+
+In this part of our work, we explore how well-suited synthetic speech is for training speech recognition models.
+If the distribution of real speech was perfectly modeled, we would assume similar performance when training with synthetic speech as when training with real speech. However, this is not the case, suggesting systematic differences between synthetic and real speech.
 
 #include "chapters/05_tts_asr.typ"
 
