@@ -23,23 +23,15 @@
   be made.]
 )
 
-// Incorporated: Expanded high-level discussion on vast space of speech possibilities vs. TTS generation limits.
-
 Synthetic speech is any speech that is artificially generated, without the use of a human's vocal tract. It has been used in assistive technology, entertainment, and education for decades @taylor_tts_2009. The most common paradigm is #abbr.l[TTS], the goal of which is to automatically convert a sequence of text into a natural-sounding utterance. However, the space of possible utterances is immense: consider that even a short utterance could have countless variations in prosody, intonation, and recording conditions, far exceeding what any TTS system can fully capture. A single sentence can be realized in many ways depending on the speaker's emotion, environment, or intent, creating a high-dimensional space of potential outputs. TTS systems, by necessity, approximate a subset of this space, often in prioritizing naturalness over exhaustive coverage of all possible realizations. More details on TTS fundamentals can be found in the overview by @taylor_tts_2009.
 
 === Text-to-Speech
 
 Formally, let $cal(T)$ be the space of all text sequences and $cal(S)$ be the space of all utterances. The objective of TTS is to model the true conditional probability distribution $Q(s|t)$ for any given pair $(t, s)$ where $t in cal(T)$ and $s in cal(S)$. This is achieved by training a generative model $f^"TTS"_theta (dot)$, where $theta$ is learned using pairs $(t,s)$ sampled from this true distribution. The model is thereby optimized to learn an approximation of this distribution $Q_theta$ which can then be used to sample a synthetic utterance $tilde(s)$ from an arbitrary input text $t$ #footnote[assuming speaker independence for simplicity here; conditioning is discussed below]:
 
-// Fixed: No tilde on input t; consistent theta; capital Q for probability distribution.
-
 $
 tilde(s) ~ Q_theta (s|t)
 $ <tts_formula>
-
-// Incorporated: Expanded to ~page length; high-level discussion around one-to-many problem, distributional challenges.
-
-// In this thesis, we explore...
 
 While @tts_formula is the simplest case of #abbr.a[TTS], $t$ is usually not the only variable $s$ is conditioned on, and there are additional conditioning variables. These are derived by applying a reductive transformation function $r(s)$ from the the space of all such transforms $cal(R)$. Since the function is reductive, neither $s$ nor $t$ can be reconstructed from the representation -- however, they should hold salient, yet abstracted, information of the speech. For example, $r(s)$ could extract speaker identity from a reference utterance, enabling voice-cloning TTS where the output mimics a specific voice.
 
@@ -57,14 +49,10 @@ $ hat(t) = argmax_(t in cal(T)) P_Phi (t|hat(s)) $
 
 Since augmenting datasets is a tried-and-tested way to improve robustness and performance, and synthetic data is easier to acquire and label than real data @pomerleau_alvinn_1988, the high ratings of #abbr.a[TTS]-generated speech inspired a number of works to use synthetic data for training #abbr.l[ASR] systems @li_synthaug_2018@rosenberg_speechaug_2019@thai_lrasr_2019.
 
-// Incorporated: Separately define TTS-for-ASR here, after 1.3 as requested.
-
 We refer to this approach as TTS-for-ASR, where TTS-generated data is used to train or augment ASR models, leveraging the controllability of synthesis to address data scarcity in domains like low-resource languages or specific speaking styles.
 
 In this work, we first continue TTS-for-ASR research, and, in line with prior works @li_synthaug_2018@hu_syntpp_2022@rossenbach_duration_2023 find that the aforementioned high human ratings do not directly translate to suitability for #abbr.a[ASR] training. Instead of being within a few percentage points of the real speech as in human evaluation @wang_tacotron_2017 real speech usually outperforms synthetic by a factor of 2 or more for #abbr.a[ASR] training @casanova_singlespeaker_2022.
 We make explaining this gap in performance the initial objective for this thesis, and introduce methodologies to both evaluate and reduce the gap. However, we hypothesise that the main reason for the gap is the inability of $Q_theta$ to approximate $Q$ in a way that captures the true distribution of real speech. Motivated by this we introduce a framework and methodology to measure the distance between these distributions empirically and show this distributional approach can predict human judgements across datasets, systems, domains and languages.
-
-// Incorporated: Formal introduction to distribution distance (new subsection).
 
 === Distribution Distance <dist_distance>
 
@@ -95,6 +83,8 @@ In Part III, we introduce and validate a new evaluation metric for synthetic spe
 - We propose the Text-to-Speech Distribution Score (TTSDS), an objective measure that quantifies the distributional dissimilarities between real and synthetic speech across various speech representations.
 
 - We validate the TTSDS by demonstrating its strong correlation with longitudinal subjective listening test data from 2008 to 2024 and its effectiveness in evaluating systems that have reached human parity across different domains.
+
+
 
 === Notation
 

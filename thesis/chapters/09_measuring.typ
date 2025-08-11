@@ -32,7 +32,7 @@ as a collection of holes in that same space. Then, the #abbr.a[EMD] measures the
 distance.]
 )
 
-This makes it a transport problem @hitchcock_transport_1941, which can be solved for the 2D case of image histograms as in the original work @rubner_earth_2000 -- however, speech representations (see @02_perceptual) are often high-dimensional, in which case this problem is prohibitively expensive.
+This makes it a transport problem @hitchcock_transport_1941, which can be solved for the 2D case of image histograms as in the original work @rubner_earth_2000 -- however, speech representations (see ...) are often high-dimensional, in which case this problem is prohibitively expensive.
 
 === Wasserstein metric
 
@@ -72,7 +72,7 @@ The first term, $||mu_R - mu_S||_2^2$, measures the distance between the centers
 
 === Perceptually-motivated factorized evaluation
 
-As we discussed in @08_distances, there are various ways to objectively evaluate if synthetic speech matches its real counterparts, and many are perceptually motivated, in-line with the representations presented in @02_perceptual.
+As we discussed in @08_distances, there are various ways to objectively evaluate if synthetic speech matches its real counterparts, and many are perceptually motivated, in-line with the representations presented in ....
 
 There is no single ground truth for synthetic speech generation due to the one-to-many nature of the task. Instead, we frame TTS evaluation as a distributional similarity task. Let $D$ be an audio dataset and $X$ a feature extracted from it. We aim to quantify how well synthetic speech mirrors real speech by obtaining correlates of each factor and measuring their distance from both real speech datasets and noise datasets. TTSDS is the average of the resulting scores along the following perceptually motivated factors: (i) #smallcaps[#smallcaps[Generic]]: Overall distributional similarity, via SSL embeddings. (ii) #smallcaps[Speaker]: Realism of speaker identity. (iii) #smallcaps[#smallcaps[Prosody]]: Pitch, duration, and rhythm quality. (iv) #smallcaps[#smallcaps[Intellibility]]: Recognition of the speech, using ASR-derived features.
 

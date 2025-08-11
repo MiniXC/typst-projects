@@ -14,6 +14,9 @@
 
 == Text-to-Speech <03_tts>
 
+// are we sure this is done in chapter 1?
+
+
 As outlined in @01_intro[Chapter], we constrain this work to multi-speaker voice-cloning #abbr.a[TTS], in which there are two inputs; a speaker representation derived from a reference recording, which is most commonly a speaker embedding (see @02_speaker), but could also be a Mel Spectrogram or any other representation containing information about the given speaker @eskimez_e2_2024, like a text prompt describing their characteristics @lyth_parler_2024. Mapping these inputs to an acoustic realisation is a complex "one-to-many" problem @ren_revisiting_2022@blumstein_phonetic_1981. This chapter provides a comprehensive overview of TTS systems, drawing heavily on the survey by @tan_survey_2021, which categorizes neural TTS components and advanced topics. We expand on key methodologies, including historical context, frontends, and contrasts with related tasks like voice conversion, while adhering to the notation introduced in Chapter 1.
 
 === History of TTS
@@ -29,6 +32,8 @@ Before the compute and data resources for #abbr.a[DNN]-based methods were availa
 // Systems like Merlin @wu_merlin_2016 exemplified this era, using HMMs or DNNs for parameter prediction, often combined with vocoders for waveform generation.
 
 *Hybrid models* represented the state-of-the-art prior to the deep learning revolution by combining the strengths of both approaches @ling_hybrid_2007. In a typical hybrid system, an #abbr.a[HMM]-based model would first generate the target acoustic parameter trajectories, providing flexible and natural prosody. Then, a unit selection component would search the database for waveform units that best matched these #abbr.a[HMM]-generated targets, rather than targets derived from simpler rules. This allowed for the high segmental quality of concatenative synthesis while leveraging the superior prosodic modelling of statistical methods.
+
+// expansion: NN synthesis here
 
 #comic.comic((150mm, 80mm), "timeline showing evolution of tts over time", blue) <fig_tts_history>
 
@@ -54,6 +59,8 @@ The second paradigm is the #abbr.a[E2E] approach in which a #abbr.a[DNN] directl
 
 #comic.comic((150mm, 80mm), "hierarchical TTS vs fully E2E TTS", purple) <fig_hier_e2e>
 
+// bigger section break between equations and overview
+
 === #abbr.l[AR] #sym.arrow.l.r #abbr.l[NAR] <03_ar_nar>
 
 If we let $T$ be the input lexical sequence (e.g., sub-word tokens), $bold(S) = (s_1, dots, s_n)$ be the target acoustic sequence (e.g., Mel-spectrogram frames), and $bold(e)_S$ be the speaker embedding vector for the target speaker, the goal of a multi-speaker conditional TTS model is to learn the distribution $p(bold(S)|bold(T),bold(e)_S)$.
@@ -69,6 +76,10 @@ In contrast *#abbr.l[NAR] models* assume conditional independence between output
 $ p(bold(S)|bold(T),bold(e)_S) = product_(i=1)^n p(s_i|bold(T),bold(e)_S) $
 
 #comic.comic((150mm, 80mm), "comparison of AR generation (sequential, step-by-step) vs. NAR (parallel, all-at-once)", green) <fig_ar_nar>
+
+// remove conditioning for simplicity (but write out that it has been removed)
+
+// define give technical details, and give overview
 
 === Objectives
 
@@ -103,6 +114,8 @@ $ cal(L)_(text("NLL"))(theta) = EE_(bold(s), c) [ - sum_(i=1)^L log p_theta (s_i
 Here, $p_theta(s_i | bold(s)_(<i), c)$ is the probability assigned by the model to the correct token $s_i$ at timestep $i$. By minimizing this loss, the model learns the conditional probability distribution of the discrete speech representation. For unconditional generation, $c$ can be omitted, reducing to $p_theta(s_i | bold(s)_(<i))$, allowing free-form speech synthesis without input constraints @tan_survey_2021.
 
 #comic.comic((150mm, 80mm), "Comic overview of TTS objectives: MSE (averaging errors), DDPM (denoising process), NLL (token prediction)", orange) <fig_tts_objectives>
+
+// this should be more weaved in with the rest, combining technical and overview
 
 === Developments in modern TTS
 

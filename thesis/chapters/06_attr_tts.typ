@@ -18,13 +18,21 @@ Building on the gaps identified and quantified via WERR in Chapter 5, this chapt
 
 === Learning Latent Representations
 
+// refer back to latent representations in the background chapter (2) for here
+
 Latent representations offer an unsupervised way to capture and inject stylistic variability into synthetic speech, addressing the one-to-many challenge without explicit attribute extraction. Real speech varies subtly in ways not captured by text alone (e.g., emphasis or emotion), and latent spaces learn these patterns from data, enabling sampling for diverse outputs. This paradigm has proven valuable in TTS-for-ASR, where broader coverage improves model robustness @sun_generating_2020. Mathematically, these methods model a latent variable $z$ such that the TTS distribution becomes $Q_theta (tilde(s) | t, z)$, with $z$ inferred from training data to approximate the real distribution better.
 
 ==== Global Style Tokens
 
+// z'd is not modeled it can be anything at inference time.
+// task might not be specific to GST
+// might fit better later
+
 Global Style Tokens (GST) provide a discrete approach to style modeling, learning a fixed set of embeddings that represent different speaking styles @wang_style_2018. During training, an attention mechanism weighs these tokens based on reference audio, encoding the utterance's style as a weighted combination. Formally, given reference speech $s$, GST computes a style vector as a convex combination of $K$ learned tokens $G = {g_1, ..., g_K}$: $z = sum_k alpha_k g_k$, where $alpha_k$ are attention weights. At inference, tokens can be selected or interpolated to control output style, such as making speech more expressive or neutral. While effective for categorical style shifts, GST's discrete nature limits fine-grained variation compared to continuous methods.
 
 ==== Variational Autoencoder
+
+// notation is bunched up and should be broken up into idv. equations
 
 Variational Autoencoders (VAE) extend this by learning a continuous latent distribution, allowing for smoother and more nuanced sampling @kingma_auto-encoding_2013. A VAE encodes reference speech $s$ into parameters of a Gaussian posterior $q_phi(z | s) = cal(N)(mu_phi(s), sigma_phi(s))$, approximating the true posterior via the evidence lower bound (ELBO): $cal(L)_"ELBO" = EE_(q_phi(z|s)) [log p_theta (s | z)] - "KL"(q_phi (z|s) || p(z))$, where $p(z)$ is a standard Gaussian prior. The TTS decoder then reconstructs $tilde(s) approx p_theta (s | z)$. By regularizing the latent space, inference-time sampling from $p(z)$ generates novel styles. This flexibility has made VAEs a go-to for TTS-for-ASR, yielding up to 16% WER improvements in low-real-data scenarios @sun_generating_2020. However, VAEs can suffer from posterior collapse if not carefully tuned, reducing effective diversity.
 
@@ -38,13 +46,19 @@ Modern non-autoregressive models often implement this via a variance adapter, in
 
 ==== Controllable Attributes <06_prosodic_correlates>
 
+// fixed dim, or vary with the length of the speech signal
+
 Attributes are typically perceptual correlates (detailed in Chapter 2), enabling fine-tuned generation. Prosody includes pitch (F0 from PyWORLD @morise_world_2016), energy (RMS of Mel frames), and duration (speaking rate via forced alignment @mcauliffe_montreal_2017). Acoustic environment uses SRMR for reverberation @kinoshita_reverb_2013 and WADA SNR for noise @kim_wada_2008. By conditioning on these, TTS systems generate speech matching specific contours or environments, enhancing ASR training data realism. To generate realistic $z$ at inference, we use speaker-dependent Gaussian Mixture Models (GMMs): Fit a GMM per speaker on training attributes, then sample $z tilde "GMM"$ for synthesis, approximating real variability.
 
 === Post-Generation Data Augmentation
 
 Post-generation augmentation complements internal methods by transforming clean synthetic output to simulate external variability. This external approach is straightforward yet powerful for TTS-for-ASR, as it directly addresses environmental mismatches without altering the core synthesis model @rossenbach_synthattention_2020. Formally, given synthetic $tilde(s) = f_theta (t, z)$, apply augmentations $a(tilde(s))$ (e.g., noise addition) to produce $tilde(s)' approx Q_theta (s | t, z, z_"env")$, where $z_"env"$ models real acoustics.
 
+// post-generation should be framed better
+
 Techniques include adding background noise from diverse sources or convolving with Room Impulse Responses (RIRs) to mimic reverberation in varied spaces (e.g., RT60 0.15-0.8s, probability 0.8). Tools like audiomentations enable probabilistic application (e.g., Gaussian noise with SNR 5-40 dB). While excellent for acoustics, it cannot retroactively adjust prosody or speaker traits, making it synergistic with latent/explicit methods for comprehensive diversity.
+
+
 
 === Experimental Design
 
@@ -76,3 +90,11 @@ Acoustic environment is crucial: Augmentation reduces WR by 6.7% (largest single
 === Limitations
 
 These methods enhance diversity but face limits: latent approaches may collapse modes, conditioning relies on accurate sampling, and augmentation ignores core synthesis flaws. Gains plateau, indicating a ceiling. While they improve WERR, full parity requires more data—scaling offers another avenue, explored next.
+
+// mirror structure from chapter 2 a bit better here
+// expand, reference back to earlier chapters
+// results and discussion shouldn't be one section
+
+
+
+// no chapters under 10 pages

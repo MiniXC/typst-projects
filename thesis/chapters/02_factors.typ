@@ -21,109 +21,70 @@
   [… we could say that speech perception is the process of forming representations of the stimulus -- the speaker’s utterance -- at several levels of description.]
 )
 
-In speech technology, the acoustic signals which make up speech, denoted as $S$, are represented in a number of different ways. Due to the continuous, large, and highly redundant nature of the raw waveform of $S$, various representations $cal(R)(S)$ have been used from the onset. These include reconstructible transformations like Mel spectrograms and reductive ones like #abbr.pla[MFCC], both to more closely align with human perception and to compress the signal @flanagan_speech_1971. Since then, representations at #emph[several levels of description] have been introduced -- often aiming to encode a particular aspect of speech. These refer to differing hierarchical abstractions of the speech signal, ranging from low-level acoustic features (e.g., raw waveforms) to mid-level perceptual correlates (e.g., pitch and energy) and high-level semantic or contextual embeddings (e.g., speaker identity or prosodic patterns). These levels allow models to capture different facets of speech, from physical properties to perceptual and linguistic interpretations, enabling tasks like synthesis and recognition. In this chapter, we discuss these representations and how they relate to human perception, as well as our own contribution of a self-supervised prosodic representation model. We first outline perceptually grounded representations, which directly correlate with human auditory processing, and then broader learned and codec-based approaches.
+// put details on representations back in here
+
+// people might get confused between general and reductive representation
+
+In speech technology, the acoustic signals which make up speech are represented in a number of different ways. In this work, we consider the raw audio waveform recording as the fundamental representation of a speech signal $S$ -- these can have different fidelity, in the form of sampling rate, the frequency of samples per unit of time and bit depth, the number of possible values per sample. For many differing uses, ranging from compression to conveying the meaning of the speech signal, other representations of this fundamental signal can be useful. All these representations are derived by applying a transformation function, denoted as $cal(R)$, to this waveform.
 
 #figure(
-  scale(x: 85%, y: 85%)[
-  #diagram(
-    spacing: 7pt,
-    cell-size: (8mm, 10mm),
-    edge-stroke: 1pt,
-    edge-corner-radius: 5pt,
-    mark-scale: 70%,
-
-    blob((0,0), align(center)[#text(size: 42pt, baseline: -5pt)[🗣️]#linebreak()#text(size: 21pt, baseline: 0pt)[Speech Signal]], width: 50mm, height: 23mm),
-    
-    // top
-    edge((0,0), (-1, -1), "-|>", bend: 10deg),
-    blob((-1,-1), [Audio Codecs], tint: orange, height: 11mm),
-    edge((-1,-1), (-1.6,-2), "-|>", bend: -10deg, label: [Algorithmic], label-side: left, label-pos: 1),
-    node((-1.7,-2.1), align(bottom)[`mp3`,`opus`,`wav`,#sym.dots]),
-    edge((-1,-1), (-0.7,-2), "-|>", bend: 10deg, label: [Learned], label-side: right, label-pos: 1.4),
-    node((-0.6,-2.4), align(top)[#text(baseline: 0pt, top-edge: 0pt, bottom-edge: 0pt)[
-      #sym.dots
-       
-      EnCodec (#cite(<defossez_encodec_2023>, form: "year"))
-      
-      DAC (#cite(<kumar_dac_2023>, form: "year"))
-    ]]),
-
-    edge((0,0), (1, -1), "-|>", bend: -10deg),
-    blob((1,-1), text(baseline: 4pt, top-edge: 0pt, bottom-edge: 0pt)[Learned
-    
-    Representations], tint: blue, width: 40mm, height: 11mm),
-    edge((1,-1), (0.35,-1.9), "-|>", bend: 10deg, label: [Monolingual], label-side: left, label-pos: 0.6, snap-to: (auto, none)),
-    node((0.35,-2.6), text(baseline: 0pt, top-edge: 0pt, bottom-edge: 0pt)[
-      #sym.dots
-
-      EAT (#cite(<chen_eat_2024>, form: "year"))
-      
-      HuBERT (#cite(<hsu_hubert_2021>, form: "year"))
-
-      wav2vec 2.0 (#cite(<baevski_wav2vec_2020>, form: "year"))
-    ]),
-    
-    edge((1.5,-1), (1.7,-2.4), "-|>", bend: -10deg, label: [Multilingual], label-side: right, label-pos: 0.6),
-    node((1.7,-2.4), text(baseline: 0pt, top-edge: 0pt, bottom-edge: 0pt)[
-      #sym.dots
-      
-      mHuBERT-147 (#cite(<boito_mhubert-147_2024>, form: "year"))
-
-      XLS-R (#cite(<conneau_xlsr_2021>, form: "year"))
-    ]),
-    
-
-    // prosody
-    edge((0,0), (-1,1), "-|>", bend: -10deg),
-    blob((-1,1), [Prosody], tint: green, width: auto),
-    edge((-1,1), (-1.4,1.7), "-|>", bend: -10deg, label: [Algorithmic], label-side: right, label-pos: 0.85, snap-to: (auto, none)),
-    node((-1.4,2.5), text(baseline: 0pt, top-edge: 0pt, bottom-edge: 0pt)[
-      
-      WORLD pitch (#cite(<morise_world_2016>, form: "year"))
-
-      Energy
-
-      #sym.dots
-    ]),
-    edge((-1,1), (-0.65,1.7), "-|>", bend: 10deg, label: [Learned], label-side: left, label-pos: .9, snap-to: (auto, auto)),
-    node((-0.3,2.5), text(baseline: 0pt, top-edge: 0pt, bottom-edge: 0pt)[
-      
-      MPM (#cite(<wallbridge_mpm_2025>, form: "year"))
-
-      ProsodyBERT (#cite(<hu_prosodybert_2023>, form: "year"))
-
-      #sym.dots
-    ]),
-
-    // speaker
-    edge((0,0), (0.5,1), "-|>", bend: -30deg),
-    blob((0.5,1), [Speaker], tint: maroon, width: auto),
-    node((0.6,2), text(baseline: 0pt, top-edge: 0pt, bottom-edge: 0pt)[
-      
-      ECAPA-TDNN (#cite(<desplanques_ecapa_2020>, form: "year"))
-
-      d-vector (#cite(<wan_generalized_2018>, form: "year"))
-
-      #sym.dots
-    ]),
-
-    // ambient
-    edge((0.5,0), (1.4,0.3), "-|>", bend: 30deg),
-    blob((1.3,0.3), [Ambient], tint: olive, width: auto),
-    node((1.3,1), text(baseline: 0pt, top-edge: 0pt, bottom-edge: 0pt)[
-      
-      #abbr.s[SRMR] (#cite(<santos_improved_2014>, form: "year"))
-
-      #abbr.s[WADA] #abbr.s[SNR] (#cite(<kim_wada_2008>, form: "year"))
-
-      #sym.dots
-    ]),
-  )],
+  image("../figures/2/invertible_to_reductive.png", width: 100%),
+  caption: [Examples of an invertible transformation in the form #abbr.a[STFT], lossy in the form of Mel spectrogram and reductive transformations in the form energy and pitch extraction, as well as possible reconstruction approaches.],
   placement: top,
-  caption: "Overview of representations of speech",
-) <representations>
+) <fig_transformations>
 
-=== Perceptually-grounded representations <02_perceptual>
+=== Transformation Classification <02_class>
+
+We classify the aforementioned transformations by the category and purpose of the resulting representation. First, we discuss the categories, which are invertible (fully reconstructible), lossy transformations (partially reconstructible), and reductive transformations (not reconstructible), with some overlap between lossy and reductive. Throughout this section, for illustrative purposes, we will use the commonly used Mel spectrogram and related representations as an example. Further representations are discussed in @02_representations.
+
+==== Categories of Transformations
+
+*Invertible Transformations:* These are lossless transformations where the original waveform can be perfectly reconstructed, such that:
+$
+cal(R)^(-1)(cal(R)(S)) = S
+$
+An example is the #abbr.a[STFT], which retains both magnitude (real) and phase (imaginary), allowing for exact reconstruction via the inverse #abbr.a[STFT] (iSTFT), as shown in @fig_transformations.
+
+*Lossy-Reconstructible Transformations:* These transformations are intentionally lossy but are designed to retain sufficient information for a perceptually similar waveform to be synthesized. The inverse operation is an approximation, often performed by a dedicated model or algorithm $f$ with learned or configured parameters $theta$. This could be a vocoder, decoder or algorithm such as the one by #citep(<griffin_griffinlim_1984>). The resulting speech is now $tilde(S)$, since it is not reconstructed perfectly and subject to change based on the model or algorithm used, resulting in the following:
+
+$
+f_theta (cal(R)(S)) = Syn
+$
+
+These representations almost always maintain the time-series nature of the original speech, with a direct mapping of specific frames in the original corresponding to specific parts of the resulting representation $cal(R)(S)$. @fig_transformations shows the Mel spectrogram as an example, for which after performing the aforementioned #abbr.a[STFT], the spectrum is scaled according to the perceptual Mel scale @volkmann_melscale_1937 and the phase is discarded. The Mel scale is used to align more closely with human perception (as our perception of pitch is not linear), while the phase is discarded as it does not contain as much perceptually relevant information @hidaka_phaseclass_2022. Therefore, Mel spectrograms only retain a magnitude spectrum of the speech, which nevertheless has been shown to retain enough information for deep learning models to learn to create a speech signals closely resembling the original#footnote[However, algorithmically reconstructed speech (i.e. using Griffin-Lim) using Mel spectrograms alone @lee_bigvgan_2023, without the phase information, results in highly degraded speech poorly rated by listeners when compared to reconstruction with phase @webber_autovocoder_2023.].
+
+*Reductive Transformations:* These transformations distill specific attributes from the signal into a representation that is not intended for direct audio reconstruction. We class representations as reductive if they cannot be reconstructed without leading to many-to-one scenarios where many waveforms clearly different from the original could lead to the same representation. 
+In the example in @fig_transformations, we show estimated energy derived by taking the average frame-level spectral magnitude sum and the fundamental frequency estimation algorithm Yin @decheveign_yin_2002 respectively.
+However, reductive transformations can also be far removed from the original signal, such as the most probable text sequence $hat(T)$ as predicted by an #abbr.l[ASR] model.
+
+*Edge cases:* Some transformations are not clearly reductive or lossy, such as most #abbr.a[SSL]-derived latent representations. They #emph[could] be used to reconstruct a speech signal, as previous work has shown that a combination of #abbr.a[SSL] representations and speaker embeddings can be reconstructed with similar performance as Mel spectrograms @siuzdak_wavthruvec_2022. However, they could also lead to significant deviation from the original depending on the information encoded by the #abbr.a[SSL] model. The layer at which the representation is extracted might also play a role, with earlier layers often corresponding more closely to acoustics @pasad_layer-wise_2021.
+
+==== Purpose of Transformations
+
+Different representations of speech can be used for differing purposes. Here, we discuss these representations and #emph[what] they encode (e.g. the whole signal, speaker identity, lexical content), #emph[how] they encode and potentially decode the signal and the #emph[uses] of the encoded speech with a particular focus on representations for speech synthesis and speech recognition.
+
+*The #emph[what] of encoding speech:* Speech can be represented at "several levels of description" @mcclelland_trace_1986 -- each level aimed to encode a particular aspect of speech. These refer to differing hierarchical abstractions of the speech signal, ranging from low-level acoustic features (e.g., raw waveforms) to mid-level perceptual correlates (e.g., pitch and energy) and high-level semantic or contextual embeddings (e.g., speaker identity or prosodic patterns). In our work, we also focus on the #emph[factors] of speech which can have levels within them. For example, the #smallcaps[Prosody] factor of speech could include the relatively low-level aforementioned perceptual correlates in addition to more high-level features such as stress markers. Any representation does not have to be pure in the sense of only belonging to one factor: It could be a combination, or represent all (or most) factors present in speech, in which case we class them as #smallcaps[Generic]. Our terminology gives us a way to classify and describe factors such as referring to WavLM @chen_wavlm_2022 embeddings as #emph[high-level] and #smallcaps[Generic], or the energy contour as #emph[low-level] and #smallcaps[Prosody]. We can also put this framework into context with the previous classifications of transformations outlined in @02_class: Invertible transformations need to encode the whole signal and are therefore #emph[low-level] #smallcaps[Generic]. However, for lossy ones, high perceptual similarity rather than an exact copy of the original recording is desirable, which allows for a higher level of abstraction, often making them #emph[mid-level]. Finally, reductive transformations can be even more selective with what they encode, as reconstruction is not a concern, and can be #emph[high-level] abstractions as well as limit themselves to just encode one factor -- although they can still be #smallcaps[Generic] or a combination of several factors.
+
+
+#figure(
+  image("../figures/2/representation_overview.png", width: 100%),
+  caption: [Overview of representations according to factors (y-axis) and level of abstraction.],
+  placement: top,
+) <fig_factors>
+
+
+// issues with figure: text missing
+
+// similar diagram for how synthetic speech can be generated (combinations of representations)
+
+// where to put learned representations:
+// audio codec, text, ... - not well studied enough
+
+// perceptually grounded not great because MFCC vs MEL
+
+// vocal tract length, cepstral mean invariance also under speaker
+
+=== Representations <02_representations>
 
 Perceptually grounded representations are designed to capture specific aspects of speech that align closely with human auditory processing. These representations provide intuitive, interpretable features that correlate directly with perceptual phenomena, serving as building blocks for more complex models. In this work, we divide reductive transformations of a speech signal $S$ into three perceptually-grounded categories, which can be used for conditioning, i.e., as part of a set $Z$.
 - *Prosody* relates to features the speaker can control independently of lexical/verbal content.
@@ -131,6 +92,8 @@ Perceptually grounded representations are designed to capture specific aspects o
 - *Ambient* relates to features that have to do with recording and environmental conditions.
 
 We outline these in more detail in the following sections, highlighting their perceptual relevance before transitioning to how self-supervised models build upon these foundations. There are also nuances in these definitions which are outside the scope of this work -- for example, by our definition, changes to a signal $S$ by impersonators altering their voice quality to imitate another speaker would be classed as prosody, while prosody is often defined as only including changes to the speech that carry non-verbal meaning, which does not include impersonation @jurafsky_slp_2008.
+
+// includes other: breathy, whispering, etc.
 
 ==== Prosody
 
@@ -142,6 +105,8 @@ Prosody does not have one universal definition, but we follow #citep(<jurafsky_s
 
 *Energy*, also referred to as loudness or intensity, is the magnitude of the signal $S$ or its spectrogram. It is rarely used outside of simple #abbr.a[VAD] methods and has proved less useful than pitch for expressive #abbr.a[TTS] @lancucki_fastpitch_2021 - however, both pitch and energy are necessary components for conveying emotion in speech @jurafsky_slp_2008@haque_energypitch_2017.
 
+// expand out: especially speaker
+
 ==== Speaker <02_speaker>
 
 Speaker characteristics relate to the qualities of a speaker's voice inherent to their biology (e.g., vocal tract anatomy), as well as other factors like accent or pathology that the speaker may not consciously alter. In TTS, these are typically captured using speaker embeddings, a type of embedding-based conditioning signal, extracted from a reference audio signal. These embeddings are then included in the conditioning set $Z$ to guide synthesis. As of the time of writing frequently used methods include x-vectors @snyder_x_2018, d-vectors @wan_generalized_2018 and ECAPA-TDNN @desplanques_ecapa_2020. For TTS conditioning, no large performance differences have been found across speaker embedding systems @stan_spkanalysis_2023 -- similarly, while some embeddings perform better for specific tasks, no clear best system has emerged @zhao_probing_2022. These systems generally take a fixed-length input signal (e.g., 10 seconds of audio) and produce a single high-dimensional vector that encapsulates speaker identity.
@@ -149,6 +114,8 @@ Speaker characteristics relate to the qualities of a speaker's voice inherent to
 ==== Ambient
 
 Lastly, ambient acoustics or environmental effects are properties of a signal $S$ shaped by its recording conditions more generally. They can include the microphone being used for recording and its distance to the speaker, the acoustics of the space of recording (e.g. leading to reverberation) and background noise. These effects are sometimes overlooked in speech research, as a recent work on dysarthria detection has shown @schu_silence_2023: Higher performance was achieved when using non-speech segments than when using speech segments from $S$, indicating most previous methods had relied on ambient acoustics rather than speech characteristics for this task. This overfitting likely occurred because ambient features (e.g., room noise or microphone artifacts) provided unintended shortcuts for classification, masking the true speech-related signals of dysarthria. These can be quantified using reductive transformations to produce numerical conditioning signals such as $"SRMR"$ for reverberation @kinoshita_reverb_2013, $"PESQ"$ for quality estimates over telephone networks @rix_pesq_2001, or $"SNR"$ for signal-to-noise ratio @kim_wada_2008.
+
+// masked prosody model needs to be shifted out of the background, also clearly indicate parts which were not done by me
 
 === Masked prosody model
 
@@ -164,9 +131,16 @@ We find that the utility of the learned representations depends on the timescale
 
 Self-supervised learning (SSL) methods learn more holistic, data-driven representations from the raw signal. These approaches provide versatile features that underpin many modern speech tasks, bridging the gap between perceptual correlates and high-level abstractions.
 
+// was image processing first?
+// expand where there is a long list of references in a row
+
 In #abbr.a[SSL], a model is trained to predict pseudo-labels created from the input signal $S$ itself. The first of these models were introduced for #abbr.a[NLP] in which a percentage of tokens in the original data are masked and said models are trained to predict the masked tokens using cross entropy loss @devlin_bert_2019. This methodology was adapted to speech by later works @schneider_wav2vec_2019@baevski_wav2vec_2020@hsu_hubert_2021@chen_wavlm_2022. At a high level, these models learn to reconstruct or predict masked portions of the input audio, often by first discretizing the signal into tokens (e.g., via clustering or vector quantization) and then using contrastive or cross-entropy losses to distinguish or regenerate the correct tokens. The resulting representations achieve state-of-the-art results on several benchmarks and challenges @evain_lebenchmark_2021@yang_superb_2021@shi_mlsuperb_2023@tsai_superb-sg_2022@wang_fine-tuned_2021 -- they have also been expanded to cover many languages beyond English @conneau_xlsr_2021@boito_mhubert-147_2024. However useful these models and their representations are for downstream tasks, it is not clear in which ways the latent spaces learned by these models correlate with human perception. For example, #citep(<millet_humanlike_2022>) find that #abbr.pla[MFCC] predict systematic effects of contrasts between specific pairs of phones better than self-supervised models. Similar effects can be observed with tasks such as word segmentation @pasad_words_2024, and different layers of the model have been shown to correlate with different perceptual units @pasad_layer-wise_2021. It therefore stands to reason that while these reductive transformations are useful for a wide range of tasks, they do not intuitively correlate with human perception in the same transparent way as the perceptual correlates discussed earlier.
 
 #comic.comic((80mm, 40mm), "Comic overview of SSL training process, showing audio input being masked and predicted", blue) <fig_ssl_process>
+
+// avoid referring to review paper directly (this should be self-contained)
+
+// add information about them and maybe group them with modeling mel spectrograms
 
 === Audio Codecs
 
@@ -176,8 +150,12 @@ Audio codecs are designed to compress and decompress audio data streams. Their p
 
 Algorithmic codecs like MP3 and Opus rely on psychoacoustic models @brandenburg_mp3_1999. These models exploit the limitations of human auditory perception, such as frequency masking (a loud sound making a quieter, nearby frequency inaudible) and temporal masking (a sound being masked by another that occurs just before or after). By identifying and removing these perceptually masked components of the signal $S$, these codecs can significantly reduce file size while maintaining high perceived quality. Opus, in particular, has become a standard for real-time interactive applications like video conferencing due to its low latency and high efficiency across a wide range of bitrates @valin_opus_2012.
 
+// be careful about r (is it reductive only)
+
 More recently, a new class of learned or neural audio codecs has emerged, which use deep learning to achieve unprecedented compression. These models, such as EnCodec @defossez_encodec_2023 and DAC @kumar_dac_2023, typically employ an autoencoder architecture. An encoder network applies a transformation $r$ to the raw waveform $S$ to create a compact, quantised latent representation $r(S)$, and a decoder network $f_theta$ reconstructs the audio from this representation to produce a synthetic signal $Syn = f_theta (r(S))$. By training end-to-end to minimise the reconstruction error between $S$ and $Syn$ (often using losses like L1 or perceptual metrics), these models learn to preserve the most perceptually salient information, achieving quality comparable or superior to algorithmic codecs at significantly lower bitrates. For example, EnCodec uses residual vector quantization—a technique that iteratively quantizes residuals from previous layers to build a hierarchical codebook—to create a hierarchical representation that can be streamed in real-time @defossez_encodec_2023, while DAC demonstrates high-fidelity reconstruction for general audio at bitrates as low as 1.5 kbps @kumar_dac_2023. Neural codecs can be semantic (focusing on content) or acoustic (focusing on fidelity), with acoustic ones often preferred for TTS.
 
 The discrete tokens $r(S)$ produced by these neural codecs constitute a powerful, reconstructible representation of the speech signal. Unlike self-supervised representations, which are optimised for downstream discriminative tasks, the goal of a codec's representation is faithful reconstruction. This property has made neural codec tokens a popular target for modern generative models. Instead of predicting complex spectrograms or waveforms directly, many state-of-the-art systems now generate these discrete audio tokens, which are then converted to a waveform $Syn$ using a pre-trained neural codec decoder $f_theta$ @wang_valle_2023@borsos_soundstorm_2023. This approach simplifies the generation task and has led to significant advances in the quality and controllability of synthetic speech. It can be applied to audio in general or speech alone @wu_codecsuperb_2024.
 
 #comic.comic((80mm, 40mm), "neural codec (enc-dec)", orange) <fig_codec_process>
+
+// add section on input representations (meaning/context, text, stress-marked phonemes)

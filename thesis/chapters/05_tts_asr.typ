@@ -21,11 +21,15 @@
 computer vision problem with a neural network, synthetic data appeared.]
 )
 
+// the neural network isn't self-driving
+
 Using synthetic data for training has been a cornerstone of machine learning since its early days, offering a practical solution to the challenges of real-world data collection. Its first recorded use dates back to 1988, when it was employed to train a self-driving neural network. The motivation was efficiency: "changes in parameters such as camera orientation would require collecting an entirely new set of road images" @pomerleau_alvinn_1988. In today's deep learning era, the rationale for leveraging Text-to-Speech (TTS)-generated speech in Automatic Speech Recognition (ASR) remains similar—synthetic data can be generated with precise control over properties like speaker identity, lexical content, or even phonetic durations, often more efficiently than gathering equivalent real data @du_speaker_2020@casanova_singlespeaker_2022@rosenberg_speechaug_2019@fazel_synthasr_2021@rossenbach_duration_2023.
 
 While synthetic data is frequently used to augment real datasets, the primary perspective in this work treats it as a proxy for real speech. Training an ASR model on TTS-generated data—TTS-for-ASR—serves as an objective lens to examine the distributional distance between real and synthetic speech. This approach probes how well synthetic speech captures the variability of real speech in a way that directly impacts a downstream task. If the distributions of real speech $S$ and synthetic speech $tilde(S)$ were truly identical, we would expect equivalent ASR performance when training on either. As we will show, this is not the case, and the resulting performance gap forms the core inquiry of this part of the thesis.
 
 === Augmenting Real Data
+
+// use equations for actually explaining augmentation (e.g. unified sets)
 
 Synthetic data often serves to enhance existing real datasets, introducing targeted diversity that can improve ASR robustness. Augmentation is this effective due to real speech datasets, while authentic, potentially lacking coverage in areas like rare vocabularies or speaking styles. TTS can fill these voids by generating tailored samples, but the key lies in balancing the mix to avoid diluting the original data and skewing the distribution.
 
@@ -34,6 +38,8 @@ A common strategy is to supplement a real dataset $S$ with synthetic speech $til
 The ratio of real to synthetic data is critical. Studies consistently show that a 50:50 split provides a solid baseline, yielding reliable improvements @li_synthaug_2018@rosenberg_speechaug_2019@wang_improving_2020. However, this is flexible—when synthetic speech introduces high style diversity (e.g., via Variational Autoencoders), even a 9:91 real-to-synthetic ratio can deliver a 16% relative WER reduction @sun_generating_2020. Commonly used datasets for these experiments include read audiobooks like LibriSpeech @panayotov_librispeech_2015 and its TTS-optimized variant, LibriTTS @zen_libritts_2019. While effective, augmentation assumes some real data is available; the true test of synthetic speech's potential lies in standalone use.
 
 === Training on Synthetic Data Alone
+
+// distuingish for lexcial-only augmentation
 
 Fully replacing real data with synthetic speech tests the core assumption of TTS parity: if synthetic distributions match real ones, ASR performance should be comparable. Before examining the evidence, consider the implications—a persistent gap would reveal systematic limitations in TTS, beyond surface-level naturalness, that hinder downstream tasks like ASR.
 
@@ -87,3 +93,9 @@ caption: "Results when training on synthetic and evaluating on real and vice ver
 However, MWERR lacks the triangle inequality, as WER emerges from non-linear optimization, not direct distribution comparison. Augmentation experiments further highlight limitations: Techniques like SpecAugment improve ASR but distort distributions away from real speech @park_specaugment_2019. Thus, MWERR is a task-specific heuristic for dissimilarity, not a true metric.
 
 Having quantified the gap via WERR, we now empirically test methods to enhance synthetic diversity in the next chapter.
+
+// overall: needs to be turned into proper contributions chapter
+// experimental setup for measuring WERR
+// what is the setup and why do we need it
+// contribution needs to be bigger
+
