@@ -61,7 +61,7 @@
   ("CWT", "Continous Wavelet Transform"),
   ("STFT", "Short-time Fourier transform"),
   ("NLL", "Negative log-liklihood"),
-  ("SLM", "Speech Language Model"),
+  ("SLM", "Spoken Language Model"),
   ("GMM", "Gaussian Mixture Model"),
   ("JSD", "Jensen-Shannon Divergence"),
   ("MWERR", "Mean Word Error Rate Ratio"),
@@ -220,6 +220,8 @@
 
 // Abstract
 #frontmatter-heading([Abstract])
+
+// conversational + full duplex
 
 #abbr.a[TTS] data generation has advanced to the point where it often mimics real data convincingly, according to human judges. Does that mean that in these settings, TTS is solved? If this were the case, the resulting data could be used as a stand-in from any problem were real data is needed -- especially in the inverse of #abbr.a[TTS], #abbr.a[ASR]. In this work, we attempt to use purely synthetic, #abbr.a[TTS]-generated, data for #abbr.a[ASR] and find a large discrepancy between the expected performance based on human judgements and the actual suitability of the data. While we show this #emph[synthetic-real gap] can be reduced by conditioning on a broad set of utterance-level characteristics, it cannot be explained fully. Further we find that dataset scale can equally only explain part of the gap, leading to diminishing returns beyond a certain point.
 In light of these findings, we continue to investigate the problem from the other directions -- can we evaluate #abbr.a[TTS] in a way that shows this gap, while also offering explainabilty as to which areas lack the most. To this end, we introduce a benchmark which measures the divergence between real and synthetic data on a distribution level across several factors, including prosody, speaker identity, ambient acoustics and intelligibility. By normalising distribution distances across these factors to follow the same scale, we can show their average correlates with human judgement, while simultaneously showing full saturation has not been reached, unlike said human judgements. As we extend our benchmark to 14 languages, we find this is especially the case for languages other than English and Chinese. Our work shows that work remains to be done in #abbr.a[TTS] research, and that evaluation techniques should be adapted and improved as systems reach human parity by traditional measures.

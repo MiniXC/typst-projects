@@ -27,23 +27,29 @@ Synthetic speech is any speech that is artificially generated, without the use o
 
 === Text-to-Speech
 
-Formally, let $cal(T)$ be the space of all text sequences and $cal(S)$ be the space of all utterances. The objective of TTS is to model the true conditional probability distribution $Q(s|t)$ for any given pair $(t, s)$ where $t in cal(T)$ and $s in cal(S)$. This is achieved by training a generative model $f^"TTS"_theta (dot)$, where $theta$ is learned using pairs $(t,s)$ sampled from this true distribution. The model is thereby optimized to learn an approximation of this distribution $Q_theta$ which can then be used to sample a synthetic utterance $tilde(s)$ from an arbitrary input text $t$ #footnote[assuming speaker independence for simplicity here; conditioning is discussed below]:
+Formally, let $cal(T)$ be the space of all text sequences and $cal(S)$ be the space of all utterances. The objective of TTS is to model the true conditional probability distribution $Q(S|T)$ for any given pair $(T, S)$ where $T in cal(T)$ and $S in cal(S)$. This is achieved by training a generative model $f^"TTS"_theta (dot)$, where $theta$ is learned using pairs $(T,S)$ sampled from this true distribution. The model is thereby optimized to learn an approximation of this distribution $Q_theta$ which can then be used to sample a synthetic utterance $tilde(S)$ from an arbitrary input text $T$:#footnote[assuming speaker independence for simplicity here; conditioning is discussed below]
 
 $
-tilde(s) ~ Q_theta (s|t)
+tilde(S) ~ Q_theta (S | T)
 $ <tts_formula>
 
-While @tts_formula is the simplest case of #abbr.a[TTS], $t$ is usually not the only variable $s$ is conditioned on, and there are additional conditioning variables. These are derived by applying a reductive transformation function $r(s)$ from the the space of all such transforms $cal(R)$. Since the function is reductive, neither $s$ nor $t$ can be reconstructed from the representation -- however, they should hold salient, yet abstracted, information of the speech. For example, $r(s)$ could extract speaker identity from a reference utterance, enabling voice-cloning TTS where the output mimics a specific voice.
+While @tts_formula is the simplest case of #abbr.a[TTS], $t$ is usually not the only variable $s$ is conditioned on, and there are additional conditioning variables. These are derived by applying a reductive transformation function $R(s)$ from the the space of all such transforms $cal(R)$. Since the function is reductive, neither $s$ nor $t$ can be reconstructed from the representation -- however, they should hold salient, yet abstracted, information of the speech. For example, $r(s)$ could extract speaker identity from a reference utterance, enabling voice-cloning TTS where the output mimics a specific voice.
+
+// we need to add hat(S) since otherwise R(S) is circular
 
 $
-tilde(s) ~ Q_theta (s | t, z) " where " z = r(s) " for some " r in cal(R)
+tilde(S) ~ Q_theta (T | T, Z) 
 $
 
-The most common example of $z$ is the identity of the speaker in form of a learned vector, simple numeral or reference utterance, in which case we refer to voice-cloning TTS. However, TTS can be conditioned on any number and kinds of $z$ (in which case we refer to a set $Z$ containing $z_1 dots z_n$ derived using $r_1 dots r_n$). Assuming speaker independence, real-world TTS often incorporates conditioning on speaker representations to handle the many possible realisations. The impossibility of modelling all possible realisations without having a perfect model of each speaker leads to some fundamental differences between real and synthetic speech: some speech might be produced which could never be uttered by a human -- for example, the robotic sound caused by certain vocoders, characterized by a buzzy or metallic timbre due to insufficient fidelity in synthesis of Mel spectrograms @hu_syntpp_2022@morise_world_2016, but these could also be more subtle and imperceptible by listeners such as is explicitly the goal for speech watermarking @nematollahi_watermarking_2013. Due to these difficulties evaluation of TTS usually relies on human judges: A number of utterances from a test set is synthesised such that for each $(tilde(s),t)$ pair there is a matching $(s,t)$ and then said human judges are asked to rate both synthetic and real speech (without knowing which is which), based on attributes such as #emph[naturalness] or #emph[quality]. This methodology should emphasise differences in speech that matter to real listeners, and ignore differences that are perceptually irrelevant. Recent works have confirmed that with this method, #citea(<taylor_tts_2009>)'s leading quote from 2009 does no longer apply, with synthetic utterances now often receiving ratings statistically inseparable from real ones @chen_vall-e_2024@tan_naturalspeech_2024@eskimez_e2_2024. These recent improvements have lead to works investigating if this synthetic data can be used for tasks where large amounts of speech data are beneficial.
+The most common example of $Z$ is the identity of the speaker in form of a learned vector, simple numeral or reference utterance, in which case we refer to voice-cloning TTS. However, TTS can be conditioned on any number and kinds of $z$ (in which case we refer to a set $Z$ containing $z_1 dots z_n$ derived using $r_1 dots r_n$). Assuming speaker independence, real-world TTS often incorporates conditioning on speaker representations to handle the many possible realisations. The impossibility of modelling all possible realisations without having a perfect model of each speaker leads to some fundamental differences between real and synthetic speech: some speech might be produced which could never be uttered by a human -- for example, the robotic sound caused by certain vocoders, characterized by a buzzy or metallic timbre due to insufficient fidelity in synthesis of Mel spectrograms @hu_syntpp_2022@morise_world_2016, but these could also be more subtle and imperceptible by listeners such as is explicitly the goal for speech watermarking @nematollahi_watermarking_2013. Due to these difficulties evaluation of TTS usually relies on human judges: 
+// maybe switch around order (reference first)
+A number of utterances from a test set is synthesised such that for each $(tilde(s),t)$ pair there is a matching reference $(s,t)$ and then said human judges are asked to rate both synthetic and real speech (without knowing which is which), based on attributes such as #emph[naturalness] or #emph[quality]. This methodology should emphasise differences in speech that matter to real listeners, and ignore differences that are perceptually irrelevant. Recent works have confirmed that with this method, #citea(<taylor_tts_2009>)'s leading quote from 2009 does no longer apply, with synthetic utterances now often receiving ratings statistically inseparable from real ones @chen_vall-e_2024@tan_naturalspeech_2024@eskimez_e2_2024. These recent improvements have lead to works investigating if this synthetic data can be used for tasks where large amounts of speech data are beneficial.
 
 === Automatic Speech Recognition
 
 The inverse of #abbr.a[TTS] is #abbr.l[ASR], which aims to automatically transcribe a speech utterance into its corresponding text sequence. Therefore, the objective of ASR is to model the conditional probability distribution $P(t|s)$. This is typically framed as a prediction task, where a model $f^"ASR"_Phi$ with parameters $Phi$ is trained on $(t,s)$ pairs to learn an approximation of this distribution. This model can then be used to infer the most probable text sequence $hat(t)$ for a given input utterance $hat(s)$:
+
+// no hat needed here
 
 $ hat(t) = argmax_(t in cal(T)) P_Phi (t|hat(s)) $
 
@@ -56,12 +62,17 @@ We make explaining this gap in performance the initial objective for this thesis
 
 === Distribution Distance <dist_distance>
 
-A key concept in this thesis is the "distributional distance" between real and synthetic speech, which quantifies how closely the probability distribution $Q_theta$ (learned by the TTS model) approximates the true distribution $Q$ of real speech. Formally, let $Q$ represent the true distribution over the space of all possible speech utterances $cal(S)$, conditioned on text $cal(T)$ and other factors (e.g., speaker, prosody). The TTS model approximates this as $Q_theta$. The distance $d(Q, Q_theta)$ can be measured using metrics like the 2-Wasserstein distance (Earth Mover's Distance), which computes the minimal "work" required to transform one distribution into the other $W(Q,Q_theta)$ which is defined in detail in @09_dist.
+A key concept in this thesis is the "distributional distance" between real and synthetic speech, which quantifies how closely the probability distribution $Q_theta$ (learned by the TTS model) approximates the true distribution $Q$ of real speech. 
+// text and conditioning also a huge space
+Formally, let $Q$ represent the true distribution over the space of all possible speech utterances $cal(S)$, conditioned on text $cal(T)$ and other factors (e.g., speaker, prosody). The TTS model approximates this as $Q_theta$. 
+// more verbose for introducing Q terms here
+The distance $d(Q, Q_theta)$ can be measured using metrics like the 2-Wasserstein distance (Earth Mover's Distance), which computes the minimal "work" required to transform one distribution into the other $W(Q,Q_theta)$ which is defined in detail in @09_dist.
 
 This distance highlights gaps in coverage (e.g., synthetic speech often lacks variability in prosody or environmental noise), which we explore empirically in Parts II and III. To use this, we propose the Text-to-Speech Distribution Score (TTSDS), which quantifies distributional dissimilarities across perceptually motivated factors: #smallcaps[Generic] (overall similarity via SSL embeddings); #smallcaps[Speaker] (realism via speaker embeddings); #smallcaps[Prosody] (e.g., pitch and speaking rate); and #smallcaps[Intelligibility] (e.g., ASR activations).
 
 For each factor, we extract features from real ($D$) and synthetic ($tilde(D)$) datasets, then compute the 2-Wasserstein distance $W_2$ to compare empirical distributions. To normalize, we also compute distances to "distractor" noise datasets ($D^"NOISE"$), yielding a score from 0 (noise-like) to 100 (real-like):
 
+// too early and technical
 $
 "Score"(tilde(D),D;D_"noise") = 100 times (W(r(tilde(D)),r(D_"noise")))/(W(r(tilde(D)),r(D)) + (W(r(tilde(D)),r(D_"noise"))))
 $
@@ -88,4 +99,4 @@ In Part III, we introduce and validate a new evaluation metric for synthetic spe
 
 === Notation
 
-To maintain clarity when discussing both speech synthesis and recognition, we adopt the following notational conventions throughout this thesis. Speech signals are denoted by $S$, and their corresponding text is denoted by $T$. When both real and synthetic data are discussed in the same context, a tilde ($tilde$) is used to indicate the synthetic counterpart (e.g. $tilde(s)$ for a synthetic speech signal in $tilde(S)$).
+To maintain clarity when discussing both speech synthesis and recognition, we adopt the following notational conventions throughout this thesis. Speech signals are denoted by $S$, and their corresponding text is denoted by $T$. When both real and synthetic data are discussed in the same context, a tilde ($tilde$) is used to indicate the synthetic counterpart.

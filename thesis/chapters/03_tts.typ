@@ -13,112 +13,153 @@
 #import "../comic.typ"
 
 == Text-to-Speech <03_tts>
+#q(
+  [#citep(<wang_tacotron_2017>)],
+  [#emph[Tacotron: Towards End-to-End Speech Synthesis]],
+  [TTS is a large-scale inverse problem: a highly compressed source (text) is "decompressed" into
+audio. Since the same text can correspond to different pronunciations or speaking styles, this is a particularly difficult learning task …]
+)
 
-// are we sure this is done in chapter 1?
+The primary goal of Text-to-Speech (TTS) is to automatically convert a sequence of text into a natural-sounding utterance. This chapter provides a comprehensive overview of the systems designed to solve this complex "one-to-many" problem, where a single text or other #smallcaps[Semantic] input can correspond to countless valid acoustic realisations depending on factors like #smallcaps[Speaker] and #smallcaps[Prosody] introduced in @02_factors[Chapter]. This chapter will illustrate how TTS systems are fundamentally designed to generate and manipulate representations related to these factors, while using yet more representations of speech for conditioning and internal representations.
 
+=== Forms of speech synthesis
 
-As outlined in @01_intro[Chapter], we constrain this work to multi-speaker voice-cloning #abbr.a[TTS], in which there are two inputs; a speaker representation derived from a reference recording, which is most commonly a speaker embedding (see @02_speaker), but could also be a Mel Spectrogram or any other representation containing information about the given speaker @eskimez_e2_2024, like a text prompt describing their characteristics @lyth_parler_2024. Mapping these inputs to an acoustic realisation is a complex "one-to-many" problem @ren_revisiting_2022@blumstein_phonetic_1981. This chapter provides a comprehensive overview of TTS systems, drawing heavily on the survey by @tan_survey_2021, which categorizes neural TTS components and advanced topics. We expand on key methodologies, including historical context, frontends, and contrasts with related tasks like voice conversion, while adhering to the notation introduced in Chapter 1.
+In our work, we focus on #abbr.a[TTS], however there are other paradigms for speech generation, the most common being #emph[Textless Generation] and #emph[Voice Conversion]. @fig_tts_vc_textless visualises these differing approaches.
+
+==== Textless Generation
+
+Beyond text-conditioned synthesis, these models produce speech without any explicit or implicit semantic input, sampling instead from a learned distribution of speech sounds. Thus, these models aim to learn the underlying probability distribution $Q(S)$ directly. Early neural approaches, such as the original WaveNet architecture, demonstrated this by using an autoregressive model to predict low-level #smallcaps[Generic] raw audio samples one at a time, conditioned only on previous samples @oord_wavenet_2016. Textless models are foundational for tasks like audio completion or infilling but they require careful handling of sequence length and long-term coherence to avoid devolving into unstructured noise @tan_survey_2021. Recently, this form of generation has seen increased interest due to #abbr.pla[SLM] @lakhotia_gslm_2021 where a #abbr.a[LLM]-like system is trained to predict high-level acoustic units, usually contextualised speech embeddings -- however, even the latest systems still lack semantic coherence, with the text extracted from speech produced by these models achieving $<20%$ "win rate" against real text @park_speechssm_2025.
+
+==== Voice Conversion
+
+While TTS maps a #smallcaps[Semantic] representation ($T$) to a #smallcaps[Generic] acoustic one ($S$), the related task of #emph[#abbr.a[VC]] transforms an input speech signal from a source style to a target style while preserving the linguistic content. VC conditions on a source utterance $S^"SRC"$ rather than text $T$:
+
+$
+tilde(S) tilde Q_theta (S | S^"SRC", Z)
+$
+
+Here, the conditioning set $Z$ typically contains a high-level #smallcaps[Speaker] embedding representing the target voice. A key challenge in VC is to effectively disentangle the #smallcaps[Semantic] content of the speech from the #smallcaps[Speaker] and #smallcaps[Prosody] factors, often using specialized feature extractors or autoencoder-based architectures @sisman_vc_2020. VC enables applications like real-time voice modification and dubbing, where the goal is to change the voice characteristics without relying on a transcript.
+
+#figure(
+  diagram(
+    spacing: 5pt,
+    cell-size: (5mm, 10mm),
+    edge-stroke: 1pt,
+    edge-corner-radius: 5pt,
+    mark-scale: 70%,
+    
+    // Unconditional Generation (NEW)
+    node((-2, 3.2), align(center)[$Z$]),
+    edge((-2, 3.2), (-2, 2), "--|>"), // Optional conditioning (e.g., random seed)
+    blob((-2, 2), [Textless Generation], tint: orange, width: 42mm),
+    edge((-2, 2), (-2, 0.9), "-|>"),
+    node((-2, 0.9), $tilde(S)$),
+
+    // voice conversion
+    node((-.37, 3.2), align(center)[$Z$]),
+    edge((-.37, 3), (0, 2), "--|>", bend: -15deg),
+    node((0, 3), $S^text("SRC")$),
+    edge((0, 3), (0, 2), "-|>"),
+
+    blob((0, 2), [Voice Conversion], tint: orange, width: 42mm),
+    edge((0, 2), (0, 0.9), "-|>"),
+    node((0, 0.9), $tilde(S)$),
+
+    // tts
+    node((1.6, 3.2), align(center)[$Z$]),
+    edge((1.6, 3.2), (2, 2), "--|>", bend: -15deg),
+    node((2, 3), $T$),
+    edge((2, 3), (2, 2), "-|>"),
+    blob((2, 2), [Text-to-Speech], tint: orange, width: 42mm),
+    edge((2, 2), (2, 0.9), "-|>"),
+    node((2, 0.9), $tilde(S)$)
+  ),
+  placement: top,
+  caption: "Comparison of Text-to-Speech (TTS), Voice Conversion (VC), and Textless Generation.",
+) <fig_tts_vc_textless>
+
+==== Text-to-Speech
+
+For this work, we focus on TTS due to the abundance of openly available TTS models compared to #abbr.pla[VC] or #abbr.pla[SLM] as well as due to their controllability -- being able to condition on separate #smallcaps[Semantic], #smallcaps[Speaker] and optionally #smallcaps[Prosody] representations allows us to investigate the synthetic speech in more controlled experimental setups. Systems which condition on at least the former two are understood as multi-speaker, voice-cloning TTS systems, which make up the majority of modern TTS systems @cooper_review_2024. The #smallcaps[Semantic] representation is text or derived from text, such as contextualised text embeddings or phones. The #smallcaps[Speaker] representation is most commonly a high-level learned speaker embedding (see @02_speaker), but can also be another representation containing salient speaker information, such as a mid-level Mel spectrogram of a reference utterance @eskimez_e2_2024 or even a high-level text prompt describing their identifying characteristics @lyth_parler_2024.
+
+=== Hierarchy of Text-to-Speech
+
+Most TTS systems have a distinct #emph[frontend], transforming the input text and a #emph[vocoder], converting some speech representation to a waveform. These components are useful since the "raw" text $T$ and waveform $S$ are not ideal representations for modeling speech.
+
+==== Frontend
+Text can be ambiguous, for example in terms of pronunciation, or representation of numbers and dates.
+Which makes the frontend, or text analysis module, a critical component of many TTS systems. Its purpose is to transform raw, unstructured text into a clean, structured linguistic feature representation suitable for the acoustic model @taylor_tts_2009. This process is fundamentally about converting the highest-level #smallcaps[Semantic] representations into a format that can be more easily mapped to acoustics. This can involve the following:
+
+*Text Normalisation:* This stage converts non-standard words, such as numbers, abbreviations, and symbols, into their full written form. For example, "1989" becomes "nineteen eighty-nine" and "Dr." becomes "Doctor." This step can help to ensuring correct pronunciation.
+
+*Linguistic Analysis:* This can include tasks like part-of-speech (POS) tagging to resolve pronunciation ambiguities (e.g., "read" as /riːd/ vs. /rɛd/) and word segmentation for languages like Chinese that do not use spaces.
+
+*Grapheme-to-Phoneme (G2P) Conversion:* This is often the final step, converting the normalized text into a mid-level #smallcaps[Semantic] representation: the *Phone Sequence*. This mapping from orthography to a phonetic representation like /s p iː tʃ/ is essential for accurate pronunciation, particularly in languages with irregular orthography like English or with polyphones in Chinese @yao_g2p_2015.
+
+*Text Tokenization:* While traditional systems used complex, multi-stage, rule-based frontends, modern neural TTS systems have simplified this process. Many models now operate directly on character sequences, only tokenizing the text @hayashi_espnet-tts_2020. A recent development is the use of #abbr.a[SSL] models to extract phonetic representations directly from audio, which can then be used to train TTS systems, bypassing traditional G2P altogether.
+
+==== Vocoder
+
+Raw waveforms are high-resolution, low-dimension representations, with typically 16- to 44-thousand values representing each second of audio. Generative models therefore are often tasked to predict a more low-resolution representation with higher dimensionality, usually a lossy-reconstructible mid-level #smallcaps[Generic] representation like a Mel spectrogram, which is then converted to a raw waveform using a vocoder. Legacy systems rely on algorithmic vocoders based on the source-filter model. *LPC Vocoders* @atal_lpc_1970, originally developed for telephony, provide a computationally cheap but robotic-sounding output. *Source-Filter Vocoders* like WORLD @morise_world_2016, represented an improvement by modeling the source (F0, aperiodicity) and filter (spectral envelope) to produce much more natural, albeit sometimes "buzzy" speech for parametric systems. Early end-to-end models like Tacotron, which were among the first to directly produce mel spectrograms successfully, used the algorithmic *Griffin-Lim* method @griffin_griffinlim_1984 to iteratively estimate phase and reconstruct a waveform.
+
+With deep learning, neural vocoders ga introduced, leading to a dramatic leap in quality. Among the first were *Simple Autoregressive* models like WaveNet @oord_wavenet_2016, which generate audio sample-by-sample, achieving human-level fidelity at the cost of extremely slow inference. To address this, parallel models were developed. *Flow-based* vocoders like WaveGlow @prenger_waveglow_2019 use normalizing flows for fast, high-quality parallel generation. However, *GAN-based* vocoders have become the dominant approach for their exceptional balance of speed and quality. Systems like MelGAN @kumar_melgan_2019, HiFi-GAN @kong_hifigan_2020 or BigVGAN @lee_bigvgan_2023 use a generator to create audio from a Mel spectrogram and a discriminator to ensure its perceptual realism, enabling real-time, high-fidelity synthesis. *Diffusion-based* vocoders such as DiffWave @kong_diffwave_2021, are another high-quality parallel approach, learning to reverse a noising process, though they can be slower than GANs. The most recent development involves using the decoder of a pre-trained *Neural Audio Codec* as the vocoder. Models like EnCodec @defossez_encodec_2023 learn to tokenize audio into a discrete representation, and their decoders can perfectly reconstruct a waveform from these tokens, a technique leveraged by the latest generation of TTS models.
 
 === History of TTS
 
-The evolution of TTS reflects advancements in signal processing, machine learning, and deep learning. Early systems relied on rule-based or concatenative methods, statistical parametric approaches, as well as neural-based models. For a detailed historical survey, see #citep(<tan_survey_2021>).
+#figure(
+  image("../figures/3/tts_timeline.png", width: 100%),
+  caption: [Non-exhaustive timeline of TTS systems, as well as frontend and vocoder technologies used.],
+  placement: top,
+) <fig_tts_timeline>
 
-Before the compute and data resources for #abbr.a[DNN]-based methods were available, three main approaches were used for #abbr.a[TTS].
+The evolution of TTS, as visualised in @fig_tts_timeline, reflects a progression in architectures and the representations they employ, moving from complex pipelines to more integrated, end-to-end systems.
 
-*Concatenative synthesis* constructs speech by selecting and concatenating pre-recorded units of speech from a large database recorded by a single speaker @taylor_tts_2009. The most common form of this was #emph[unit selection synthesis]. For a given input text, the system would first determine a target sequence of phonetic units with associated prosodic features (e.g., pitch, duration). A search algorithm, typically Viterbi search, would then find the optimal path through the speech database to retrieve a sequence of waveform units. The "optimality" was determined by a cost function that balanced a #emph[target cost] (how well a database unit matches the target phonetic and prosodic features) and a #emph[join cost] (how smoothly two adjacent units can be concatenated) @hunt_unit_1996. While capable of producing high-quality and natural-sounding speech, these systems were limited by the contents of their database and could have audible concatenation points.
+The legacy era was defined by modular systems. *Concatenative synthesis*, exemplified by the *Festival* @taylor_festival_1998 toolkit, used a frontend with full linguistic analysis to select raw waveform chunks from a database. As it concatenated existing audio, it did not require a vocoder. In parallel, *Statistical Parametric Speech Synthesis* (SPSS), seen in *HTS* @tokuda_hts_2013 and later the DNN-based *Merlin* toolkit @wu_merlin_2016, also used a complex linguistic frontend but generate parameters for a *Source-Filter* vocoder like WORLD @morise_world_2016.
 
-*Statistical parametric speech synthesis* emerged parallel to this, with #abbr.l[HMM]-based synthesis being the most prominent example @tukoda_hmm_2013. Instead of concatenating waveforms, #abbr.a[HMM]-based systems generate a smooth trajectory of acoustic parameters (like spectral features and fundamental frequency) from statistical models trained on speech data. 
+The first wave of end-to-end neural models simplifies the frontend to basic tokenization and focuses on generating spectrograms. *Tacotron* @wang_tacotron_2017 is a autoregressive model that used the algorithmic *Griffin-Lim* @griffin_griffinlim_1984 method as its vocoder. The major quality breakthrough comes with *Tacotron 2* @shen_natural_2018, which pairs a similar spectrogram-prediction model with a powerful, though slow, *Simple Autoregressive* neural vocoder based on WaveNet @oord_wavenet_2016.
 
-// Systems like Merlin @wu_merlin_2016 exemplified this era, using HMMs or DNNs for parameter prediction, often combined with vocoders for waveform generation.
+The subsequent drive for efficiency leads to a family of non-autoregressive models that generate Mel spectrograms in parallel. These systems, including *FastSpeech*, *FastSpeech2*, and *GlowTTS*, offload the final waveform generation to a separately trained, fast neural vocoder. As @fig_tts_timeline shows, these models can be paired with various *Mel Spectrogram Based* vocoders, with *GAN-based* models like HiFi-GAN @kong_hifigan_2020 being the most common choice due to their speed and quality. *Diffusion-based* and *Flow-based* vocoders are also viable options for this architecture.
 
-*Hybrid models* represented the state-of-the-art prior to the deep learning revolution by combining the strengths of both approaches @ling_hybrid_2007. In a typical hybrid system, an #abbr.a[HMM]-based model would first generate the target acoustic parameter trajectories, providing flexible and natural prosody. Then, a unit selection component would search the database for waveform units that best matched these #abbr.a[HMM]-generated targets, rather than targets derived from simpler rules. This allowed for the high segmental quality of concatenative synthesis while leveraging the superior prosodic modelling of statistical methods.
+Recent developments have focused on integrated end-to-end approaches and output representations. *VITS* @kim_vits_2021 represents a true end-to-end approach, jointly learning to align text and generate a raw waveform directly within a single model, thus having its own integrated vocoder. Concurrently, diffusion models have been applied to the main TTS task in systems like *NaturalSpeech2* @tan_naturalspeech_2024 and *StyleTTS2* @li_styletts_2024, which typically generate a high-quality Mel spectrogram that is then rendered by a powerful GAN-based vocoder. The latest paradigm shift, represented by *VALL-E* @wang_valle_2023 and *ParlerTTS* @lyth_parler_2024, abandons spectrograms entirely. These systems use a simplified frontend, sometimes leveraging an *SSL Phoneme Model* for robust phonetic representations, and their acoustic model predicts a sequence of discrete tokens. The final waveform is then synthesized using a *Neural Audio Codec* decoder as the vocoder. However, alignment-free diffusion models producing mel spectrograms like *E2/F5* @eskimez_e2_2024 have achieved similar performance.
 
-// expansion: NN synthesis here
+=== Training Paradigms and Objectives
 
-#comic.comic((150mm, 80mm), "timeline showing evolution of tts over time", blue) <fig_tts_history>
+The development of modern TTS has been driven by diverse neural network architectures and the training objectives used to optimize them. While legacy systems were modular by necessity, current state-of-the-art approaches are predominantly #abbr.pla[DNN]. These systems typically take as input a #smallcaps[Semantic] representation in the form of a character or phoneme sequence, and are trained to produce a #smallcaps[Generic] acoustic representation as output, most commonly a Mel spectrogram or a sequence of discrete audio codec tokens. This section details the primary architectural paradigms that define how these models generate speech, and the training objectives used to guide their learning process.
 
-=== TTS Frontends
+==== Architectural Paradigms
 
-A critical but often overlooked component of TTS systems is the frontend, or text analysis module, which transforms raw text into linguistic features for synthesis @tan_survey_2021. This includes text normalization (converting non-standard words like "1989" to "nineteen eighty nine"), word segmentation (especially for languages like Chinese), part-of-speech tagging, prosody prediction, and grapheme-to-phoneme (G2P) conversion. G2P, for instance, maps written text to phonetic representations (e.g., "speech" to /s p iː tʃ/), essential for accurate pronunciation, particularly in languages with irregular orthography like English or polyphones in Chinese @yao_g2p_2015.
+The architecture of a TTS model dictates how it transforms input text into an acoustic representation. The most fundamental distinction between architectures is whether they generate the output sequence autoregressively or non-autoregressively.
 
-In neural TTS, frontends are simplified, often handling only normalization and G2P, as models directly process characters or phonemes. However, advanced systems incorporate neural frontends for end-to-end processing @hayashi_espnet-tts_2020. For details on frontend tasks, see @tan_survey_2021[Section 2.2].
+*Autoregressive (AR) Models:* These models generate the output sequence one step at a time, conditioning each step on the previously generated outputs. If we let the input linguistic sequence be $T$ and the target acoustic sequence be $bold{S} = (s_1, ..., s_n)$, an AR model factorizes the probability sequentially:
+$ p(bold(S)|bold(T)) = product_(i=1)^n p(s_i|s_1,dots,s_(i-1),bold(T)) $
+This sequential dependency allows AR models to capture complex, long-range correlations in the speech signal, often leading to highly coherent and natural-sounding output. The canonical example is *Tacotron 2* @shen_natural_2018, which uses an attention-based sequence-to-sequence architecture to generate Mel spectrogram frames one by one. More recently, this paradigm has been applied to discrete token generation in models like *VALL-E* @wang_valle_2023. These Speech Language Models (SLMs) frame TTS as a language modeling task, autoregressively predicting the next neural codec token based on the text and preceding audio tokens. The primary drawback of the AR paradigm is slow inference speed due to its inherently sequential nature, which can also lead to error propagation where a mistake early in the sequence affects all subsequent outputs.
 
-=== Voice Conversion vs. TTS
+*Non-Autoregressive (NAR) Models:* To overcome the slow inference of AR models, NAR models were developed to generate the entire output sequence in parallel. These models assume conditional independence between the output frames given the full input conditioning:
+$ p(bold(S)|bold(T)) = product_(i=1)^n p(s_i|bold(T)) $
+This parallel generation is extremely fast but presents a new challenge: aligning the variable-length input text sequence with the much longer output acoustic sequence. NAR models can be further subdivided based on how they solve this alignment problem.
 
-While TTS maps text $T$ to speech $S$ (conditioned on variables like speaker embedding $z = r(s)$ as in Equation 1.2), voice conversion (VC) transforms an the input speech signal $S$ to a target style while preserving content. Formally, VC conditions on $S$ rather than $T$: $tilde(s) tilde Q_theta (s | hat(s), z)$, where $z$ might represent target speaker timbre or style, and $hat(s)$ represents the speech to be converted. Unlike TTS, VC often disentangles content from prosody/timbre @sisman_vc_2020. This distinction is important, as VC enables unconditional generation or style transfer without text, complementing TTS in applications like dubbing.
+**Explicit Duration-Based Models** address the alignment challenge directly by predicting the duration for each input unit (typically a phone or character). This duration information is then used to expand the input sequence to match the target acoustic sequence's length. The most common implementation of this is the *Variance Adaptor* module. An early example, *FastSpeech* @ren_fastspeech_2019, used a teacher-student approach where a pre-trained AR model provided the duration targets. The more robust and widely adopted approach, seen in *FastSpeech 2* @ren_fastspeech_2021, uses a forced aligner to extract ground-truth durations from the training data and trains the variance adaptor to predict them from text, along with other low-level #smallcaps[Prosody] correlates like pitch and energy.
 
-=== Unconditional Generation
-
-Beyond text-conditioned synthesis, unconditional generation models produce speech without explicit input, sampling from learned distributions. These often use autoregressive architectures to generate waveforms directly, as in early WaveNet @oord_wavenet_2016, which models $Q(S)$ without $t$ or $z$. Unconditional models are foundational for tasks like audio completion or creative sound design, but require careful handling of sequence length and variability to avoid artifacts @tan_survey_2021.
-
-=== Hierarchical #sym.arrow.l.r #abbr.l[E2E] <03_hier_e2e>
-
-Seeing #abbr.a[TTS] as a *hierarchical pipeline* breaks the problem into a series of steps and representations, moving from the utterance-level information such as speaker @stanton_speaker_2022 and lexical content, to phone level, frame level (i.e. mel spectrogram or MFCC frames) to sample level. The precise levels might differ in their definition and purpose between systems, but generally there is a gradual transformation from lower- to higher-resolution representations, ending in the raw waveform. The individual transformations might be accomplished using #abbr.pla[DNN], other learned modules or rule-based systems.
-
-The second paradigm is the #abbr.a[E2E] approach in which a #abbr.a[DNN] directly predicts the output from the input. In many other domains, this approach has lead to consistently better results, however, for the high-resolution, continuous and highly inter-correlated nature of audio signals, this does not necessarily seem to be the case at the time of writing. Even the most recent #abbr.a[E2E] systems often use one or two components of the hierarchical approach, most commonly the #emph[vocoder], which converts mel spectrograms or other intermediate representations to raw waveforms @eskimez_e2_2024@chen_vall-e_2024, as well as the #abbr.a[g2p] conversion module @casanova_xtts_2024.
-
-#comic.comic((150mm, 80mm), "hierarchical TTS vs fully E2E TTS", purple) <fig_hier_e2e>
-
-// bigger section break between equations and overview
-
-=== #abbr.l[AR] #sym.arrow.l.r #abbr.l[NAR] <03_ar_nar>
-
-If we let $T$ be the input lexical sequence (e.g., sub-word tokens), $bold(S) = (s_1, dots, s_n)$ be the target acoustic sequence (e.g., Mel-spectrogram frames), and $bold(e)_S$ be the speaker embedding vector for the target speaker, the goal of a multi-speaker conditional TTS model is to learn the distribution $p(bold(S)|bold(T),bold(e)_S)$.
-
-*#abbr.l[AR] models* model this probability sequentially such that:
-
-$ p(bold(S)|bold(T),bold(e)_S) = product_(i=1)^n p(s_i|s_1,dots,s_(i-1),bold(T),bold(e)_S) $
-
-Here, $n$ represents the sequence length, determined by a stopping mechanism (e.g., an end-of-sequence token or predicted duration). #abbr.a[AR] can lead to better #abbr.a[TTS] performance, but usually shows less strict adherence to the lexical and speaker conditioning, since it is additionally conditioned on its own output, which can cause it to revert to unconditional generation in some cases @mehta_neuralhmm_2022.
-
-In contrast *#abbr.l[NAR] models* assume conditional independence between output frames given the full conditioning information:
-
-$ p(bold(S)|bold(T),bold(e)_S) = product_(i=1)^n p(s_i|bold(T),bold(e)_S) $
-
-#comic.comic((150mm, 80mm), "comparison of AR generation (sequential, step-by-step) vs. NAR (parallel, all-at-once)", green) <fig_ar_nar>
-
-// remove conditioning for simplicity (but write out that it has been removed)
-
-// define give technical details, and give overview
-
-=== Objectives
-
-When #link(<part_01>, [Part II]) of this work was conceptualised, the most common training objective for TTS was the #abbr.a[MSE] loss in use for the #abbr.a[NAR] FastPitch @lancucki_fastpitch_2021 as well as FastSpeech 1 @ren_fastspeech_2019 and 2 @ren_fastspeech_2021. On the #abbr.a[AR], Tacotron2 @wang_tacotron_2017 uses the same objective.
-
-==== Mean Squared Error (MSE)
-
-$ cal(L)_(text("MSE"))(theta)=EE[||bold(S)-f(bold(T),bold(e)_S;theta)||_2^2] $
-
-Our exploration of different forms of conditioning for TTS-for-ASR systems in @06_attr[Chapter] utilises this objective. 
-
-However, this can lead to oversmoothing of the output @ren_revisiting_2022 which caused the exploration of other objectives.
-
-==== Denoising Diffusion Probabilistic Models (DDPM)
-
-Among these is the *#abbr.a[DDPM] objective* @ho_denoising_2020 which we explore in detail in @07_scaling[Chapter]. In this approach speech is generated by learning to reverse a fixed forward process, $q$, which gradually adds Gaussian noise to the target speech $bold(S)$ over $N$ steps. This noising process is governed by a variance schedule $beta_n$. The model, parameterized by $theta$, learns the reverse denoising process, $p_theta(s_(n-1)|s_n)$, by predicting the parameters $(mu_theta, sigma_theta)$ to remove the noise at each step. It is trained by minimizing a loss function derived from the evidence lower bound (ELBO), which ensures the model can accurately reconstruct the original data from a noised state.
-
-The simplified objective is to train a noise-prediction network, $epsilon_theta$, to predict the added noise $epsilon$ from a noised sample $bold(S)_t$ at any timestep $t$:
-
-$ cal(L)_(text("DDPM"))(theta) = EE_(bold(S)_0, bold(epsilon), t, c) [|bold(epsilon) - bold(epsilon)_theta (bold(S)_t, t, c)\|_2^2] $
-
-where $c$ represents the conditioning variables such as text and speaker information; $bold(S)_0$ is the original data; $bold(S)_t$ is the noised version at step $t$; and $bold(epsilon)$ is the noise added.
-
-==== Negative Log-Likelihood (NLL)
-
-Another way to generate synthetic speech is emerging, inspired by #abbr.pla[LLM] -- speech is converted into a discrete sequence of tokens and the task is to simply predict the next (speech) token @lyth_parler_2024. This can be used for unconditional speech generation, as well as conditioned on text tokens or a specific speaker to effectively make it a #abbr.a[TTS] or #abbr.a[VC] system. The training objective for such autoregressive, token-based models is the standard cross-entropy loss, which seeks to minimize the #abbr.a[NLL] of the ground-truth token sequence. This requires a preliminary step where the continuous speech waveform $bold(S)$ is encoded into a sequence of discrete tokens $bold(s) = (s_1, s_2, ..., s_L)$ using a neural audio codec.
-
-The model is then trained to predict each token $s_i$ given the preceding tokens $bold(s)_(<i)$ and conditioning information $c$. The loss is the sum of the #abbr.pla[NLL] over the entire sequence:
-
-$ cal(L)_(text("NLL"))(theta) = EE_(bold(s), c) [ - sum_(i=1)^L log p_theta (s_i | bold(s)_(<i), c) ] $
-
-Here, $p_theta(s_i | bold(s)_(<i), c)$ is the probability assigned by the model to the correct token $s_i$ at timestep $i$. By minimizing this loss, the model learns the conditional probability distribution of the discrete speech representation. For unconditional generation, $c$ can be omitted, reducing to $p_theta(s_i | bold(s)_(<i))$, allowing free-form speech synthesis without input constraints @tan_survey_2021.
-
-#comic.comic((150mm, 80mm), "Comic overview of TTS objectives: MSE (averaging errors), DDPM (denoising process), NLL (token prediction)", orange) <fig_tts_objectives>
-
-// this should be more weaved in with the rest, combining technical and overview
-
-=== Developments in modern TTS
-
-While for #abbr.pla[LLM], a specific (decoder-only) architecture and training paradigm has emerged @naveed_llmoverview_2023, there is great diversity in the approaches to #abbr.a[TTS]. *Hierarchical* and #abbr.a[E2E] as well as #abbr.a[NAR] and #abbr.a[AR] can be combined, where systems blend elements of both to balance efficiency and quality @tan_survey_2021. For example, a model which generates Mel spectrograms and uses a separate vocoder to convert them to waveforms is #emph[mostly] #abbr.a[E2E], but still has the one hierarchical component of the vocoder. On the side of #abbr.a[NAR] and #abbr.a[AR], there is also the possibility of hybrid models which solve part of the #abbr.a[TTS] task in a #abbr.a[NAR] fashion while solving another part using an #abbr.a[AR] approach @wang_slmeval_2024. Modern #abbr.a[AR] approaches mostly predict tokens or speech codes and are often referred to as #abbr.pla[SLM]. These models greatly benefit from scale of data and model parameters, but can suffer in the areas of speaker identity and intelligibility, and sometimes hallucinate, meaning they generate speech not present in the transcript @wang_slmeval_2024. On the other hand purely #abbr.a[NAR] models have evolved as well, with the most popular recent approach abandoning both explicit alignment and #abbr.a[g2p] -- they do this by providing the transcript a sequence of characters as input to the model. Instead of phone- or word-level duration prediction, only the overall length of the utterance is predicted, and the input sequence padded to match this duration. The output representation of these models are usually Mel spectrograms, and they are trained using diffusion @eskimez_e2_2024@chen_f5_2024.
+**Implicit Alignment Models** represent a more advanced class of NAR architectures that learn the alignment between text and speech end-to-end, without requiring pre-computed durations. *Glow-TTS* @kim_glowtts_2020 achieved this using normalizing flows coupled with a Monotonic Alignment Search mechanism that finds the most probable alignment during training. A highly successful example is *VITS* @kim_vits_2021, which uses a Variational Autoencoder (VAE) framework. It jointly learns a stochastic duration predictor and an alignment between the latent text and speech representations, guided by a connectionist temporal classification (CTC)-style loss. This allows the model to be trained end-to-end, learning to generate high-quality audio in parallel while discovering the alignment on its own.
 
 #comic.comic((150mm, 150mm), "most common TTS architectures, nonautoregressive-with-correlates, token-based, token-based, ...", green) <fig_tts_arch>
+
+==== Training Objectives
+
+The training objective, or loss function, guides the optimization of the model's parameters. Modern TTS systems employ several different objectives, often in combination, to balance fidelity, diversity, and training stability.
+
+*Mean Squared Error (MSE) / L1 Loss:* For models that predict a continuous representation like a Mel spectrogram ($bold{S}$), the simplest and most common objective is a reconstruction loss. This is typically the Mean Squared Error (L2 loss) or the Mean Absolute Error (L1 loss). The objective is to minimize the distance between the model's prediction $f(bold{T};theta)$ and the ground-truth target:
+$ cal(L)_(text("MSE"))(theta)=EE[||bold(S)-f(bold(T);theta)||_2^2] $
+While stable and easy to optimize, this loss is known to produce "oversmoothed" outputs. By penalizing large errors heavily, it encourages the model to predict the average of all plausible outputs, resulting in a loss of fine-grained detail and texture in the final synthesized speech @ren_revisiting_2022. It was the primary objective for models like Tacotron 2 and the FastSpeech series.
+
+*Negative Log-Likelihood (NLL) / Cross-Entropy Loss:* This is the standard objective for models that generate discrete sequences, such as the token-based Speech Language Models. After converting the continuous waveform $bold{S}$ into a discrete token sequence $bold{s} = (s_1, ..., s_L)$, an autoregressive model is trained to predict each token given the previous ones. The training objective is to minimize the NLL of the ground-truth sequence, which is equivalent to maximizing the log-probability of the data:
+$ cal(L)_(text("NLL"))(theta) = EE_(bold(s), c) [ - sum_(i=1)^L log p_theta (s_i | bold(s)_(<i), c) ] $
+where $c$ is the conditioning information. This is the fundamental loss used to train powerful token-based models like *VALL-E*.
+
+*Adversarial Loss:* To improve the perceptual quality of the output, many systems incorporate adversarial training. This involves a discriminator network that is trained to distinguish real from synthesized audio, while the main generator model is trained to produce outputs that can "fool" the discriminator. This minimax game pushes the generator to create outputs that are perceptually indistinguishable from real data, capturing fine details that reconstruction losses often miss. GAN training is a core component of vocoders like HiFi-GAN and is also integrated directly into end-to-end TTS models like *VITS*.
+
+*Diffusion Loss:* The training of diffusion models relies on a specialized objective. The model, $epsilon_theta$, is optimized to predict the noise $epsilon$ that was added to a clean sample $bold{S}_0$ to create a noised version $bold{S}_t$ at timestep $t$. The simplified loss is typically an MSE loss in the noise space:
+$ cal(L)_(text("DDPM"))(theta) = EE_(bold(S)_0, bold(epsilon), t, c) [|bold(epsilon) - bold(epsilon)_theta (bold(S)_t, t, c)\|_2^2] $
+By learning to predict the noise, the model effectively learns the score function of the data distribution. This allows it to generate high-fidelity samples that do not suffer from the oversmoothing issue of direct MSE prediction on the data itself. This is the core objective for diffusion-based TTS models like *NaturalSpeech 2*. Many state-of-the-art systems, including VITS and modern diffusion models, use a combination of these losses—for instance, a reconstruction loss (like L1), an adversarial loss, and perceptual feature matching losses—to achieve the best results.
+
+#comic.comic((150mm, 80mm), "Comic overview of TTS objectives: MSE (averaging errors), DDPM (denoising process), NLL (token prediction)", orange) <fig_tts_objectives>

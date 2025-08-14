@@ -74,7 +74,7 @@ While powerful, pure attention-based models do not explicitly enforce monotonic 
 
 === Pretrain-finetune approach
 
-In recent #abbr.a[ASR] works, #abbr.a[SSL] is frequently employed, where a model is first pre-trained on a task like predicting masked portions of the speech. The resulting model is then fine-tuned with an additional "head" for the desired task and objective, most commonly #abbr.a[CTC] (@prabhavalkar_survey_2023). See @02_ssl for more details on #abbr.a[SSL] representations.
+In recent #abbr.a[ASR] works, #abbr.a[SSL] is frequently employed, where a model is first pre-trained on a task like predicting masked portions of the speech. The resulting model is then fine-tuned with an additional "head" for the desired task and objective, most commonly #abbr.a[CTC] (@prabhavalkar_survey_2023).
 
 Pretraining leverages large amounts of unlabeled audio data to learn robust acoustic representations, addressing data scarcity in supervised #abbr.a[ASR]. Popular models include wav2vec 2.0 @baevski_wav2vec_2020 and HuBERT @hsu_hubert_2021, which use contrastive or masked prediction tasks to capture phonetic and contextual information. During fine-tuning, a lightweight head (e.g., linear layer with CTC loss) is added to adapt the pretrained encoder for transcription. This approach yields state-of-the-art results on benchmarks like LibriSpeech, often outperforming models trained from scratch by 10-20% relative WER reduction, especially in low-resource scenarios (@prabhavalkar_survey_2023). This improves generalization to noisy or accented speech, and efficiency in transfer learning across languages or domains.
 
