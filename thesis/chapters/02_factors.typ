@@ -93,7 +93,7 @@ At a low level, identity is encoded in physical properties. Formant frequencies,
 
 To create a more robust representation, systems distill these variable acoustic cues into high-level, learned speaker embeddings. These fixed-dimensional vectors are extracted using a network trained to discriminate between thousands of speakers. Architectures like x-vectors @snyder_x_2018 and ECAPA-TDNN @desplanques_ecapa_2020 excel at this, learning to create a representation that is maximally sensitive to inter-speaker differences while being invariant to intra-speaker variability (like phonetic content). These embeddings are the cornerstone of speaker verification and diarization @bredin_pyannote_2023, as well as generative tasks like multi-speaker TTS and voice cloning @li_styletts_2024. Beyond core timbre, other identifying characteristics contribute to our perception of a speaker, such as perceived age, gender, and accent. While these can be treated as explicit semantic labels, they are often learned implicitly as part of a powerful speaker embedding, which captures not just anatomy but also these habitual, identity-linked speaking patterns.
 
-==== Prosody Representations
+==== Prosody Representations <02_prosody_rep>
 
 The #smallcaps[Prosody] factor is an #emph[intermediate] factor, governing the melody and rhythm of speech that links acoustic signals to emotional and pragmatic meaning.
 
