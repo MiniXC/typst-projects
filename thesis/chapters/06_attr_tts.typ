@@ -1,15 +1,5 @@
 #import "../abbr.typ"
 #import "../math.typ": *
-#import "@preview/fletcher:0.5.7" as fletcher: diagram, node, edge
-#import fletcher.shapes: house, hexagon
-#let blob(pos, label, tint: white, width: 26mm, ..args) = node(
-	pos, align(center, label),
-	width: width,
-	fill: tint.lighten(60%),
-	stroke: 1pt + tint.darken(20%),
-	corner-radius: 5pt,
-	..args,
-)
 #import "../comic.typ"
 
 == Enhancing Synthetic Speech Diversity <06_attr>

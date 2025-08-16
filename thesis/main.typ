@@ -11,7 +11,7 @@
 
 
 #set quote(block: true)
-#set cite(style: "american-anthropological-association")
+#set cite(style: "annual-reviews-author-date")
 
 #abbr.make(
   ("KDE", "Kernel Density Estimation", "Kernel Density Estimates"),
@@ -251,7 +251,7 @@ But unfortunately, while they sound very good, the voices were really bad for sp
       set text(font: "Crimson Pro", size: 16pt)
       if it.element.depth == 1 {
         parts-outline.step()
-        set text(font: "Crimson Pro", size: 18pt, style: "italic")
+        set text(font: "Crimson Pro", size: 17.5pt, style: "italic")
         if not (it.body().text.contains("Appendix") or it.body().text.contains("Bibliography")) {
           it.indented([
             Part #context [#parts-outline.display("I")] #h(.3em) --
@@ -325,7 +325,9 @@ But unfortunately, while they sound very good, the voices were really bad for sp
 
 #include "chapters/01_introduction.typ"
 
-= Background <part_00>
+= Speech; Synthesis and Recognition <part_00>
+
+
 
 #include "chapters/02_factors.typ"
 
@@ -337,7 +339,7 @@ But unfortunately, while they sound very good, the voices were really bad for sp
 
 
 In this part of our work, we explore how well-suited synthetic speech is for training speech recognition models.
-If the distribution of real speech was perfectly modeled, we would assume similar performance when training with synthetic speech as when training with real speech. However, this is not the case, suggesting systematic differences between synthetic and real speech.
+If the distribution of real speech was perfectly modeled, we would assume similar performance when training with synthetic speech as when training with real speech. However, this is not the case, suggesting systematic differences between synthetic and real speech. We first quantify the extent of this gap in @05_ttsasr[Chapter], then reduce it through conditioning and augmentation in @06_attr[Chapter] and finally investigate how far it could be reduced using scaling in @07_scaling[Chapter].
 
 #include "chapters/05_tts_asr.typ"
 
@@ -345,9 +347,9 @@ If the distribution of real speech was perfectly modeled, we would assume simila
 
 #include "chapters/07_scaling.typ"
 
-= Quantifying distances of synthetic and real speech <part_02>
+= Distributional distance of synthetic and real speech <part_02>
 
-Since our work in TTS-for-ASR suggested a large discrepancy between expected and actual performance due to a mismatch in distributions, we explore in which ways TTS evaluation can be improved by considering these distributions rather than individual samples alone.
+Since our work in TTS-for-ASR suggested a large discrepancy between expected and actual performance due to a mismatch in distributions, we explore in which ways TTS evaluation can be improved by considering these distributions rather than individual samples alone. We introduce the Text-to-Speech Distribution Distance (TTSDS) a measure utilising the distributional Wasserstein distance across several factors of speech, and show it correlates well with human judgement across domains and could feasibly be applied across languages.
 
 #include "chapters/08_eval.typ"
 
@@ -406,7 +408,8 @@ Since our work in TTS-for-ASR suggested a large discrepancy between expected and
     "references/asr.bib",
     "references/own.bib"
   ),
-  style: "american-anthropological-association"
+  style: "annual-reviews-author-date",
+  
 )
 
 #set text(top-edge: if review {1em} else {"cap-height"}, bottom-edge: if review {-.8em} else {"baseline"})
@@ -431,7 +434,7 @@ As far as licenses and resources permitted, all code and datasets used in the ma
 - #emph[Various datasets and pretrained models] #sym.arrow #underline[#link("https://huggingface.co/cdminix", [huggingface.co/cdminix])]: Includes forced-aligned versions of LibriTTS (@06_attr[Chapter]), Vocex (@02_factors[Chapter]), and detailed listening test results from TTSDS (@09_dist[Chapter]).
 
 
-== On the use of GenAI
+== GenAI
 
 Generative AI (GenAI) was used in the making of this thesis in accordance with the University of Edinburgh's GenAI policy#footnote[#link(
   "https://information-services.ed.ac.uk/computing/comms-and-collab/elm/guidance-for-working-with-generative-ai",
@@ -462,3 +465,7 @@ The general process for using GenAI in this work was conducted as follows:
 - Be specific: We never asked open-ended questions to GenAI, such as "My thesis topic is [...] how would you structure this thesis?" - we always posed a narrow, specific problem with text we had already created.
 
 *Transparency*: We publish all GenAI chats used in the making of this work at #link("https://github.com/minixc/thesis_genai", underline[github.com/minixc/thesis_genai]).
+
+== Chronology
+
+Research is not a linear process, and goals and topics can shift over time. For this work, the original goal was to investigate synthetic speech for #abbr.a[ASR] training. However, the large gap between synthetic and real speech when it came to this task, compared to how highly speech produced by modern systems is rated by humans, gave me pause. Instead of solely focusing on its usefulness for ASR, I decided to investigate the synthetic speech distribution as a whole, seeing the TTS-for-ASR task as an entry point for doing so.

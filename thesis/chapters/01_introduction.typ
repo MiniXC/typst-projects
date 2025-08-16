@@ -2,16 +2,6 @@
 #import "../quote.typ": *
 #import "../math.typ": *
 #import "../moremath.typ": *
-#import "@preview/fletcher:0.5.7" as fletcher: diagram, node, edge
-#import fletcher.shapes: house, hexagon
-#let blob(pos, label, tint: white, width: 26mm, ..args) = node(
-	pos, align(center, label),
-	width: width,
-	fill: tint.lighten(60%),
-	stroke: 1pt + tint.darken(20%),
-	corner-radius: 5pt,
-	..args,
-)
 
 == Introduction <01_intro>
 
@@ -41,23 +31,23 @@ $
 tilde(S) ~ Q_theta (T | T, Z) 
 $
 
-The most common example of $Z$ is the identity of the speaker in form of a learned vector, simple numeral or reference utterance, in which case we refer to voice-cloning TTS. However, TTS can be conditioned on any number and kinds of $z$ (in which case we refer to a set $Z$ containing $z_1 dots z_n$ derived using $r_1 dots r_n$). Assuming speaker independence, real-world TTS often incorporates conditioning on speaker representations to handle the many possible realisations. The impossibility of modelling all possible realisations without having a perfect model of each speaker leads to some fundamental differences between real and synthetic speech: some speech might be produced which could never be uttered by a human -- for example, the robotic sound caused by certain vocoders, characterized by a buzzy or metallic timbre due to insufficient fidelity in synthesis of Mel spectrograms @hu_syntpp_2022@morise_world_2016, but these could also be more subtle and imperceptible by listeners such as is explicitly the goal for speech watermarking @nematollahi_watermarking_2013. Due to these difficulties evaluation of TTS usually relies on human judges: 
+The most common example of $Z$ is the identity of the speaker in form of a learned vector, simple numeral or reference utterance, in which case we refer to voice-cloning TTS. However, TTS can be conditioned on any number and kinds of $z$, in which case we refer to a set $Z$ containing $z_1 dots z_n$ derived using some $R in cal(R)$. Assuming speaker independence, real-world TTS often incorporates conditioning on speaker representations to handle the many possible realisations. The impossibility of modelling all possible realisations without having a perfect model of each speaker leads to some fundamental differences between real and synthetic speech: some speech might be produced which could never be uttered by a human -- for example, the robotic sound caused by certain vocoders, characterized by a buzzy or metallic timbre due to insufficient fidelity in synthesis of Mel spectrograms @hu_syntpp_2022@morise_world_2016, but these could also be more subtle and imperceptible by listeners such as is explicitly the goal for speech watermarking @nematollahi_watermarking_2013. Due to these difficulties evaluation of TTS usually relies on human judges: 
 // maybe switch around order (reference first)
-A number of utterances from a test set is synthesised such that for each $(tilde(s),t)$ pair there is a matching reference $(s,t)$ and then said human judges are asked to rate both synthetic and real speech (without knowing which is which), based on attributes such as #emph[naturalness] or #emph[quality]. This methodology should emphasise differences in speech that matter to real listeners, and ignore differences that are perceptually irrelevant. Recent works have confirmed that with this method, #citea(<taylor_tts_2009>)'s leading quote from 2009 does no longer apply, with synthetic utterances now often receiving ratings statistically inseparable from real ones @chen_vall-e_2024@tan_naturalspeech_2024@eskimez_e2_2024. These recent improvements have lead to works investigating if this synthetic data can be used for tasks where large amounts of speech data are beneficial.
+A number of utterances from a test set is synthesised such that for each $(T,tilde(S))$ pair there is a matching reference $(T,S)$ and then said human judges are asked to rate both synthetic and real speech (without knowing which is which), based on attributes such as #emph[naturalness] or #emph[quality]. This methodology should emphasise differences in speech that matter to real listeners, and ignore differences that are perceptually irrelevant. Recent works have confirmed that with this method, #citea(<taylor_tts_2009>)'s leading quote from 2009 does no longer apply, with synthetic utterances now often receiving ratings statistically inseparable from real ones @chen_vall-e_2024@tan_naturalspeech_2024@eskimez_e2_2024. These recent improvements have lead to works investigating if this synthetic data can be used for tasks where large amounts of speech data are beneficial.
 
 === Automatic Speech Recognition
 
-The inverse of #abbr.a[TTS] is #abbr.l[ASR], which aims to automatically transcribe a speech utterance into its corresponding text sequence. Therefore, the objective of ASR is to model the conditional probability distribution $P(t|s)$. This is typically framed as a prediction task, where a model $f^"ASR"_Phi$ with parameters $Phi$ is trained on $(t,s)$ pairs to learn an approximation of this distribution. This model can then be used to infer the most probable text sequence $hat(t)$ for a given input utterance $hat(s)$:
+The inverse of #abbr.a[TTS] is #abbr.l[ASR], which aims to automatically transcribe a speech utterance into its corresponding text sequence. Therefore, the objective of ASR is to model the conditional probability distribution $P(T|S)$. This is typically framed as a prediction task, where a model $f^"ASR"_Phi$ with parameters $Phi$ is trained on $(S,T)$ pairs to learn an approximation of this distribution. This model can then be used to infer the most probable text sequence $T$ for a given input utterance $S$:
 
 // no hat needed here
 
-$ hat(t) = argmax_(t in cal(T)) P_Phi (t|hat(s)) $
+$ T = argmax_(T in cal(T)) P_Phi (T|S) $
 
 Since augmenting datasets is a tried-and-tested way to improve robustness and performance, and synthetic data is easier to acquire and label than real data @pomerleau_alvinn_1988, the high ratings of #abbr.a[TTS]-generated speech inspired a number of works to use synthetic data for training #abbr.l[ASR] systems @li_synthaug_2018@rosenberg_speechaug_2019@thai_lrasr_2019.
 
 We refer to this approach as TTS-for-ASR, where TTS-generated data is used to train or augment ASR models, leveraging the controllability of synthesis to address data scarcity in domains like low-resource languages or specific speaking styles.
 
-In this work, we first continue TTS-for-ASR research, and, in line with prior works @li_synthaug_2018@hu_syntpp_2022@rossenbach_duration_2023 find that the aforementioned high human ratings do not directly translate to suitability for #abbr.a[ASR] training. Instead of being within a few percentage points of the real speech as in human evaluation @wang_tacotron_2017 real speech usually outperforms synthetic by a factor of 2 or more for #abbr.a[ASR] training @casanova_singlespeaker_2022.
+In this work, we first continue TTS-for-ASR research, and, in line with prior works @li_synthaug_2018@hu_syntpp_2022@rossenbach_duration_2023 find that the aforementioned high human ratings do not directly translate to suitability for #abbr.a[ASR] training. Instead of being within a few percentage points of the real speech as in human evaluation @wang_tacotron_2017 real speech usually outperforms synthetic by a factor of 2 or more for #abbr.a[ASR] training @casanova_cross_2023.
 We make explaining this gap in performance the initial objective for this thesis, and introduce methodologies to both evaluate and reduce the gap. However, we hypothesise that the main reason for the gap is the inability of $Q_theta$ to approximate $Q$ in a way that captures the true distribution of real speech. Motivated by this we introduce a framework and methodology to measure the distance between these distributions empirically and show this distributional approach can predict human judgements across datasets, systems, domains and languages.
 
 === Distribution Distance <dist_distance>
