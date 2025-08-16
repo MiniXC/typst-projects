@@ -8,6 +8,10 @@
   )
 }
 
+#let ac(comment) = {
+  text(comment, fill: red)
+}
+
 #let citep(key) = {
   cite(key, form: "prose")
 }
