@@ -21,7 +21,7 @@
   ("NLP", "Natural Language Processing"),
   ("TTS", "Text-to-Speech"),
   ("CNN", "Convolutional Neural Network"),
-  ("g2p", "Grapheme-to-Phoneme"),
+  ("G2P", "Grapheme-to-Phoneme"),
   ("VAD", "Voice Activity Detection"),
   ("DNN", "Deep Neural Network"),
   ("SRMR", "Speech-to-reverberation modulation energy ratio"),
@@ -65,7 +65,9 @@
   ("GMM", "Gaussian Mixture Model"),
   ("JSD", "Jensen-Shannon Divergence"),
   ("MWERR", "Mean Word Error Rate Ratio"),
-  ("TDNN", "Time-delay Neural Network")
+  ("TDNN", "Time-delay Neural Network"),
+  ("EMA", "Exponentional Moving Average"),
+  ("CLIP", "Contrastive Language-Image Pre-training")
 )
 
 // CONFIG
@@ -193,9 +195,9 @@
     #if true {
       block(above: 0em, below: 2em)[
         #text(10pt, fill: blue)[
-          Review version with wide margins and spacing
+          Review version (#datetime.today().day()/#datetime.today().month()/#datetime.today().year())
   
-          Word Count: #total-words
+          Word Count: \~#(context(calc.round(float(str(state("total-words").final()))/1000)*1000))
         ]
       ]
     }
@@ -464,7 +466,7 @@ The general process for using GenAI in this work was conducted as follows:
 - Critique, not revision: We never ask to create a "better version" of any given input, but instead ask for specific critique of potential shortcomings. We had to sometimes explicitly specify this to the GenAI tools since they seemed prone to replacing the input with their own version, even when we did not ask for it.
 - Be specific: We never asked open-ended questions to GenAI, such as "My thesis topic is [...] how would you structure this thesis?" - we always posed a narrow, specific problem with text we had already created.
 
-*Transparency*: We publish all GenAI chats used in the making of this work at #link("https://github.com/minixc/thesis_genai", underline[github.com/minixc/thesis_genai]).
+*Transparency*: We publish all GenAI prompt templates used in the making of this work at #link("https://github.com/minixc/thesis_genai", underline[github.com/minixc/thesis_genai]) -- a full version history of the progress of this thesis is also available at #link("https://github.com/minixc/typst_projects", underline[github.com/minixc/typst_projects]).
 
 == Chronology
 

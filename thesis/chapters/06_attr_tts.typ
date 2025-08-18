@@ -4,16 +4,6 @@
 #import "../moremath.typ": *
 #import "@preview/booktabs:0.0.4": *
 #show: booktabs-default-table-style
-#import "@preview/fletcher:0.5.7" as fletcher: diagram, node, edge
-#import fletcher.shapes: house, hexagon
-#let blob(pos, label, tint: white, width: auto, ..args) = node(
-	pos, align(center, label),
-	width: width,
-	fill: tint.lighten(60%),
-	stroke: 1pt + tint.darken(20%),
-	corner-radius: 5pt,
-	..args,
-)
 
 == Enhancing Synthetic Speech Diversity <06_attr>
 
@@ -23,7 +13,7 @@
 [We condition the model $dots$ in two different ways: global conditioning and local conditioning.]
 )
 
-#ac("TODO: reframe the chapter a bit through local vs global conditioning angle and include WaveNet in background")
+#ac("TODO: reframe the chapter a bit through local vs global conditioning angle and include WaveNet in background OR find a better quote.")
 
 Building on the significant performance gap between ASR models trained on real versus synthetic speech, as quantified by the Word Error Rate Ratio (WERR) in @05_ttsasr[Chapter], this chapter details various methodologies developed to increase the diversity and realism of synthetic speech. As established, synthetic speech, despite its high human naturalness ratings, often lacks the intricate variability inherent in real human speech. This limitation directly impedes its utility for training robust ASR systems. Here, we systematically explore three complementary paradigms aimed at bridging this distributional divide: learning latent representations, explicit conditioning on attributes, and post-generation data augmentation. By introducing and controlling these aspects of speech, we aim to reduce the distributional distance between synthetic and real speech, which should, in turn, manifest as a reduction in WERR. The discussion progresses from methods that implicitly capture broad stylistic variations to those offering fine-grained, targeted control, culminating in empirical validation that demonstrates their impact. Throughout this chapter, we adhere to the formal notation established in the introduction, where $Q_theta$ represents the Text-to-Speech (TTS) model's approximation of the true speech distribution $Q(S|T)$.
 
@@ -45,9 +35,9 @@ This approximate posterior $q_phi (Z|S)$ is trained to approximate the true post
 $ cal(L)_"ELBO" = EE_(q_phi (Z|S)) [log p_theta (S | Z)] - "KL"(q_phi (Z|S) || p (Z)) $
 The TTS decoder then takes a sampled latent vector $Z$ and the input text $T$ to reconstruct the synthetic utterance $tilde(S)$, aiming to approximate $p_theta(S | Z)$. The regularization of the latent space ensures that samples drawn from the simple prior $p(Z)$ at inference time can generate novel and plausible speech styles, even if those specific styles were not explicitly present as reference utterances. This flexibility has made VAEs a powerful tool for TTS-for-ASR, leading to significant Word Error Rate (WER) improvements in scenarios with limited real data @sun_generating_2020. However, VAEs can be susceptible to #emph[posterior collapse], a phenomenon where the KL divergence term dominates the loss, causing the model to ignore the latent variable $Z$ and instead rely solely on the text input $T$ @wang_vaecollapse_2021. This results in a degenerate latent space that fails to capture diverse stylistic variations, thereby reducing the effective diversity of the generated speech. Careful tuning and architectural considerations are necessary to mitigate this issue.
 
-=== Explicit Conditioning on Attributes and Augmentation for ASR
+=== Explicit Conditioning and Augmentation
 
-To address the limitations of latent representations in providing fine-grained control and interpretability, this part of the thesis shifts focus to explicit conditioning on attributes and post-generation data augmentation. The primary motivation for this approach is twofold. Firstly, while latent representations offer an unsupervised means to inject variability, they often provide limited insight into which specific factors of speech are lacking in diversity within the synthetic output. By directly controlling measurable attributes, we can more precisely diagnose the deficiencies of synthetic speech in terms of factors like #smallcaps[Speaker] identity, #smallcaps[Prosody], and #smallcaps[Ambient] conditions. Secondly, by systematically varying these attributes, we aim to demonstrate that increased diversity in synthetic speech directly translates to improved ASR performance, thereby providing a more controlled experimental framework to explain the persistent WERR gap discussed in @05_ttsasr[Chapter 5].
+To address the limitations of latent representations in providing fine-grained control and interpretability, this part of the thesis shifts focus to explicit conditioning on attributes and post-generation data augmentation. The primary motivation for this approach is twofold. Firstly, while latent representations offer an unsupervised means to inject variability, they often provide limited insight into which specific factors of speech are lacking in diversity within the synthetic output. By directly controlling measurable attributes, we can more precisely diagnose the deficiencies of synthetic speech in terms of factors like #smallcaps[Speaker] identity, #smallcaps[Prosody], and #smallcaps[Ambient] conditions. Secondly, by systematically varying these attributes, we aim to demonstrate that increased diversity in synthetic speech directly translates to improved ASR performance, thereby providing a more controlled experimental framework to explain the persistent WERR gap discussed in @05_ttsasr[Chapter].
 
 ==== Methodology and Novelty
 
@@ -105,7 +95,7 @@ Common techniques for post-generation augmentation include:
 
 Tools such as the `audiomentations` library @jordal_audiomentations_2022 facilitate the probabilistic application of these and other augmentation techniques, allowing for a diverse range of acoustic conditions to be simulated. While highly effective for introducing acoustic environmental variability and improving robustness to noise, post-generation augmentation cannot retroactively adjust intrinsic speech properties like prosodic patterns or speaker characteristics that are determined during the core synthesis process. Therefore, it is best utilized synergistically with internal TTS enhancements (latent methods or explicit conditioning) to achieve comprehensive diversity across all relevant speech factors.
 
-=== Experimental Design
+=== Experiments on TTS-for-ASR Diversity
 
 #figure(
   image("../figures/6/attr_tts_arch.png", width: 70%),
@@ -134,7 +124,7 @@ The #emph[Attributes System] system builds on the baseline by explicitly conditi
 The post-generation #emph[Augmentation System]: builds additionally applies post-generation augmentation to its synthesized output. This involves adding Gaussian noise with a target SNR ranging from 5 dB to 40 dB and convolving the audio with Room Impulse Responses (RIRs) with a target RT60 (reverberation time) ranging from 0.15s to 0.8s. RIRs are applied with a probability of 0.8. These augmentations are performed using the `audiomentations` library, and the parameters of both were adjusted to represent the range of values in the original data.
 Finally, the #emph[Oracle System] serves as an empirical upper bound for the effectiveness of explicit conditioning. For this system, the ground-truth values for all attributes are used directly for conditioning the TTS model during synthesis, instead of sampling from GMMs. Post-generation augmentation (noise and RIRs) is also applied to its output. This allows us to quantify the maximum potential improvement achievable if attributes could be perfectly predicted or controlled. @fig_tts_aug illustrates the full system with all systems applied.
 
-=== Results and Discussion
+=== Implications on Distribution Gap
 
 #figure(
   table(

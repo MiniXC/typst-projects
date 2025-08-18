@@ -141,7 +141,7 @@ caption: [Comparison of ASR WERs purely synthetic, purely real, and mixed data, 
 placement: top,
 ) <tab_werr_summary>
 
-==== Baseline and Recognizability of Synthetic Speech
+==== Baseline and Recognizability of Synthetic Speech <05_hybrid>
 
 Beyond the mere existence of a distributional gap, the inherent regularity of synthetic speech has distinct implications for ASR model performance, manifesting in predictable and sometimes counter-intuitive ways. This phenomenon becomes evident when examining ASR models trained and evaluated on different combinations of real and synthetic data, as summarized in @tab_cross_ttsasr, for which we train a FastSpeech 2 @ren_fastspeech_2021 model on the `train-clean-360` split of LibriTTS @zen_libritts_2019. A 6-layer hybrid HMM-TDNN system with a hidden unit size of 512, is trained with the LF-MMI @hadian_lfmmi_2018 objective for 4 epochs on this resulting data and a real dataset with equivalent transcripts. The resulting WERR is 3.66 -- better than 4 and worse than 6 of the systems in the literature shown in @tab_werr_summary, which we deem acceptable as a baseline.
 
