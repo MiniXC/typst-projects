@@ -18,7 +18,7 @@ As we have established throughout this work it is useful to conceptualize speech
 
 When considering the entire space of possible speech recordings, even under specific constraints, the complexity of accurately replicating the real speech distribution becomes evident. For example, if utterances are restricted to a maximum duration of 60 seconds, and each data point within an utterance is quantized to one of $2^16$ values (corresponding to a 16-bit depth), with a sampling rate set at 16 kHz, this yields a total of $16,000 times 60 = 960,000$ values per recording. Consequently, the number of potential unique recordings would be $2^(16 times 960,000)$, represent a vast space. However, it is crucial to recognize that to human listeners, the overwhelming majority of these theoretical recordings would manifest as incoherent or meaningless noise.
 
-In the development of a system designed to produce synthetic speech, the objective is to accurately model the real speech distribution, which is a comparatively small subset within this expansive recording space. If the precise real speech distribution was already known, it would be unnecessary to model it. Therefore, practitioners typically resort to estimating this distribution from available data. The "performance" of such models is often verified by collecting subjective judgments from human listeners, as detailed in @08_eval[Chapter]. Alternatively, or complementarily, the degree to which a synthetic distribution resembles its real counterpart can be objectively quantified, a methodology that is elaborated upon in the subsequent sections of this chapter.
+In the development of a system designed to produce synthetic speech, the objective is to accurately model the real speech distribution, which is a comparatively small subset within this expansive recording space. If the precise real speech distribution was already known, it would be unnecessary to model it. Therefore, practitioners typically resort to estimating this distribution from available data. The "performance" of such models is often verified by collecting subjective judgments from human listeners, as detailed in @08_eval[Chapter]. Alternatively, the degree to which a synthetic distribution resembles its real counterpart can be objectively quantified, which we detail in the remainder of this Chapter.
 
 === Earth Mover's Distance
 
@@ -133,7 +133,7 @@ $ "TTSDS"(D,tilde(D),D^"NOISE") = 100 times (min[W_2(tilde(D),D^"NOISE"_i)]_(i=0
 In this formulation, $(min[W_2(tilde(D),D^"NOISE"_i)]_(i=0)^N)$ represents the minimum 2-Wasserstein distance between the synthetic speech and a designated set of distractor noise datasets, while $W_2(tilde(D),D)$ denotes the 2-Wasserstein distance to the distribution of real speech. An example of this scoring method, specifically for the one-dimensional pitch feature, is provided in @fig_f0, where the equation yields scores ranging from 0 to 100. Values exceeding 50 signify a stronger similarity to genuine speech than to noise. The final TTSDS1 score is computed as the unweighted arithmetic mean of the individual factor scores, with each factor score itself being the mean of its belonging feature scores.
 
 #figure(
-  image("../figures/9/pitch_distributions.png", width: 100%),
+  image("../figures/9/pitch_distributions.png", width: 80%),
   placement: top,
   caption: [Distribution of $F_0$ in TTSDS for ground-truth, synthetic, and noise datasets. The distance between the synthetic and real distributions ($d_"gt"$) and the distance to noise ($d_"n"$) are shown, as well as how the overall score is computed.],
 ) <fig_f0>
@@ -365,6 +365,7 @@ A comprehensive enumeration of the #abbr.a[TTS] systems evaluated for TTSDS2, al
   caption: [
     Spearman rank correlations. Colours: #box(fill: negstrong, rect(width: 7pt, height: 7pt)) –1 … –0.5, #box(fill: negweak, rect(width: 7pt, height: 7pt)) –0.5 … 0, #box(fill: posweak, rect(width: 7pt, height: 7pt)) 0 … 0.5, #box(fill: posstrong, rect(width: 7pt, height: 7pt)) 0.5 … 1.
   ],
+  placement: top
 ) <fig_ttsds2_spearman_correlation>]
 
 
