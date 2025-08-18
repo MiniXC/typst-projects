@@ -239,6 +239,13 @@ But unfortunately, while they sound very good, the voices were really bad for sp
 // Acknowledgements
 #frontmatter-heading([Acknowledgements])
 
+First and foremost, my supervisors Ondrej Klejch and Peter Bell were encouraging, patient and full of wisdom, and I admire how they managed to guide me in my research -- it was the perfect balance, keeping me on track while also allowing a great a deal of flexibility. In particular, I will never forget a meeting in which I anxiously pointed out the research was deviating quite strongly from the initial premise and Peter, after a brief pause, simply suggested to change the title -- and so we did. I would also like to thank Huawei for funding this work and for their team to provide valuable feedback and encouragement.
+
+The fellow students and scholars I have met throughout the years, within and without of CSTR, were the best reasons to come to the office and conferences and have supplied many ideas and insights for my work. Gustav Eje Henter believed in my research from the start, and has and continues to be an endless source of advice and enthusiasm. Nick Rossenbach's research on TTS-for-ASR and discussions on the topic were inspiring and helped me find my footing in the early stages. While our research does not have much in common, Maria Dolak, Zeyu Zhao and Sung-Lin Yeh were great fellow 5th-floor-IF-researchers. Finally, the great discussions with fellow CSTR members, too many to list them all, have undoubtedly contributed a great deal to this work as well.
+
+I am also lucky to have an incredible family. My partner Celina always lent an ear and having her by my side means the world to me. My parents always believed I could do this, even when I did not, and came for a much-needed visit to Edinburgh when times were tough. My brother Benjamin, beyond being my best friend, has been a great source of inspiration and advice, and I am excited to read his thesis when the time comes -- his star in academia will undoubtedly shine brighter than mine. My grandmother was also always just a call away despite the big geographical distance.
+
+To my friends, beyond listening to me about the perils of academia, you have helped me keep up my resolve in so many ways. My flatmates over the years, Angus, Rory and David, have been nothing but lovely and kind. The D&D sessions with Kat, David, Elo, Alex, Anja and Sven were always a highlight, as were the runs with Sam, the hikes and climbs with Erik, gaming with the Treemteam and the discussions about German hip-hop with Dom. On that note, I would also like to thank SSIO for waiting to release his fifth album until after the submission of this thesis. 
 
 #set text(top-edge: "cap-height", bottom-edge: "baseline")
 
