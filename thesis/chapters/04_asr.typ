@@ -18,8 +18,8 @@ $ T = argmax_(T in cal(T)) P_theta (T|S) $
 Modern high-performance #abbr.a[ASR] systems are almost exclusively trained using discriminative objectives. In contrast to generative approaches that might model the joint probability $P(S, T)$, discriminative models are optimized to directly model the posterior probability $P(T|S)$, maximizing the score of the correct transcription while simultaneously minimizing the scores of all incorrect competing hypotheses. This approach has proven more effective at achieving low #abbr.a[WER]. The two dominant paradigms for discriminative #abbr.a[ASR] training are hybrid HMM-DNN systems and end-to-end models. For a comprehensive review of #abbr.a[E2E] #abbr.a[ASR] models, see #citep(<prabhavalkar_survey_2023>).
 
 #figure(
-image("../figures/4/tts_asr_comp.jpg", width: 100%),
-caption: [Comparison of TTS and ASR problems, with TTS increasing diversity, and ASR both decreasing (normalisation) or increasing (augmentation) diversity.],
+image("../figures/4/tts_asr_comp.png", width: 100%),
+caption: [Comparison of TTS and ASR problems, with TTS increasing diversity, and ASR both decreasing diversity through normalisation.],
 placement: top,
 ) <fig_tts_asr_comp>
 
@@ -65,7 +65,7 @@ $ P(T|S) = product_(k=1)^K P(t_k | t_(<k), S) $
 The objective is a standard cross-entropy loss over the predicted token distributions: $cal(L)_("att") = -sum_(i=1)^L log P(t_i | t_(<i), S)$. While powerful, pure attention-based models do not explicitly enforce monotonic alignment, which can lead to instability. This has led to the development of hybrid CTC/attention models @watanabe_joint_2017 that combine both objectives in a multi-task learning framework. The CTC loss acts as a regularizer, encouraging monotonic alignments, while the attention component models global dependencies, resulting in more robust and accurate systems.
 
 #figure(
-image("../figures/4/hybrid_encdec_ctc.jpg", width: 100%),
+image("../figures/4/hybrid_encdec_ctc.png", width: 100%),
 caption: [Hybrid and end-to-end encoder-decoder and CTC models and their connection to a language model.],
 placement: top,
 ) <fig_tts_asr_comp>

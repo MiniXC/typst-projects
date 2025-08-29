@@ -147,8 +147,8 @@ Among non-autoregressive models, #emph[Explicit Duration-Based Models] address t
 // add info on encoder-decoder transformers?
 
 #figure(
-image("../figures/3/arch_overview.jpg", width: 100%),
-caption: [A side-by-side comparison of U-Net, Transformer and Conformer neural network architectures.],
+image("../figures/3/unet_transformer.png", width: 100%),
+caption: [A side-by-side comparison of U-Net and Transformer/ Conformer neural network architectures.],
 placement: top,
 ) <fig_arch_overview>
 
