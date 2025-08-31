@@ -77,7 +77,7 @@ placement: top,
 As @fig_tts4asr_splits shows, a carefully controlled experimental setup is needed to compare synthetic and real speech viability for ASR training. Unless otherwise specified, the approach we use for TTS-for-ASR evaluation in this work is as follows: First, a TTS system is trained on a dataset $D^"TTS"_"train"$. A second dataset#footnote[usually smaller than the first to emulate a low-resource scenario], which does not share any text samples $T$ with this first dataset is constructed for ASR training, we name this $D^"ASR"_"train"$. The text samples $T^"ASR"_"train"$ of this dataset are used as inputs to the previously trained TTS system, and the pairs of these texts and the resulting waveforms become the synthetic $tilde(D)^"ASR"_"train"$ dataset. 
 Then two equivalent ASR systems are trained with the real and synthetic data respectively. In the final step, a held-out test set $D^"ASR"_"test"$, again with no overlap with any of the previous datasets is used to derive the #abbr.a[WER] for the real and synthetically-trained ASR models, abbreviated as $"WER"(D)$ and $"WER"(tilde(D))$.
 
-=== Word Error Rate Ratio (WERR)
+=== #("Word Error Rate Ratio (WERR)")
 
 To quantify the disparity between ASR performance when trained on synthetic versus real speech, we also introduce the Word Error Rate Ratio (WERR). This metric directly compares the effectiveness of different training data types using $"WER"(D)$ and $"WER"(tilde(D))$. The WERR is formally defined as the ratio of the Word Error Rate (WER) achieved by an ASR model trained exclusively on synthetic speech to the WER achieved by an ASR model trained exclusively on real speech, when both are evaluated on the same real test set:
 

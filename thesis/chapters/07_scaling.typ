@@ -6,7 +6,7 @@
 #import "@preview/booktabs:0.0.4": *
 #show: booktabs-default-table-style
 
-== Scaling properties for TTS-for-ASR <07_scaling>
+== Scaling properties for #linebreak() TTS-for-ASR <07_scaling>
 
 #q(
   [#citep(<sutton_bitter_2019>)],

@@ -13,3 +13,5 @@
 #let makesyn(inner) = {
   $tilde(#inner)$
 }
+
+#let asrT = $hat(T)$

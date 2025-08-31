@@ -20,7 +20,7 @@ When considering the entire space of possible speech recordings, even under spec
 
 In the development of a system designed to produce synthetic speech, the objective is to accurately model the real speech distribution, which is a comparatively small subset within this expansive recording space. If the precise real speech distribution was already known, it would be unnecessary to model it. Therefore, practitioners typically resort to estimating this distribution from available data. The "performance" of such models is often verified by collecting subjective judgments from human listeners, as detailed in @08_eval[Chapter]. Alternatively, the degree to which a synthetic distribution resembles its real counterpart can be objectively quantified, which we detail in the remainder of this Chapter.
 
-=== Earth Mover's Distance
+=== #("Earth Mover's Distance")
 
 #figure(
   image("../figures/9/xvector.svg", width: 100%),
