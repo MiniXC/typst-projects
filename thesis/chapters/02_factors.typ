@@ -49,7 +49,7 @@ However, reductive transformations can also be far removed from the original sig
 ==== Edge cases
 Some transformations are not clearly reductive or lossy, such as most #abbr.a[SSL]-derived latent representations. They #emph[could] be used to reconstruct a speech signal, as previous work has shown that a combination of #abbr.a[SSL] representations and speaker embeddings can be reconstructed with similar performance as Mel spectrograms @siuzdak_wavthruvec_2022. However, they could also lead to significant deviation from the original depending on the information encoded by any particular #abbr.a[SSL] model. The layer at which the representation is extracted might also play a role, with earlier layers often corresponding more closely to acoustics @pasad_layer-wise_2021.
 
-=== Purpose of Transformations
+=== Purpose of transformations
 
 Different representations of speech can be used for differing purposes. Here, we discuss these representations and #emph[what] they encode (e.g. the whole signal, speaker identity, lexical content), #emph[how] they encode and potentially decode the signal and the #emph[why] the resulting representations might be used in speech synthesis.
 
@@ -74,18 +74,18 @@ At the purely #emph[acoustic] end of the spectrum lie representations whose prim
 At the opposite, purely #emph[semantic] end are representations that encode abstract meaning, content, and concepts, completely detached from the acoustic signal that conveyed them. The final text transcript from an ASR system or a conceptual "Intent" label are examples. The purpose of these representations can be analysis, understanding, and symbolic reasoning. They are the inputs and outputs of systems concerned with what is being said, by whom, and for what purpose.
 The vast majority of speech processing involves bridging the gap between these two poles, and thus many representations encode aspects of both. These #emph[intermediate] representations are designed to make acoustic information tractable for semantic tasks, or to guide the generation of acoustic signals from semantic information. For example, a Mel spectrogram is fundamentally acoustic, yet it is structured in a perceptually relevant way that makes it easier for a model to recognize phonetic content, making semantic content easier to access and model. #smallcaps[Prosody] features like a pitch contour are acoustic measurements, but their shape and trajectory can convey semantic meaning such as if the speaker is expressing a certain emotion or asking a question. Conversely, a #smallcaps[Speaker] embedding is a high-level abstraction of identity (a semantic concept), but it is learned by distilling patterns directly from acoustic signals. Another #emph[intermediate] representation are high-level #abbr.a[SSL] embeddings, which are learned from raw audio with the explicit goal of being maximally useful for a wide range of downstream semantic tasks.
 
-=== A Factor-Based Review of Speech Representations <02_representations>
+=== Factor-based review of speech representations <02_representations>
 
 We will now examine the factors of speech as laid out in @fig_factors in more detail, contextualising their roles across various speech technology applications. We follow a bottom-up order from the figure, reordered to reflect a common conceptual flow from abstract semantics to the concrete acoustic signal.
 
-==== Semantic Representations
+==== Semantic representations
 
 The #smallcaps[Semantic] factor encompasses the linguistic content of speech. Its representations lie firmly at the semantic pole of our spectrum and are central to any task involving understanding or generating language.
-One of the most foundational and frequently used representations is the phone sequence. This representation converts the orthographic sequence of letters into a sequence of phonemes, the basic sound units of a language. This transformation, known as #abbr.a[g2p] conversion, resolves ambiguities in pronunciation (e.g., the different sounds of "ough" in "through," "tough," and "though") and provides a canonical representation of pronunciation. In TTS, it serves as a clean input to the acoustic model. In ASR, especially for low-resource languages, predicting a phoneme sequence can be a useful intermediate step before word-level transcription. Multilingual models like Allosaurus provide phone recognition for a vast number of languages, facilitating such cross-lingual applications @li_allosaurus_2020.
+One of the most foundational and frequently used representations is the phone sequence. This representation converts the orthographic sequence of letters into a sequence of phonemes, the basic sound units of a language. This transformation, known as #abbr.a[G2P] conversion, resolves ambiguities in pronunciation (e.g., the different sounds of "ough" in "through," "tough," and "though") and provides a canonical representation of pronunciation. In TTS, it serves as a clean input to the acoustic model. In ASR, especially for low-resource languages, predicting a phoneme sequence can be a useful intermediate step before word-level transcription. Multilingual models like Allosaurus provide phone recognition for a vast number of languages, facilitating such cross-lingual applications @li_allosaurus_2020.
 
 On the more abstract side, modern systems for both ASR and TTS process text using powerful encoders, often using conextualised language models like BERT @devlin_bert_2019. These produce contextualised text embeddings, which are high-dimensional vectors that capture not just the identity of words but also their meaning within the specific context of the sentence. In TTS, this helps generate more natural prosody @kakouros_what_2023. In Spoken Language Understanding (SLU), these embeddings are the basis for interpreting the user's commands. At the highest level of abstraction, intent represents the speaker's pragmatic goal. In conversational AI, an ASR system first produces text, which is then classified into an intent label. This label then drives the dialogue manager and determines the content and style of the TTS response, completing the interaction loop.
 
-==== Speaker Representations <02_speaker>
+==== Speaker representations <02_speaker>
 
 The #smallcaps[Speaker] factor encompasses the unique, identifying characteristics of an individual's voice. Its representations bridge the gap between acoustic reality and the semantic concept of identity.
 
@@ -93,7 +93,7 @@ At a low level, identity is encoded in physical properties. Formant frequencies,
 
 To create a more robust representation, systems distill these variable acoustic cues into high-level, learned speaker embeddings. These fixed-dimensional vectors are extracted using a network trained to discriminate between thousands of speakers. Architectures like x-vectors @snyder_x_2018 and ECAPA-TDNN @desplanques_ecapa_2020 excel at this, learning to create a representation that is maximally sensitive to inter-speaker differences while being invariant to intra-speaker variability (like phonetic content). These embeddings are the cornerstone of speaker verification and diarization @bredin_pyannote_2023, as well as generative tasks like multi-speaker TTS and voice cloning @li_styletts_2023. Beyond core timbre, other identifying characteristics contribute to our perception of a speaker, such as perceived age, gender, and accent. While these can be treated as explicit semantic labels, they are often learned implicitly as part of a powerful speaker embedding, which captures not just anatomy but also these habitual, identity-linked speaking patterns.
 
-==== Prosody Representations <02_prosody_rep>
+==== Prosody representations <02_prosody_rep>
 
 The #smallcaps[Prosody] factor is an #emph[intermediate] factor, governing the melody and rhythm of speech that links acoustic signals to emotional and pragmatic meaning.
 
@@ -101,7 +101,7 @@ Low-level prosodic features provide a quantitative link between acoustics and pe
 
 For a more holistic view, mid-to-high-level representations are used. *Phonologic Labels*, derived from linguistic theories like ToBI @ross_prediction_1996, provide a symbolic, semantic description of acoustic events like pitch accents and boundary tones, useful for linguistic analysis. A more data-driven approach is to learn a continuous, high-level prosody embedding. This vector can serve as an input feature for an emotion classifier or as a conditioning signal for style transfer in voice conversion and expressive TTS @wang_style_2018. At the highest level, a discrete emotion label sits at the semantic end, representing the final interpretation of a complex set of underlying acoustic cues.
 
-==== Ambient Representations
+==== Ambient representations
 
 The #smallcaps[Ambient] factor encompasses all environmental aspects of a recording. The utility of its representations depends entirely on whether the task goal is analysis of the real world or synthesis of an ideal one.
 
@@ -109,7 +109,7 @@ For analytical tasks like ASR, modeling ambient acoustics is critical. Systems m
 
 Conversely, for generative tasks like TTS, the goal is typically to produce clean speech. Here, the ambient factor is something to be eliminated. Ambient representations are therefore primarily used for quality control during data preparation, ensuring that the training data is as free from acoustic contamination as possible.
 
-==== Generic Representations
+==== Generic representations
 
 The #smallcaps[Generic] factor includes representations that encode the full acoustic signal. They span the entire spectrum, from the purely acoustic waveform to abstract embeddings that bridge to the semantic domain.
 
@@ -122,7 +122,7 @@ Finally, high-level *Contextualised Speech Embeddings* from #abbr.a[SSL] models 
 // TODO for this chapter: small intro on SSL? also tree figure with specific representations
 // also talk about how w2v etc can be seen as semantic but we class them as generic?
 
-==== Limitations and Cross-Factor Phenomena
+==== Limitations and cross-factor phenomena
 
 While the factorized view provides a useful framework, it is important to acknowledge its limitations. Certain acoustic phenomena do not fit neatly into a single category, but rather exist at the intersection of multiple factors, highlighting the complex relationship between acoustics and semantics.
 

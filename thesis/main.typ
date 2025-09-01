@@ -4,8 +4,6 @@
 #import "@preview/wordometer:0.1.4": word-count, total-words, total-characters
 #import "@preview/i-figured:0.2.4"
 
-#set math.equation(numbering: "(1)")
-
 #show: word-count
 
 
@@ -105,7 +103,7 @@
 #let title-spacing() = 9em
 #let author = "Christoph Minixhofer"
 #set document(
-  title: "Quantifying the distributional distance between synthetic and real speech", 
+  title: "Quantifying the Distributional Distance between Synthetic and Real Speech", 
   author: "Christoph Minixhofer",
   date: datetime.today()
 )
@@ -113,7 +111,6 @@
 // heading shenanigans
 #let parts = counter("parts")
 #parts.step()
-
 #show heading.where(
   level: 1
 ): it => [
@@ -127,6 +124,7 @@
       #set text(font: "Crimson Pro", size: 26pt, weight: "medium", hyphenate: false)
       #set par(justify: false)
       Part #parts.display("I")
+      #h(.2em) -- #h(.2em)
       #(it.body)
       #line
     ]
@@ -221,8 +219,6 @@
 
 // Abstract
 #frontmatter-heading([Abstract])
-
-// conversational + full duplex
 
 This thesis addresses the discrepancy between the high perceived naturalness of synthetic speech and its comparatively limited utility for training robust downstream applications, specifically Automatic Speech Recognition (ASR) systems. Despite recent Text-to-Speech (TTS) models achieving subjective naturalness ratings statistically indistinguishable from human speech, ASR models trained exclusively on synthetic data consistently exhibit significantly higher error rates when evaluated on real speech. We posit that this persistent #emph[synthetic-real gap] arises from the inability of current TTS models to fully approximate the nuanced, high-dimensional probability distribution of real speech, particularly concerning its inherent variability.
 
@@ -332,15 +328,13 @@ Finally, I would also like to thank Huawei for funding this work and for the fee
 
 #set text(top-edge: if review {1em} else {"cap-height"}, bottom-edge: if review {-.8em} else {-.25em})
 
+#show math.equation: i-figured.show-equation.with(numbering: "1.1")
 #show heading: i-figured.reset-counters
 #show figure: i-figured.show-figure
-#show math.equation: i-figured.show-equation
 
 #include "chapters/01_introduction.typ"
 
 = Speech Representations, Synthesis and Recognition <part_00>
-
-
 
 #include "chapters/02_factors.typ"
 

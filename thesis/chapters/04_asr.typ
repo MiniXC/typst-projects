@@ -24,7 +24,7 @@ placement: top,
 ) <fig_tts_asr_comp>
 
 
-=== The Challenge of Speech Variability
+=== Speech variability
 
 While TTS is a "one-to-many" problem where a single text can have many valid acoustic realisations, ASR is a "many-to-one" problem. A single intended text sequence can be realized as a vast number of acoustically distinct signals, all of which should map back to the same transcription. This variability is the central challenge of ASR and arises from the factors of speech discussed in @02_factors[Chapter]. Variability from the #smallcaps[Speaker] factor includes differences in vocal tract length, pitch, and accent. The #smallcaps[Prosody] factor introduces variability through changes in speaking rate, stress, and intonation. Finally, the #smallcaps[Ambient] factor adds variability through background noise, reverberation, and different recording channels.
 
