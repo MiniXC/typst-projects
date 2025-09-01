@@ -5,7 +5,7 @@
 #import "@preview/i-figured:0.2.4"
 
 #show: word-count
-
+#set footnote(numbering: "*")
 
 #set quote(block: true)
 #set cite(style: "annual-reviews-author-date")
@@ -80,12 +80,16 @@
       inside: if review { 4.8cm } else {if print { 3.8cm } else { 3.4cm }},
       outside: if review { 4.8cm } else {if print { 2.8cm } else { 3.4cm }},
     ),
+    header: (
+      counter(footnote).update(0)
+    ),
     binding: left,
   )
 #set text(
   font: "New Computer Modern",
   size: 12pt,
   hyphenate: true,
+  region: "GB",
 )
 #set par(
   justify: true,
@@ -222,7 +226,7 @@
 
 This thesis addresses the discrepancy between the high perceived naturalness of synthetic speech and its comparatively limited utility for training robust downstream applications, specifically Automatic Speech Recognition (ASR) systems. Despite recent Text-to-Speech (TTS) models achieving subjective naturalness ratings statistically indistinguishable from human speech, ASR models trained exclusively on synthetic data consistently exhibit significantly higher error rates when evaluated on real speech. We posit that this persistent #emph[synthetic-real gap] arises from the inability of current TTS models to fully approximate the nuanced, high-dimensional probability distribution of real speech, particularly concerning its inherent variability.
 
-To quantify this disparity, we introduce the Word Error Rate Ratio (WERR), a metric that directly compares ASR performance when trained on synthetic versus real data. Our empirical investigations confirm a substantial WERR, indicating that ASR models trained on synthetic speech perform considerably worse than those trained on real speech, even when the synthetic utterances are subjectively perceived as highly natural. This observation suggests that synthetic speech, while perceptually clean, often lacks the intricate acoustic and prosodic variability crucial for ASR model robustness.
+To quantify this disparity, we introduce the Word Error Rate Ratio (WERR), a heuristic that directly compares ASR performance when trained on synthetic versus real data. Our empirical investigations confirm a substantial WERR, indicating that ASR models trained on synthetic speech perform considerably worse than those trained on real speech, even when the synthetic utterances are subjectively perceived as highly natural. This observation suggests that synthetic speech, while perceptually clean, often lacks the intricate acoustic and prosodic variability crucial for ASR model robustness.
 
 We explore methodologies to enhance synthetic speech diversity, including explicit conditioning on speaker, prosodic, and environmental attributes, as well as post-generation data augmentation. While these techniques demonstrably reduce the WERR, thereby narrowing the synthetic-real gap, our findings indicate a plateau in performance, suggesting an inherent ceiling for current synthesis paradigms in fully capturing real-world speech complexity. Furthermore, we conduct a comprehensive study on the scaling properties of synthetic data for ASR training, comparing Mean Squared Error (MSE)-based and Denoising Diffusion Probabilistic Model (DDPM)-based TTS architectures. Our results demonstrate that DDPMs exhibit superior scalability and more effectively leverage large training datasets, leading to sustained improvements in ASR performance compared to MSE models, which rapidly plateau due to oversmoothing. However, even with the enhanced scaling of DDPMs, projections indicate that an extraordinarily large volume of synthetic data would be required to achieve parity with ASR models trained on real speech.
 
@@ -346,7 +350,7 @@ Finally, I would also like to thank Huawei for funding this work and for the fee
 
 
 In this part of our work, we explore how well-suited synthetic speech is for training speech recognition models.
-If the distribution of real speech was perfectly modeled, we would assume similar performance when training with synthetic speech as when training with real speech. However, this is not the case, suggesting systematic differences between synthetic and real speech. We first quantify the extent of this gap in @05_ttsasr[Chapter], then reduce it through conditioning and augmentation in @06_attr[Chapter] and finally investigate how far it could be reduced using scaling in @07_scaling[Chapter].
+If the distribution of real speech was perfectly modeled, we would assume similar performance when training with synthetic speech as when training with real speech. However, this is not the case, suggesting systematic differences between synthetic and real speech. We first quantify the extent of this gap in @05_ttsasr[Chapter], then reduce it through conditioning and augmentation in @06_diversity[Chapter] and finally investigate how far it could be reduced using scaling in @07_scaling[Chapter].
 
 #include "chapters/05_tts_asr.typ"
 
@@ -438,8 +442,8 @@ As far as licenses and resources permitted, all code and datasets used in the ma
 - *TTSDS* #sym.arrow #underline[#link("https://ttsdsbenchmark.com",[ttsdsbenchmark.com])]: The TTSDS score libary and datasets introduced in @09_dist[Chapter].
 - *MPM* #sym.arrow #underline[#link("https://github.com/MiniXC/masked_prosody_model",[github.com/MiniXC/masked_prosody_model])]: #abbr.a[SSL] prosody correlate model introduced in @02_factors[Chapter].
 - *Speech Diffusion* #sym.arrow #underline[#link("https://github.com/MiniXC/speech-diffusion",[github.com/MiniXC/speech-diffusion])]: The diffusion architecture introduced in @07_scaling[Chapter].
-- *LightningFastSpeech2* #sym.arrow #underline[#link("https://github.com/MiniXC/LightningFastSpeech2", [github.com/MiniXC/LightningFastSpeech2])]: A reimplemention of FastSpeech2 with additional prosodic correlates and conditioning, introduced in @06_attr[Chapter].
-- #emph[Various datasets and pretrained models] #sym.arrow #underline[#link("https://huggingface.co/cdminix", [huggingface.co/cdminix])]: Includes forced-aligned versions of LibriTTS (@06_attr[Chapter]), Vocex (@02_factors[Chapter]), and detailed listening test results from TTSDS (@09_dist[Chapter]).
+- *LightningFastSpeech2* #sym.arrow #underline[#link("https://github.com/MiniXC/LightningFastSpeech2", [github.com/MiniXC/LightningFastSpeech2])]: A reimplemention of FastSpeech2 with additional prosodic correlates and conditioning, introduced in @06_diversity[Chapter].
+- #emph[Various datasets and pretrained models] #sym.arrow #underline[#link("https://huggingface.co/cdminix", [huggingface.co/cdminix])]: Includes forced-aligned versions of LibriTTS (@06_diversity[Chapter]), Vocex (@02_factors[Chapter]), and detailed listening test results from TTSDS (@09_dist[Chapter]).
 
 
 == GenAI
@@ -466,13 +470,13 @@ The general process for using GenAI in this work was conducted as follows: 1) Ou
 
 // *Transparency*: We publish all GenAI prompt templates used in the making of this work at #link("https://github.com/minixc/thesis_genai", underline[github.com/minixc/thesis_genai]) -- a full version history of the progress of this thesis is also available at #link("https://github.com/minixc/typst_projects", underline[github.com/minixc/typst_projects]).
 
-== Chronology
+// == Chronology
 
-Research is not a linear process, and goals and topics can shift over time. For this work, the original goal was to investigate synthetic speech for #abbr.a[ASR] training (TTS-for-ASR), with a focus on low-resource applications.
+// Research is not a linear process, and goals and topics can shift over time. For this work, the original goal was to investigate synthetic speech for #abbr.a[ASR] training (TTS-for-ASR), with a focus on low-resource applications.
 
-However, the large gap between synthetic and real speech when it came to this task, compared to how highly speech produced by modern systems is rated by humans, gave us pause. This at first lead to more detailed investigations of the underlying data distributions while still focusing on improving TTS-for-ASR, but later inspired investigating evaluating TTS itself in a way that was more true to these distributions rather than individual samples.
+// However, the large gap between synthetic and real speech when it came to this task, compared to how highly speech produced by modern systems is rated by humans, gave us pause. This at first lead to more detailed investigations of the underlying data distributions while still focusing on improving TTS-for-ASR, but later inspired investigating evaluating TTS itself in a way that was more true to these distributions rather than individual samples.
 
-Chapters 5 and 6 fall firmly into our earlier TTS-for-ASR work but the distributional distances investigated to improve TTS conditioning were the inspiration for TTSDS1 and TTSDS2 introduced in Chapters 8 and 9. Chapter 7 was work started before TTSDS, but finalized after TTSDS1 was already completed. While it does not directly link the two approaches, it provides the valuable insight that the limitations of the synthetic speech distribution cannot be fully outscaled (for now).
+// Chapters 5 and 6 fall firmly into our earlier TTS-for-ASR work but the distributional distances investigated to improve TTS conditioning were the inspiration for TTSDS1 and TTSDS2 introduced in Chapters 8 and 9. Chapter 7 was work started before TTSDS, but finalized after TTSDS1 was already completed. While it does not directly link the two approaches, it provides the valuable insight that the limitations of the synthetic speech distribution cannot be fully outscaled (for now).
 
 == Party Summary
 

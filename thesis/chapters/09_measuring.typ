@@ -12,6 +12,12 @@
   [… we want to define a consistent measure of distance, or dissimilarity, between two distributions of mass in a space that is itself endowed with a ground distance. … Practically, it is important that [such] distances between distributions correlate with human perception.]
 )
 
+#q(
+[#citep(<moller_quality_2009>)],
+[#emph("Quality prediction for synthesized speech: Comparison of approaches")],
+[Each time a new TTS system is developed which potentially introduces new types of degradations, the validity and reliability of such a prediction algorithm has to be tested anew.]
+)
+
 As we have established throughout this work it is useful to conceptualize speech as a distribution rather than as isolated instances. In this chapter, we expand this perspective beyond TTS-for-ASR and introduce a methodology to quantify the dissimilarity between real and synthetic speech distributions across diverse systems, domains, and languages. This approach aims to provide a consistent measure of distance that correlates with human perception.
 
 === Audio and speech distributions
