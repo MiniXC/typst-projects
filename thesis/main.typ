@@ -362,7 +362,7 @@ If the distribution of real speech was perfectly modeled, we would assume simila
 
 Since our work in TTS-for-ASR suggested a large discrepancy between expected and actual performance due to a mismatch in distributions, we explore in which ways TTS evaluation can be improved by considering these distributions rather than individual samples alone. We introduce the Text-to-Speech Distribution Distance (TTSDS) a measure utilising the distributional Wasserstein distance across several factors of speech, and show it correlates well with human judgement across domains and could feasibly be applied across languages.
 
-#include "chapters/08_eval.typ"
+#include "chapters/08_dist.typ"
 
 #include "chapters/09_measuring.typ"
 

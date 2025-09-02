@@ -71,7 +71,7 @@ This manuscript is divided into three parts, with background on speech and its r
 -   *@06_diversity[Chapter]*: This chapter explores methodologies for enhancing the diversity of synthetic speech through explicit attribute conditioning and post-generation data augmentation.
 -   *@07_scaling[Chapter]*: This chapter analyses the scaling properties of synthetic data for ASR training, comparing the effectiveness of Mean Squared Error (MSE)-based and Denoising Diffusion Probabilistic Model (DDPM)-based TTS models with increasing training data size.
 ===== Part III
--   *@08_eval[Chapter]*: This chapter outlines the measurement of distributional distance for synthetic speech, and detailing the development and validation of the Text-to-Speech Distribution Score (TTSDS).
+-   *@08_dist[Chapter]*: This chapter outlines the measurement of distributional distance for synthetic speech, and detailing the development and validation of the Text-to-Speech Distribution Score (TTSDS).
 -   *@09_dist[Chapter]*: This chapter covers improvements to TTSDS which increase its robustness and versatility, as well as additional validation of TTSDS across domains and languages.
 
 *@10_conclusions[Chapter]* covers conclusions, limitations and future directions of our work.

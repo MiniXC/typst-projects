@@ -7,12 +7,6 @@
 == Measuring distributional distance <09_dist>
 
 #q(
-  [#citep(<rubner_earth_2000>)],
-  [#emph("The Earth Mover's Distance as a Metric for Image Retrieval")],
-  [… we want to define a consistent measure of distance, or dissimilarity, between two distributions of mass in a space that is itself endowed with a ground distance. … Practically, it is important that [such] distances between distributions correlate with human perception.]
-)
-
-#q(
 [#citep(<moller_quality_2009>)],
 [#emph("Quality prediction for synthesized speech: Comparison of approaches")],
 [Each time a new TTS system is developed which potentially introduces new types of degradations, the validity and reliability of such a prediction algorithm has to be tested anew.]
@@ -24,15 +18,15 @@ As we have established throughout this work it is useful to conceptualize speech
 
 When considering the entire space of possible speech recordings, even under specific constraints, the complexity of accurately replicating the real speech distribution becomes evident. For example, if utterances are restricted to a maximum duration of 60 seconds, and each data point within an utterance is quantized to one of $2^16$ values (corresponding to a 16-bit depth), with a sampling rate set at 16 kHz, this yields a total of $16,000 times 60 = 960,000$ values per recording. Consequently, the number of potential unique recordings would be $2^(16 times 960,000)$, represent a vast space. However, it is crucial to recognize that to human listeners, the overwhelming majority of these theoretical recordings would manifest as incoherent or meaningless noise.
 
-In the development of a system designed to produce synthetic speech, the objective is to accurately model the real speech distribution, which is a comparatively small subset within this expansive recording space. If the precise real speech distribution was already known, it would be unnecessary to model it. Therefore, practitioners typically resort to estimating this distribution from available data. The "performance" of such models is often verified by collecting subjective judgments from human listeners, as detailed in @08_eval[Chapter]. Alternatively, the degree to which a synthetic distribution resembles its real counterpart can be objectively quantified, which we detail in the remainder of this Chapter.
+In the development of a system designed to produce synthetic speech, the objective is to accurately model the real speech distribution, which is a comparatively small subset within this expansive recording space. If the precise real speech distribution was already known, it would be unnecessary to model it. Therefore, practitioners typically resort to estimating this distribution from available data. The "performance" of such models is often verified by collecting subjective judgments from human listeners, as detailed in @08_dist[Chapter]. Alternatively, the degree to which a synthetic distribution resembles its real counterpart can be objectively quantified, which we detail in the remainder of this Chapter.
 
 === #("Earth Mover's Distance")
 
-#figure(
-  image("../figures/9/xvector.svg", width: 100%),
-  placement: top,
-  caption: [KDE of X-Vector speaker embeddings in 2D PCA space for ground truth, synthetic, and noise data, with normalized density scaled by $10^(-5)$.],
-) <fig_vector>
+// #figure(
+//   image("../figures/9/xvector.svg", width: 100%),
+//   placement: top,
+//   caption: [KDE of X-Vector speaker embeddings in 2D PCA space for ground truth, synthetic, and noise data, with normalized density scaled by $10^(-5)$.],
+// ) <fig_vector>
 
 An intuitive approach to quantifying the dissimilarity between two distributions is the #abbr.a[EMD], a concept initially conceptualized and introduced by #citep(<rubner_earth_2000>) for the purpose of assessing perceptual similarity in image retrieval tasks. This metric is conceptually derived from the Wasserstein distance @vaserstein_markov_1969, which, in turn, draws upon the Kantorovich–Rubinstein metric @kantorovich_planning_1939. The fundamental motivation behind the #abbr.a[EMD] is articulated as follows:
 
@@ -83,7 +77,7 @@ The initial term, $|| mu - tilde(mu) ||_2^2$, quantifies the dissimilarity betwe
 
 === Perceptually-motivated factorized evaluation
 
-As elaborated in @08_distances, various objective methodologies exist for evaluating the alignment of synthetic speech with its real counterpart.
+As elaborated in @03_objective_metrics, various objective methodologies exist for evaluating the alignment of synthetic speech with its real counterpart.
 The task of synthetic speech generation inherently lacks a singular ground truth, given the one-to-many nature of the task. Instead, #abbr.a[TTS] evaluation is framed as a problem of distributional similarity. Here, $D$ denotes an audio dataset and $cal(R)(S)$ represents a feature extracted from it. The objective is to quantify the fidelity of synthetic speech in mirroring real speech by deriving correlates for each perceptual factor and assessing their distance from both genuine speech datasets and various noise dataset distributions.
 
 The initial iteration of this metric, TTSDS2 version 1.0 (hereafter referred to as TTSDS1), evaluates the quality of synthetic speech across multiple perceptual factors and ascertains its correlation with human judgments over a substantial period, spanning from legacy systems of 2008 to more contemporary ones from 2024. This foundational version benchmarks 35 #abbr.a[TTS] systems, demonstrating that a score computed as an unweighted average of various factors exhibits a strong correlation with human evaluations from each distinct time period. TTSDS1 delineates five primary factors, each assessed through specific features, to offer a comprehensive evaluation:
@@ -94,61 +88,61 @@ The initial iteration of this metric, TTSDS2 version 1.0 (hereafter referred to 
 - #smallcaps[Prosody]: This factor evaluates the realism of speech #smallcaps[Prosody]. It employs frame-level representations derived from our self-supervised prosody model and frame-level pitch features extracted using the WORLD vocoder @morise_world_2016. Furthermore, a proxy for segmental durations is obtained by utilizing HuBERT tokens and measuring their lengths, which corresponds to the number of consecutive occurrences of the same token.
 - #smallcaps[Speaker]: This factor quantifies the degree of similarity between the synthetic speaker's voice and that of a real speaker. This is achieved by employing representations obtained from speaker verification systems, specifically d-vectors @wan_generalized_2018 and the more contemporary WeSpeaker @wang_wespeaker_2023 representations.
 
-#figure(
-  table(
-    columns: (auto, 1fr),
-    align: (left, left), // Left-align content in both columns
-    [#strong[Factor]], [#strong[Feature]], // Table headers, bolded as in the original LaTeX
-    toprule(),
-    // Environment Factor
-    [#strong[Environment]], [#strong[Noise/Artifacts]],
-    [], [VoiceFixer #cite(<liu_voicefixer_2021>) + PESQ #cite(<rix_pesq_2001>)],
-    [], [WADA SNR #cite(<kim_wada_2008>)],
-    // Speaker Factor
-    toprule(),
-    [#strong[Speaker]], [#strong[Speaker Embedding]],
-    [], [d-vector #cite(<wan_generalized_2018>)],
-    [], [WeSpeaker #cite(<wang_wespeaker_2023>)],
-    // Prosody Factor
-    toprule(),
-    [#strong[Prosody]], [#strong[Segmental Length]],
-    [], [Hubert #cite(<hsu_hubert_2021>) token length],
-    [], [#strong[Pitch]],
-    [], [WORLD #cite(<morise_world_2016>)],
-    [], [#strong[SSL Representations]],
-    [], [MPM (Ours)],
-    // Intelligibility Factor
-    toprule(),
-    [#strong[Intelligibility]], [#strong[ASR WER]],
-    [], [wav2vec 2.0 #cite(<baevski_wav2vec_2020>)],
-    [], [Whisper #cite(<radford_robust_2023>)],
-    // General Factor
-    toprule(),
-    [#strong[General]], [#strong[SSL Representations]],
-    [], [Hubert #cite(<hsu_hubert_2021>)],
-    [], [wav2vec 2.0 #cite(<baevski_wav2vec_2020>)],
-  ),
-  caption: [Features used in the benchmark and their respective factors. The overall TTSDS1 score is computed as an average of individual factor scores.],
-  placement: top,
-) <fig_ttsds1_features>
+// #figure(
+//   table(
+//     columns: (auto, 1fr),
+//     align: (left, left), // Left-align content in both columns
+//     [#strong[Factor]], [#strong[Feature]], // Table headers, bolded as in the original LaTeX
+//     toprule(),
+//     // Environment Factor
+//     [#strong[Environment]], [#strong[Noise/Artifacts]],
+//     [], [VoiceFixer #cite(<liu_voicefixer_2021>) + PESQ #cite(<rix_pesq_2001>)],
+//     [], [WADA SNR #cite(<kim_wada_2008>)],
+//     // Speaker Factor
+//     toprule(),
+//     [#strong[Speaker]], [#strong[Speaker Embedding]],
+//     [], [d-vector #cite(<wan_generalized_2018>)],
+//     [], [WeSpeaker #cite(<wang_wespeaker_2023>)],
+//     // Prosody Factor
+//     toprule(),
+//     [#strong[Prosody]], [#strong[Segmental Length]],
+//     [], [Hubert #cite(<hsu_hubert_2021>) token length],
+//     [], [#strong[Pitch]],
+//     [], [WORLD #cite(<morise_world_2016>)],
+//     [], [#strong[SSL Representations]],
+//     [], [MPM (Ours)],
+//     // Intelligibility Factor
+//     toprule(),
+//     [#strong[Intelligibility]], [#strong[ASR WER]],
+//     [], [wav2vec 2.0 #cite(<baevski_wav2vec_2020>)],
+//     [], [Whisper #cite(<radford_robust_2023>)],
+//     // General Factor
+//     toprule(),
+//     [#strong[General]], [#strong[SSL Representations]],
+//     [], [Hubert #cite(<hsu_hubert_2021>)],
+//     [], [wav2vec 2.0 #cite(<baevski_wav2vec_2020>)],
+//   ),
+//   caption: [Features used in the benchmark and their respective factors. The overall TTSDS1 score is computed as an average of individual factor scores.],
+//   placement: top,
+// ) <fig_ttsds1_features>
 
-The specific features integrated into TTSDS1 for each factor are visually represented and detailed in @fig_ttsds1_features.
+The specific features integrated into TTSDS1 for each factor are visually represented and detailed in @tbl:tab_ttsds1_features.
 
-The scoring mechanism for each feature within TTSDS1 is derived by comparing its empirical distribution in synthetic speech $hat(P)(cal(R)(tilde(S))|tilde(D))$ to the distributions obtained from real speech datasets $hat(P)(cal(R)(S)|D)$ and noise datasets $hat(P)(cal(R)(S)|D^"NOISE"_i)$, drawn from a set of differing noise datasets $cal(D)^"NOISE"$, leveraging the 2-Wasserstein distance. The normalized similarity score for a given feature $cal(R)(S)$ is mathematically defined as follows:
+The scoring mechanism for each feature within TTSDS1 is derived by comparing its empirical distribution in synthetic speech $hat(P)(cal(R)(tilde(S))|tilde(D))$ to the distributions obtained from real speech datasets $hat(P)(cal(R)(S)|D)$ and noise datasets $hat(P)(cal(R)(S)|D^"NOISE"_i)$, drawn from a set of differing noise datasets $cal(D)^"NOISE"$, leveraging the 2-Wasserstein distance. The normalised similarity score for a given feature $cal(R)(S)$ is mathematically defined as follows:
 $ "TTSDS"(D,tilde(D),D^"NOISE") = 100 times (min[W_2(tilde(D),D^"NOISE"_i)]_(i=0)^N) / (W_2(tilde(D),D) + min[W_2(tilde(D),D^"NOISE"_i)]_(i=0)^N $
 In this formulation, $(min[W_2(tilde(D),D^"NOISE"_i)]_(i=0)^N)$ represents the minimum 2-Wasserstein distance between the synthetic speech and a designated set of distractor noise datasets, while $W_2(tilde(D),D)$ denotes the 2-Wasserstein distance to the distribution of real speech. An example of this scoring method, specifically for the one-dimensional pitch feature, is provided in @fig_f0, where the equation yields scores ranging from 0 to 100. Values exceeding 50 signify a stronger similarity to genuine speech than to noise. The final TTSDS1 score is computed as the unweighted arithmetic mean of the individual factor scores, with each factor score itself being the mean of its belonging feature scores.
 
-#figure(
-  image("../figures/9/pitch_distributions.png", width: 80%),
-  placement: top,
-  caption: [Distribution of $F_0$ in TTSDS for ground-truth, synthetic, and noise datasets. The distance between the synthetic and real distributions ($d_"gt"$) and the distance to noise ($d_"n"$) are shown, as well as how the overall score is computed.],
-) <fig_f0>
+// #figure(
+//   image("../figures/9/pitch_distributions.png", width: 80%),
+//   placement: top,
+//   caption: [Distribution of $F_0$ in TTSDS for ground-truth, synthetic, and noise datasets. The distance between the synthetic and real distributions ($d_"gt"$) and the distance to noise ($d_"n"$) are shown, as well as how the overall score is computed.],
+// ) <fig_f0>
 
-#figure(
-  image("../figures/9/heatmaps_ttsds1.png", width: 100%),
-  placement: top,
-  caption: [Development of factor score correlation coefficients over time from early speech synthesis (Blizzard'08) to the latest systems (TTS Arena).],
-) <fig_ttsds1_factor_correlation>
+// #figure(
+//   image("../figures/9/heatmaps_ttsds1.png", width: 100%),
+//   placement: top,
+//   caption: [Development of factor score correlation coefficients over time from early speech synthesis (Blizzard'08) to the latest systems (TTS Arena).],
+// ) <fig_ttsds1_factor_correlation>
 
 The correlations observed between TTSDS1 factor scores and subjective evaluation metrics across different temporal stages are depicted in @fig_ttsds1_factor_correlation, illustrating the increasing importance of factors such as #smallcaps[Prosody] over time as TTS systems gain in perceived naturalness.
 
