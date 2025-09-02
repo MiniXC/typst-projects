@@ -41,7 +41,7 @@ Given that augmenting datasets is a well-established method for improving the ro
 
 However, in this work, we find that the high human ratings of synthetic speech do not directly translate to its suitability for #abbr.a[ASR] training. In alignment with prior works such as #citep(<li_synthaug_2018>), #citep(<hu_syntpp_2022>), and #citep(<rossenbach_duration_2023>), we observe that while human evaluations often place synthetic speech within a few percentage points of real speech in terms of naturalness @wang_tacotron_2017, real speech typically outperforms synthetic speech by a factor of 2 or more for ASR training @casanova_cross_2023. This persistent discrepancy between human perception and downstream utility constitutes a central focus of this thesis. We propose that the primary reason for this performance gap lies in the inability of the TTS model's learned distribution $Q_theta$ to adequately approximate the true distribution of real speech, $Q$, especially concerning the subtle variability that ASR models leverage for robust performance. Motivated by this hypothesis, we introduce a framework and methodology to empirically measure the distance between these distributions and demonstrate that this distributional approach can predict human judgments across diverse datasets, systems, domains, and languages.
 
-=== Contributions
+=== Publications
 
 This thesis is based on the following publications, which have been adapted and extended to form its core chapters.
 
@@ -54,10 +54,8 @@ This work inspired us to investigate synthetic speech distributions more holisti
 - #cite(<minixhofer_ttsds2_2025>, form: "full")
 Additionally, the Masked Prosody Model (MPM) which serves as a component of TTSDS was published in the following joint first-author publication.
 - #cite(<wallbridge_mpm_2025>, form: "full")
-An extended pre-print of TTSDS including multilingual results was published.
+An extended pre-print of TTSDS including multilingual results is under review at NeurIPS 2025.
 - #cite(<minixhofer_ttsds2arxiv_2025>, form: "full")
-
-
 
 === Structure
 

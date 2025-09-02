@@ -193,7 +193,7 @@
         #context document.author.first()
       ]
     ]
-    #if true {
+    #if false {
       block(above: 0em, below: 2em)[
         #text(10pt, fill: blue)[
           Review version (#datetime.today().day()/#datetime.today().month()/#datetime.today().year())
@@ -220,6 +220,8 @@
 #counter(page).update(1)
 
 #set text(top-edge: if review {1em} else {"cap-height"}, bottom-edge: if review {-.8em} else {-.2em})
+
+
 
 // Abstract
 #frontmatter-heading([Abstract])
@@ -256,7 +258,14 @@ My friends, beyond listening to me about the perils of academia, have helped me 
 
 Finally, I would also like to thank Huawei for funding this work and for the feedback their team in Cambridge provided.
 
-#pagebreak()
+#frontmatter-heading([Declaration])
+
+I declare that this thesis was composed by myself, that the work contained herein is my own except where explicitly stated otherwise in the text, and that this work has not been submitted for any other degree or professional qualification except as specified.
+
+#align(right)[
+#image("figures/signature.png", width: 15%)
+#emph[(Christoph Minixhofer)]
+]
 
 #set text(top-edge: "cap-height", bottom-edge: "baseline")
 
@@ -332,7 +341,7 @@ Finally, I would also like to thank Huawei for funding this work and for the fee
 
 #set text(top-edge: if review {1em} else {"cap-height"}, bottom-edge: if review {-.8em} else {-.25em})
 
-#show math.equation: i-figured.show-equation.with(numbering: "1.1")
+#show math.equation: i-figured.show-equation.with(numbering: "(1.1)")
 #show heading: i-figured.reset-counters
 #show figure: i-figured.show-figure
 
@@ -420,8 +429,7 @@ Since our work in TTS-for-ASR suggested a large discrepancy between expected and
     "references/asr.bib",
     "references/own.bib"
   ),
-  style: "annual-reviews-author-date",
-  
+  style: "iso-690-author-date",
 )
 
 #set text(top-edge: if review {1em} else {"cap-height"}, bottom-edge: if review {-.8em} else {"baseline"})
@@ -434,16 +442,13 @@ Since our work in TTS-for-ASR suggested a large discrepancy between expected and
 
 #abbr.list(columns: 2)
 
-== List of Figures
 
-
-
-== Open source contributions
+== Open Source Contributions
 
 As far as licenses and resources permitted, all code and datasets used in the making of this thesis have been published at the web locations below.
 
 - *Phones* #sym.arrow #underline[#link("https://minixc.github.io/phones",[minixc.github.io/phones])]: A library for calculating distances between phones across languages.
-- *TTSDS* #sym.arrow #underline[#link("https://ttsdsbenchmark.com",[ttsdsbenchmark.com])]: The TTSDS score libary and datasets introduced in @09_dist[Chapter].
+- *TTSDS* #sym.arrow #underline[#link("https://ttsdsbenchmark.com",[ttsdsbenchmark.com])] and #underline[#link("https://github.com/ttsds/ttsds",[github.com/ttsds/ttsds])]: The TTSDS score libary and datasets introduced in @09_dist[Chapter].
 - *MPM* #sym.arrow #underline[#link("https://github.com/MiniXC/masked_prosody_model",[github.com/MiniXC/masked_prosody_model])]: #abbr.a[SSL] prosody correlate model introduced in @02_factors[Chapter].
 - *Speech Diffusion* #sym.arrow #underline[#link("https://github.com/MiniXC/speech-diffusion",[github.com/MiniXC/speech-diffusion])]: The diffusion architecture introduced in @07_scaling[Chapter].
 - *LightningFastSpeech2* #sym.arrow #underline[#link("https://github.com/MiniXC/LightningFastSpeech2", [github.com/MiniXC/LightningFastSpeech2])]: A reimplemention of FastSpeech2 with additional prosodic correlates and conditioning, introduced in @06_diversity[Chapter].
@@ -452,10 +457,10 @@ As far as licenses and resources permitted, all code and datasets used in the ma
 
 == GenAI used in this Thesis
 
-Generative AI (GenAI) was used in the making of this thesis in accordance with the University of Edinburgh's GenAI policy#footnote[#link(
+Generative AI (GenAI) was used in the making of this thesis in accordance with the University of Edinburgh's GenAI policy.#footnote[#link(
   "https://information-services.ed.ac.uk/computing/comms-and-collab/elm/guidance-for-working-with-generative-ai",
   underline[https://information-services.ed.ac.uk/computing/comms-and-collab/elm/guidance-for-working-with-generative-ai],
-)]. For most cases, the Edinburgh Language Model service was used.
+)] For most cases, the Edinburgh Language Model service was used.
 
 How to use these tools in academia is controversial, and in the light of the contents of this thesis, we set out to use them in a way that does not reduce the diversity of the lexical distribution found in this work, as is so often the case with GenAI. We also publish prompt templates and commit history of this work at #link("https://github.com/minixc/typst_projects", underline[github.com/minixc/typst_projects])
 

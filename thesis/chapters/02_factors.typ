@@ -123,9 +123,6 @@ Closer to the acoustic pole are representations from *Neural Audio Codecs*. Mode
 
 Finally, high-level *Contextualised Speech Embeddings* from #abbr.a[SSL] models like WavLM @chen_wavlm_2022 are #emph[intermediate] representations. Learned from raw acoustics, they are explicitly optimised to be useful for a wide range of downstream semantic tasks. They are reductive yet encode rich, entangled information about all factors. This makes them a state-of-the-art auxiliary feature for nearly any speech task, capable of improving robustness and performance by providing a powerful, pre-trained understanding of the relationship between sound and meaning.
 
-// TODO for this chapter: small intro on SSL? also tree figure with specific representations
-// also talk about how w2v etc can be seen as semantic but we class them as generic?
-
 ==== Limitations and cross-factor phenomena
 
 While the factorised view provides a useful framework, it is important to acknowledge its limitations. Certain acoustic phenomena do not fit neatly into a single category, but rather exist at the intersection of multiple factors, highlighting the complex relationship between acoustics and semantics.

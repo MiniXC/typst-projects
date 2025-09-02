@@ -10,7 +10,6 @@
 	corner-radius: 5pt,
 	..args,
 )
-#import "../comic.typ"
 
 == Text-to-Speech <03_tts>
 #q(

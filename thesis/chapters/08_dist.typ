@@ -11,13 +11,19 @@
   [… we want to define a consistent measure of distance, or dissimilarity, between two distributions of mass in a space that is itself endowed with a ground distance. … Practically, it is important that [such] distances between distributions correlate with human perception.]
 )
 
-As established throughout this work, it is useful to conceptualise speech as a distribution rather than as isolated instances. This chapter introduces a methodology to quantify the dissimilarity between real and synthetic speech distributions. Our approach moves beyond single-utterance evaluation and aims to provide a consistent measure of distance that correlates with human perception. We begin by discussing the theoretical underpinnings of measuring distances between complex distributions, before detailing the first iteration of our proposed metric, the Text-to-Speech Distribution Score (TTSDS).
+As established throughout this work, it is useful to conceptualise speech as a distribution rather than as isolated instances. This perspective moves beyond single-utterance evaluation and necessitates a methodology to quantify the dissimilarity between distributions of synthetic and real speech. A successful approach would require a consistent, objective measure of distance that strongly correlates with human perception across a wide range of systems and conditions. This motivates the central research questions for this part of our work:
 
-The primary contribution of this chapter is the introduction of the Text-to-Speech Distribution Score (TTSDS), a robust and factorised framework for objectively evaluating synthetic speech by measuring the distributional distance to real speech. This framework utilises a range of perceptually-motivated factors, incorporating novel feature extractors such as the Masked Prosody Model (MPM), a self-supervised model designed to learn representations of prosodic structure. We conduct an extensive validation of this methodology, demonstrating that TTSDS scores strongly correlate with subjective human judgments across diverse #abbr.a[TTS] systems and datasets spanning over a decade of research. These contributions were covered in the following works:
+#emph[
+Can the distributional distance between synthetic and real speech be quantified by a robust and objective metric? 
 
-- #cite(<minixhofer_ttsds_2024>, form: "full")
+Does such a metric, when factorised across perceptually-motivated aspects of speech, consistently correlate with human judgments across diverse systems and over time?
+]
 
-- #cite(<wallbridge_mpm_2025>, form: "full")
+This chapter addresses these questions by introducing the Text-to-Speech Distribution Score (TTSDS), a robust and factorised framework for objectively evaluating synthetic speech by measuring its distributional distance to real speech. This framework utilises a range of perceptually-motivated factors, incorporating novel feature extractors such as the Masked Prosody Model (MPM), a self-supervised model designed to learn representations of prosodic structure. We conduct an extensive validation of this methodology, demonstrating that TTSDS scores strongly correlate with subjective human judgments across diverse #abbr.a[TTS] systems and datasets spanning over a decade of research. These contributions were covered in the following works:
+
+- #cite(<minixhofer_ttsds_2024>, form: "full", style: "iso-690-author-date")
+
+- #cite(<wallbridge_mpm_2025>, form: "full", style: "iso-690-author-date")
 
 === The Challenge of Speech Distributions
 
@@ -47,13 +53,13 @@ Formally, the Wasserstein distance quantifies the dissimilarity between two empi
 
 $ W_p (Q, tilde(Q)) = (inf_(gamma in Pi(Q, tilde(Q))) E_((x,y)~gamma)[d(x,y)^p])^(1/p) $
 
-where $d(x,y)$ signifies the distance between points $x$ and $y$. For simplicity, we focus on the case where $p=2$ and $d(x,y)$ corresponds to the Euclidean distance $||x-y||_2$, rather than the #abbr.a[EMD] for which $p=1$. Direct computation of this distance for arbitrary high-dimensional distributions remains a challenging endeavor. However, two specific scenarios permit efficient, closed-form solutions. In the one-dimensional case, the 2-Wasserstein distance possesses a straightforward closed-form solution. Given the #abbr.a[CDF]s for the real and synthetic distributions, denoted as $C_R$ and $C_S$, respectively, the squared 2-Wasserstein distance is the squared L2-distance between their inverse functions @kolouri_optimal_2017:
+where $d(x,y)$ signifies the distance between points $x$ and $y$. For simplicity, we focus on the case where $p=2$ and $d(x,y)$ corresponds to the Euclidean distance $||x-y||_2$, rather than the #abbr.a[EMD] for which $p=1$. Direct computation of this distance for arbitrary high-dimensional distributions remains a challenging endeavour. However, two specific scenarios permit efficient, closed-form solutions. In the one-dimensional case, the 2-Wasserstein distance possesses a straightforward closed-form solution. Given the #abbr.a[CDF]s for the real and synthetic distributions, denoted as $C_R$ and $C_S$, respectively, the squared 2-Wasserstein distance is the squared L2-distance between their inverse functions @kolouri_optimal_2017:
 
-$ W_2^2(P_R, P_S) = integral_0^1(C_R^(-1)(z)-C_S^(-1)(z))^2d z $
+$ W_2(P_R, P_S)^2 = integral_0^1(C_R^(-1)(z)-C_S^(-1)(z))^2d z $
 
 For sets of high-dimensional vectors, as proposed by #citep(<heusel_fid_2017>) in the context of image generation, a simplifying assumption can be made: that the embedding distributions can be approximated by multivariate Gaussians. This approximation enables the calculation of the 2-Wasserstein distance in a closed form. Let the real and synthetic embedding distributions be modeled by multivariate Gaussians $N(mu, Sigma)$ and $N(tilde(mu), tilde(Sigma))$, respectively. The squared 2-Wasserstein distance, also recognized as the Fréchet distance @frechet_1925, between these two Gaussian distributions is given by #citep(<dowson_frechet_1982>):
 
-$ W_2^2(Q, tilde(Q)) = ||mu - tilde(mu)||_2^2 + text("Tr")(Sigma + tilde(Sigma)) - 2(Sigma tilde(Sigma))^(1/2)) $
+$ W_2(Q, tilde(Q))^2 = ||mu - tilde(mu)||_2^2 + text("Tr")(Sigma + tilde(Sigma)) - 2(Sigma tilde(Sigma))^(1/2)) $
 
 where $mu$ and $tilde(mu)$ are the mean vectors, $Sigma$ and $tilde(Sigma)$ are the covariance matrices, and $text("Tr")(dot)$ is the trace of a matrix. This metric forms the basis of the #abbr.a[FID] @heusel_fid_2017 and the Fréchet Audio Distance @kilgour_fad_2019.
 
@@ -67,7 +73,7 @@ The task of synthetic speech generation inherently lacks a singular ground truth
 - #smallcaps[Prosody]: This factor evaluates the realism of speech #smallcaps[Prosody]. It employs frame-level representations derived from our self-supervised prosody model and frame-level pitch features extracted using the WORLD vocoder @morise_world_2016. Furthermore, a proxy for segmental durations is obtained by utilizing HuBERT tokens and measuring their lengths, which corresponds to the number of consecutive occurrences of the same token.
 - #smallcaps[Speaker]: This factor quantifies the degree of similarity between the synthetic speaker's voice and that of a real speaker. This is achieved by employing representations obtained from speaker verification systems, specifically d-vectors @wan_generalized_2018 and the more contemporary WeSpeaker @wang_wespeaker_2023 representations.
 
-===== Masked Prosody Model
+=== Masked Prosody Model
 
 #figure(
   image("../figures/8/mpm.png", width: 60%),
@@ -75,7 +81,7 @@ The task of synthetic speech generation inherently lacks a singular ground truth
   caption: [Architecture of the Masked Prosody Model.],
 ) <fig_mpm_architecture>
 
-Inspired by masked language models in text processing, the Masked Prosody Model (#abbr.a[MPM]) was developed to learn to reconstruct corrupted sequences of prosodic features—pitch, loudness, and voice activity—independent of lexical content. As illustrated in @fig:fig_mpm_architecture, the model architecture consists of separate input sequences for each prosodic feature, which are then processed by a series of Conformer blocks @gulati_conformer_2020, well-suited to their high-resolution and continuous nature.
+Inspired by masked language models in text processing, the Masked Prosody Model (#abbr.a[MPM]) was developed to learn to reconstruct corrupted sequences of prosodic features -- pitch, loudness, and voice activity -- independent of lexical content. As illustrated in @fig:fig_mpm_architecture, the model architecture consists of separate input sequences for each prosodic feature, which are then processed by a series of Conformer blocks @gulati_conformer_2020, well-suited to their high-resolution and continuous nature.
 
 The input features are extracted at a resolution of approximately 10ms. Pitch (F0) and voice activity are extracted using the WORLD vocoder @morise_world_2016, while energy is computed as the Root-Mean-Square of each Mel spectrogram frame. All feature contours are normalised across the utterance, which removes information about absolute feature values but allows the model to encode prosody from unseen speakers. Before masking, the continuous input sequences are quantised into discrete codebooks. Random segments of the aligned sequences are then masked such that approximately 50% of the input signal remains. The model is trained to reconstruct the original quantised values for each feature with an independent Categorical Cross Entropy loss.
 
@@ -114,12 +120,16 @@ The downstream evaluation of the model's representations on tasks such as syllab
   placement: top,
 ) <tab_ttsds1_features>
 
-===== Formulation of TTSDS
-The scoring mechanism for each feature within TTSDS is derived by comparing its empirical distribution in synthetic speech $hat(P)(cal(R)(tilde(S))|tilde(D))$ to the distributions obtained from real speech datasets $hat(P)(cal(R)(S)|D)$ and noise datasets $hat(P)(cal(R)(S)|D^"NOISE"_i)$. The normalized similarity score for a given feature $cal(R)(S)$ is defined as:
+=== Formulation of TTSDS
+The scoring mechanism for each feature within TTSDS is derived by comparing its empirical distribution in synthetic speech $hat(P)(cal(R)(tilde(S))|tilde(D))$ to the distributions obtained from real speech datasets $hat(P)(cal(R)(S)|D)$ and noise datasets $hat(P)(cal(R)(S)|D^"NOISE"_i)$.
 
-$ "TTSDS"(D,tilde(D),D^"NOISE") = 100 times (min[W_2(tilde(D),D^"NOISE"_i)]_(i=0)^N) / (W_2(tilde(D),D) + min[W_2(tilde(D),D^"NOISE"_i)]_(i=0)^N $
+First, we compute the 2-Wasserstein distance between each noise dataset and the speech such that $W_2^"NOISE"=min_(D^"NOISE" in cal(D)^"NOISE")[W_2(tilde(D),D^"NOISE")]$ where $cal(D)^"NOISE"$ is the set of all distractor noise datasets, typically 4 or 5 in number. Additionally, $W_2^"REAL"=W_2(tilde(D),D)$, where $D$ is the real reference speech dataset.
 
-In this formulation, the term $min[W_2(tilde(D),D^"NOISE"_i)]_(i=0)^N$ represents the minimum 2-Wasserstein distance between the synthetic speech and a designated set of distractor noise datasets, while $W_2(tilde(D),D)$ denotes the 2-Wasserstein distance to the distribution of real speech. This yields scores ranging from 0 to 100, where values exceeding 50 signify a stronger similarity to genuine speech than to noise, as exemplified for the pitch feature in @fig:fig_f0. The final TTSDS score is the unweighted arithmetic mean of the individual factor scores.
+We define the normalised TTSDS score for a particular feature is as follows:
+
+$ "TTSDS"(D,tilde(D)) = 100 times (W_2^"NOISE") / (W_2^"REAL" + W_2^"NOISE") $
+
+This yields scores ranging from 0 to 100, where values exceeding 50 signify a stronger similarity to genuine speech than to noise, as exemplified for the pitch feature in @fig:fig_f0. The final TTSDS score is the unweighted arithmetic mean of the individual factor scores, which in turns are calculated as the arithmetic mean of their feature scores.
 
 #figure(
   image("../figures/8/pitch_distributions.png", width: 80%),
@@ -170,11 +180,11 @@ We compare our benchmark with two MOS prediction methods. The first is WVMOS @an
 
 The correlations observed between TTSDS factor scores and subjective evaluation metrics across these temporal stages are depicted in @fig:fig_ttsds1_factor_correlation. Our results show that the TTSDS score, computed as an unweighted average of factors, consistently correlates well with human evaluations, with Spearman coefficients from 0.60 to 0.83. This is in contrast to the baseline MOS predictors, which achieve mixed results, performing well on some datasets but poorly on others, indicating a lack of generalisation.
 
-#figure(grid(columns: 2, row-gutter: 2mm, column-gutter: 1mm,
+#figure(grid(columns: 2, row-gutter: 2mm, column-gutter: 4mm,
   image("../figures/8/overtime.png", width: 100%),
   image("../figures/8/wilcoxon.png", width: 100%),
-  [a) Development of factor score correlation coeffi- cients over time from early speech synthesis (Blizzard’08) to the latest systems (TTS Arena).],
-  [b) Results of Wilcoxon signed-rank tests between systems' extracted features for the TTS Arena dataset.],),
+  [a) Development of factor score correlation coefficients over time.],
+  [b) Results of Wilcoxon signed-rank tests between systems.],),
   placement: top,
   caption: [Factor scores over time and Wilcoxon signed-rank test.],
 ) <fig_overtime>
@@ -183,4 +193,6 @@ A more detailed factor-by-factor analysis reveals shifting listener priorities, 
 
 The ranking of modern systems from the TTS Arena is shown in @tbl:tab_tts_arena_ranking. While the UTMOS baseline correctly predicts the best system, its other scores show little correlation with the subjective Elo ratings. In contrast, our prosody factor, speaker factor, and overall TTSDS score correlate well. To assess the metric's discriminative power, a Wilcoxon signed-rank test was performed, with results shown in @fig:fig_overtime b). This shows that while worst-performing systems are distinguishable from top-performers, there are no statistically significant differences between the very best systems, a common challenge in subjective tests as well. This validation establishes TTSDS as a reliable objective measure capable of predicting human perception and providing interpretable insights into specific areas of improvement for #abbr.a[TTS] systems.
 
-While the validation of TTSDS successfully demonstrated that a factorised, distributional approach can provide a robust and interpretable objective metric for synthetic speech, correlating strongly with human judgments across different eras of #abbr.a[TTS] technology, this initial validation was primarily conducted on English audiobook-style speech. The increasing capability of modern #abbr.a[TTS] systems necessitates evaluation methods that are robust not only to clean, read speech but also to more challenging real-world conditions, including noisy environments, conversational styles, and diverse speaker populations like children. Furthermore, the global nature of speech technology requires metrics that can be reliably applied across multiple languages. Motivated by these requirements for greater robustness and broader applicability, the next chapter introduces TTSDS2, an enhanced and expanded version of the framework. There, we detail the specific refinements to the feature set and methodology designed to address these challenges and present a comprehensive validation across these diverse domains and languages.
+While the validation of TTSDS successfully demonstrated that a factorised, distributional approach can provide a robust and interpretable objective metric for synthetic speech, correlating strongly with human judgments across different eras of #abbr.a[TTS] technology, this initial validation possesses several limitations that warrant careful consideration. The subjective scores used for comparison were sourced from existing benchmarks, namely the Blizzard Challenges and the TTS Arena leaderboard. While this provides a valuable temporal perspective, it also means that we cannot be fully certain of the conditions under which these subjective ratings were collected. This is particularly relevant for the TTS Arena data, which, despite representing the most modern and therefore pertinent systems, is gathered through uncontrolled crowdsourcing. Furthermore, its A/B preference test methodology does not enforce speaker identity matching between the compared samples, potentially confounding listener judgments of overall quality with perceptions of speaker similarity.
+
+A further significant constraint is that the evaluation was conducted exclusively on read speech, predominantly in an audiobook style. The performance of the metric on more varied and challenging acoustic conditions, such as spontaneous conversational speech or speech recorded in noisy environments, remains unverified. Finally, while the selection of systems provided a useful overview of technological progression, a more exhaustive comparison encompassing a larger, more diverse set of contemporary models is necessary to fully establish the metric's discriminative power and generalisability. These shortcomings—the reliance on external and potentially confounded subjective data, the narrow focus on a single speech domain, and the limited scope of system comparison—motivate the subsequent phase of our research. The following chapter introduces an enhanced iteration of the framework, TTSDS2, alongside a comprehensive, large-scale validation study designed specifically to address these limitations.

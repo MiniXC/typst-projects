@@ -15,9 +15,17 @@
 
 Building on the significant performance gap between ASR models trained on real versus synthetic speech, as quantified by the Word Error Rate Ratio (WERR) in @05_werr, this chapter introduces and evaluates methodologies to increase the diversity of synthetic speech. As established in the previous chapter, synthetic speech, despite its high human naturalness ratings, often lacks the intricate variability inherent in real human speech. This limitation directly impedes its utility for training robust ASR systems. Here, we systematically explore three complementary paradigms aimed at bridging this distributional gap: learning latent representations, explicit conditioning on attributes, and post-generation data augmentation. By introducing and controlling these aspects of speech, we aim to reduce the distributional distance between synthetic and real speech, which should, in turn, manifest as a reduction in WERR. Throughout this chapter, we adhere to the formal notation established in the introduction, where $Q_theta$ represents the Text-to-Speech (TTS) model's approximation of the true speech distribution $Q(S|T)$.
 
+The preceding chapter established that the synthetic-real gap stems from a lack of diversity in the generated speech. This conclusion motivates the central research questions we address in this chapter: 
+
+#emph[If the synthetic-real gap is caused by insufficient diversity, to what extent can this gap be narrowed by explicitly modelling and generating greater acoustic and prosodic variability?
+
+What are the relative efficacies of different paradigms for introducing this diversity, specifically comparing explicit conditioning within the TTS model against post-generation data augmentation?
+
+How do these enhancement strategies impact the underlying distributions of specific speech attributes, and does a measurable reduction in this distributional distance directly correspond to a reduction in the task-specific WERR?]
+
 The primary contribution of this chapter is a systematic methodology for enhancing synthetic speech diversity through explicit conditioning on acoustic attributes, combined with a novel probabilistic sampling approach for generating this conditioning information. We conduct a controlled experimental evaluation of this methodology alongside post-generation augmentation, quantifying their impact on the synthetic-real gap using both the task-oriented WERR and direct distributional distance measures. These contributions were covered in the following work:
 
-- #cite(<minixhofer_evaluating_2023>, form: "full")
+- #cite(<minixhofer_evaluating_2023>, form: "full", style: "iso-690-author-date")
 
 === Paradigms for Enhancing Speech Diversity
 
@@ -77,7 +85,8 @@ Post-generation data augmentation is employed as a complementary strategy. This 
 
 ==== Quantifying Distributional Distance
 
-In addition to using the task-based WERR metric, we also directly quantify the distance between the distributions of the real and synthetic attributes. As introduced in @03_objective_metrics and discussed in detail in @09_dist, distributional metrics offer a way to compare entire sets of speech samples. We use the 2-Wasserstein distance, which is intuitively understood as the "Earth Mover's Distance" and measures the minimum cost to transform one distribution into another @rubner_earth_2000. For the one-dimensional attributes (#smallcaps[Prosody] and #smallcaps[Ambient] factors), we compute the 2-Wasserstein distance directly from their empirical distributions. For the high-dimensional d-vectors (#smallcaps[Speaker] factor), we compute the Fréchet distance, which is the 2-Wasserstein distance between two multivariate Gaussians fitted to the data. This allows for a quantitative assessment of how closely the synthetic attribute distributions match the real ones.
+In addition to using the task-based WERR metric, we also directly quantify the distance between the distributions of the real and synthetic attributes. As introduced in @03_objective_metrics distributional metrics offer a way to compare entire sets of speech samples. Distributional distances also form the basis for our contributions in @08_dist[Chapter] and @09_dist[Chapter], where they are introduced in more detail.
+We use the 2-Wasserstein distance, which is intuitively understood as the "Earth Mover's Distance" and measures the minimum cost to transform one distribution into another @rubner_earth_2000. For the one-dimensional attributes (#smallcaps[Prosody] and #smallcaps[Ambient] factors), we compute the 2-Wasserstein distance directly from their empirical distributions. For the high-dimensional d-vectors (#smallcaps[Speaker] factor), we compute the Fréchet distance, which is the 2-Wasserstein distance between two multivariate Gaussians fitted to the data. This allows for a quantitative assessment of how closely the synthetic attribute distributions match the real ones.
 
 === Experimental Evaluation
 

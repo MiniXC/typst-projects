@@ -14,11 +14,15 @@
 )
 
 The principle that performance in machine learning improves with scale -- of data, computation, and model size -- is now a well-established fact. This phenomenon is often formalised by neural scaling laws, which describe a predictable and simple power-law relationship between a model's test error and these scaling factors @kaplan_scaling_2020. While these laws have been most documented for large language models, they have since been verified across a diverse range of domains, from computer vision to spoken language modelling @bahri_scaling_2024.
-In the context of scaling for TTS-for-ASR, we pose the following research question: #emph[How does the choice of TTS training objective -- specifically Mean Squared Error versus a Denoising Diffusion Probabilistic Model -- and the scale of the TTS training data affect the utility of the generated synthetic speech for ASR training, and can this behaviour be modelled by neural scaling laws?]
+In the context of scaling for TTS-for-ASR, we pose the following research question: 
+
+#emph[How does the choice of TTS training objective -- specifically Mean Squared Error versus a Denoising Diffusion Probabilistic Model -- and the scale of the TTS training data affect the utility of the generated synthetic speech for ASR training?
+
+Can TTS-for-ASR behaviour with respect to TTS training data be modelled by neural scaling laws?]
 
 The primary contribution of this chapter is the first comprehensive investigation into the neural scaling properties of synthetic speech for ASR training. We systematically compare the scaling behaviours of two distinct TTS training objectives: the conventional Mean Squared Error (MSE) and the probabilistic Denoising Diffusion Probabilistic Model (DDPM). To formally model the observed phenomena, particularly the significant performance disparity in low-data regimes, we propose a novel two-term power law that extends the standard neural scaling law to account for the initial distributional mismatch between synthetic and real data. Through our experiments, we quantify the scaling trajectories of both model types, linking their performance to the acoustic properties of the generated speech, specifically its spectral variance. These contributions were presented in the following publication:
 
-- #cite(<minixhofer_oversmoothing_2025>, form: "full")
+- #cite(<minixhofer_oversmoothing_2025>, form: "full", style: "iso-690-author-date")
 
 === Neural Scaling Laws and Synthetic Data
 
@@ -26,11 +30,12 @@ The empirical study of neural scaling laws was prominently established by #citep
 
 Subsequent research has extended these observations to the domain of synthetic data. Work by #citep(<fan_images_2024>) in computer vision confirmed that models trained on synthetic images also exhibit power-law scaling. However, their work revealed a crucial performance disparity: for supervised image classification, synthetic data scaled less effectively than real data. They identified two primary reasons for this gap: the inability of the generative models to accurately produce certain concepts and a lack of diversity in the generated images. This finding in the vision domain directly parallels the central problem of this thesis -- the synthetic-real gap in speech -- and provides a motivation for investigating how different generative modelling choices might affect these scaling properties.
 
-=== Training Objectives and their Hypothesized Impact on Scaling
+=== Training Objectives and their Hypothesised Impact on Scaling
 
 The standard neural scaling law provides a framework for modelling performance when training and testing on data from the same distribution. However, in the #abbr.a[TTS]-for-#abbr.a[ASR] paradigm, the training data is synthetic while the test data is real. The properties of the synthetic distribution are determined by the #abbr.a[TTS] model's training objective, which we hypothesise will have an impact on its scaling behaviour. There is limited formal theory linking specific generative objectives to scaling law parameters, thus this work provides an empirical investigation into this relationship.
 
-==== Mean Squared Error (MSE) and Oversmoothing
+
+==== Mean Squared Error and Oversmoothing
 
 As discussed in @03_tts, #abbr.a[TTS] models trained to minimise #abbr.a[MSE] assume that the conditional probability distribution of the target speech feature (e.g., Mel spectrograms) given the input text is unimodal. This assumption is fundamentally at odds with the "one-to-many" nature of speech, where a single text can have many valid acoustic realisations. This leads to the well-documented issue of oversmoothing, where the model learns to predict the statistical average of all plausible outputs @ren_revisiting_2022. The resulting synthetic speech often exhibits low spectral variance and lacks the fine-grained texture of real speech. We hypothesise that this inherent bias will cause #abbr.a[MSE]-based models to exhibit a distinct scaling pattern: they may perform relatively well in low-data regimes by quickly learning the average speech pattern, but their performance will quickly plateau as the lack of diversity becomes a bottleneck, preventing the #abbr.a[ASR] model from learning robust representations.
 
@@ -59,9 +64,9 @@ To empirically test these hypotheses, we designed a controlled experimental fram
 
 ==== TTS and ASR Architectures
 The core #abbr.a[TTS] architecture, shown in @fig:fig_tts_arch_scaling, consists of two U-Net models @ronneberger_u-net_2015. A U-Net Encoder ($"U-Net"_"ENC"$) generates a multi-resolution prosody representation from the input phone sequence and a speaker d-vector, using the #abbr.a[CWT] of pitch, energy, and duration.
-$ P = "U-Net"_"ENC" ("G2P"(T), Z_"SPK") $
-This prosody representation $P$ is then expanded according to predicted durations to create $P'$. A second U-Net Decoder ($"U-Net"_"DEC"$) transforms this prosody representation into a Mel spectrogram, additionally conditioning on high-level semantic features from a pre-trained Flan-T5-Base language model @chung_scaling_2024:
-$ cal(R)_"MEL" (tilde(S)) = "U-Net"_"DEC" (P', Z_"SPK", f^"T5"_phi (T)) $
+$ H = "U-Net"_"ENC" ("G2P"(T), Z_"SPK") $
+This prosody representation $H$ is then expanded according to predicted durations to create $hat(H)$. A second U-Net Decoder ($"U-Net"_"DEC"$) transforms this prosody representation into a Mel spectrogram, additionally conditioning on high-level semantic features from a pre-trained Flan-T5-Base language model @chung_scaling_2024:
+$ cal(R)_"MEL" (tilde(S)) = "U-Net"_"DEC" (hat(H), Z_"SPK", f^"T5"_phi (T)) $
 This U-Net architecture is crucial for #abbr.a[DDPM] training, as its structure, with its skip connections and hierarchical feature processing, is well-suited to the denoising task. For the #abbr.a[MSE] model, a FastSpeech 2-style architecture was also tested and found to perform similarly; however, we use the U-Net architecture for both objectives to ensure a direct and fair comparison of the training losses. For #abbr.a[ASR] evaluation, we use two distinct architectures: the hybrid HMM-TDNN model from our previous experiments (6-layer, 512 hidden units, LF-MMI objective), and a Conformer-CTC model (12-layer, 8 attention heads, CTC objective).
 
 #figure(
@@ -90,31 +95,31 @@ Here, the first term $(D_v/D)^alpha$ parametrises an initial, #emph[variance-lim
     table.header(
       [],
       [],
-      [Hybrid WER],
-      [Conformer WER],
+      [Hybrid],
+      [Conformer],
     ),
     toprule(),
     table.cell(
     rowspan: 6,
     align: horizon,
       rotate(-90deg, reflow: true)[
-        *ASR Training Data*
+        *WERR*
       ],
     ),
     table.vline(),
-    [100], [6.92], [6.98],
-    [250], [6.57], [6.70],
-    [500], [6.21], [6.25],
-    [1000], [5.41], [4.40],
-    [2500], [#emph[N/A]], [4.15],
-    [5000], [#emph[N/A]], [3.64],
+    [100], [3.69], [3.19],
+    [250], [2.78], [2.66],
+    [500], [1.83], [1.80],
+    [1000], [1.29], [1.49],
+    [2500], [#emph[N/A]], [1.34],
+    [5000], [#emph[N/A]], [1.25],
     toprule(),
   ),
   caption: [Word Error Rates (WER) of ASR models trained on real speech.],
   placement: top
-) <tab_real_asr_wer>
+) <tab_real_asr_werr>
 
-Our experiments reveal distinct scaling behaviours for the two training paradigms, confirming our initial hypotheses when the #abbr.a[ASR] training set is fixed. The results are presented as #abbr.a[WER] achieved by #abbr.a[ASR] models trained on synthetic data (@fig:fig_scaling_lines) and as the #abbr.s[WERR] relative to models trained on real data of the same size (@fig:fig_scaling_werr). The baseline real-data #abbr.a[WER] values are shown in @tbl:tab_real_asr_wer, and the full synthetic-data #abbr.a[WER] results are in @tbl:tab_synthetic_asr_wer.
+Our experiments reveal distinct scaling behaviours for the two training paradigms, confirming our initial hypotheses when the #abbr.a[ASR] training set is fixed. The results are presented as #abbr.a[WER] achieved by #abbr.a[ASR] models trained on synthetic data (@fig:fig_scaling_lines) and as the #abbr.s[WERR] relative to models trained on real data of the same size (@fig:fig_scaling_werr). The baseline real-data #abbr.a[WER] values and the full synthetic-data #abbr.a[WER] results are in @tbl:tab_synthetic_asr_wer.
 
 ==== Divergent Scaling Trajectories
 As predicted, the #abbr.a[MSE] model demonstrates stronger performance in low-data regimes (below 500 hours). At 100 hours, the #abbr.s[WERR] for the #abbr.a[MSE] model is 3.66, whereas for the #abbr.a[DDPM] model it is 8.33. The deterministic nature of #abbr.a[MSE] allows it to quickly learn a stable, albeit averaged, representation of speech. However, its performance rapidly plateaus, showing minimal improvement beyond 1000 hours of training data. In contrast, the #abbr.a[DDPM] model, while initially struggling, exhibits a much more favourable scaling trajectory. Its performance improves continuously with more data, overtaking the #abbr.a[MSE] model at around 1000 hours and continuing to improve, achieving a best #abbr.s[WERR] of 1.46 at 2500 hours for this 10-hour #abbr.a[ASR] setup.
@@ -141,7 +146,7 @@ The underlying reason for these divergent scaling behaviours is made clear by an
 ) <fig_scaling_werr>
 
 ==== Synthetic Speech Performance
-While fixing the #abbr.a[ASR] training data allows for controlled analysis, exploring the full results in @tbl:tab_synthetic_asr_wer reveals further insights. When both the #abbr.a[TTS] and #abbr.a[ASR] training set sizes are increased, the #abbr.s[WERR] can be reduced even further. The lowest #abbr.s[WERR] achieved for the hybrid model is 1.07, obtained when training the #abbr.a[TTS] model on 5000 hours and the #abbr.a[ASR] model on 1000 hours of the resulting synthetic speech. For the Conformer model, the lowest #abbr.s[WERR] is 1.25, achieved when training both the #abbr.a[TTS] and #abbr.a[ASR] systems on 5000 hours of data.
+While fixing the #abbr.a[ASR] training data allows for controlled analysis, exploring the full results in @tbl:tab_synthetic_asr_wer reveals further insights. When both the #abbr.a[TTS] and #abbr.a[ASR] training set sizes are increased, the #abbr.s[WERR] can be reduced even further. The lowest #abbr.s[WERR] achieved for the hybrid model is 1.07, obtained when training the #abbr.a[TTS] model on 5000 hours and the #abbr.a[ASR] model on 1000 hours of the resulting synthetic speech. For the Conformer model, the lowest #abbr.s[WERR] is 1.25,  as shown in @tbl:tab_real_asr_werr, achieved when training both the #abbr.a[TTS] and #abbr.a[ASR] systems on 5000 hours of data.
 
 Interestingly, under certain conditions, synthetic data can outperform its real equivalent, resulting in a #abbr.s[WERR] below 1.0. For instance, when a Conformer #abbr.a[ASR] model is trained on just 100 hours of synthetic data generated by a #abbr.a[TTS] model that was itself trained on 5000 hours, the resulting #abbr.a[WER] is 5.88. This is substantially better than the 6.98 #abbr.a[WER] achieved when training on the corresponding 100 hours of real data, yielding a #abbr.s[WERR] of 0.84. We hypothesise that the large-scale #abbr.a[TTS] model acts learns a rich and diverse representation of speech from its vast 5000-hour training set. When generating a smaller 100-hour subset, it produces speech that is both highly varied and acoustically canonical, having averaged out some of the idiosyncratic speaker behaviours, disfluencies, or recording artefacts present in the smaller real dataset. This cleaner, yet still diverse, data can be a more efficient training signal for an #abbr.a[ASR] model with a limited data budget.
 
@@ -171,13 +176,16 @@ Interestingly, under certain conditions, synthetic data can outperform its real 
     [250], [19.81], [18.33], [18.65], [*17.41*], [17.95], [17.8], [17.81], [17.72], [15.48], [*15.32*],
     [500], [13.18], [11.87], [*11.39*], [11.92], [11.95], [12.14], [11.23], [11.64], [*9.75*], [10.51],
     [1000], [8.23], [7.08], [*7.00*], [7.01], [7.16], [6.84], [6.71], [6.57], [*5.54*], [5.61],
-    [2500], [7.44], [7.27], [*6.52*], [6.56], [6.67], [6.69], [*5.95*], [6.30], [5.59], [*5.60*],
-    [5000], [6.10], [*5.71*], [5.78], [5.83], [5.88], [5.66], [*5.2*], [5.24], [*4.54*], [4.55],
+    [2500], [7.44], [7.27], [*6.52*], [6.56], [6.67], [6.69], [5.95], [6.30], [5.59], [*5.60*],
+    [5000], [6.10], [*5.71*], [5.78], [5.83], [5.88], [5.66], [5.2], [5.24], [*4.54*], [4.55],
+    toprule(),
+    table.cell(colspan: 2)[*Real*], [6.92], [6.57], [6.21], [5.41], [6.98], [6.70], [6.25], [4.40], [4.15], [3.64],
     toprule(),
   ),
   caption: [Word Error Rates (WER) of ASR models trained on synthetic speech, generated by Text-to-Speech (TTS) models.],
   placement: top,
 ) <tab_synthetic_asr_wer>
+
 
 ==== Fitting the Scaling Law
 To formally capture the observed behaviours, we fit the two-term power law to the empirical WERR data from the 10-hour #abbr.a[ASR] setup. For the #abbr.a[DDPM] model, the fitted parameters were $alpha = 1.86$ and $gamma = 0.06$. The smaller $alpha$ value reflects its slower initial improvement, while the larger $gamma$ value indicates a more sustained scaling behaviour. For the #abbr.a[MSE] model, the parameters were $alpha = 2.93$ and $gamma = 0.01$. The large $alpha$ reflects a rapid initial improvement, while the near-zero $gamma$ confirms its quick stagnation. As shown in @fig:fig_scaling_werr, these fitted laws accurately model the empirical data, confirming the validity of our proposed two-term model.

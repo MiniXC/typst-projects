@@ -4,7 +4,7 @@
 #import "@preview/booktabs:0.0.4": *
 #show: booktabs-default-table-style
 
-== Measuring distributional distance <09_dist>
+== TTSDS Across Domains and Languages <09_dist>
 
 #q(
 [#citep(<moller_quality_2009>)],
@@ -12,144 +12,78 @@
 [Each time a new TTS system is developed which potentially introduces new types of degradations, the validity and reliability of such a prediction algorithm has to be tested anew.]
 )
 
-As we have established throughout this work it is useful to conceptualize speech as a distribution rather than as isolated instances. In this chapter, we expand this perspective beyond TTS-for-ASR and introduce a methodology to quantify the dissimilarity between real and synthetic speech distributions across diverse systems, domains, and languages. This approach aims to provide a consistent measure of distance that correlates with human perception.
+In the preceding chapter, we introduced the Text-to-Speech Distribution Score (TTSDS), a factorised framework for quantifying the distributional dissimilarity between real and synthetic speech. The initial validation demonstrated its potential, showing strong correlations with human judgments across several decades of speech synthesis technology. However, that validation also highlighted several critical limitations. The reliance on pre-existing subjective datasets, such as the crowdsourced TTS Arena, introduced uncertainty regarding the listening conditions and experimental design; for instance, the comparison tests did not control for speaker identity, a potential confounding variable. Moreover, the evaluation was confined to a single domain of clean, read English speech, leaving the metric's robustness to more challenging, real-world conditions unevaluated. Finally, a more systematic comparison against a broader set of contemporary systems was required to fully assess its capabilities. These limitations directly inform the next stage of our investigation and lead to the following set of research questions for this chapter:
 
-=== Audio and speech distributions
+#emph[
+How can the TTSDS framework be enhanced to achieve greater robustness and generalisability across diverse acoustic domains, speaking styles, and multiple languages?
 
-When considering the entire space of possible speech recordings, even under specific constraints, the complexity of accurately replicating the real speech distribution becomes evident. For example, if utterances are restricted to a maximum duration of 60 seconds, and each data point within an utterance is quantized to one of $2^16$ values (corresponding to a 16-bit depth), with a sampling rate set at 16 kHz, this yields a total of $16,000 times 60 = 960,000$ values per recording. Consequently, the number of potential unique recordings would be $2^(16 times 960,000)$, represent a vast space. However, it is crucial to recognize that to human listeners, the overwhelming majority of these theoretical recordings would manifest as incoherent or meaningless noise.
+Can this metric demonstrate consistent correlation with human perception when validated against a subjective dataset spanning various domains?
 
-In the development of a system designed to produce synthetic speech, the objective is to accurately model the real speech distribution, which is a comparatively small subset within this expansive recording space. If the precise real speech distribution was already known, it would be unnecessary to model it. Therefore, practitioners typically resort to estimating this distribution from available data. The "performance" of such models is often verified by collecting subjective judgments from human listeners, as detailed in @08_dist[Chapter]. Alternatively, the degree to which a synthetic distribution resembles its real counterpart can be objectively quantified, which we detail in the remainder of this Chapter.
+How does the performance of this distributional metric compare to a comprehensive suite of existing objective evaluation methods when benchmarked on the task of predicting human quality judgments for state-of-the-art TTS systems?
 
-=== #("Earth Mover's Distance")
+]
+This chapter addresses these questions by presenting TTSDS2, a significant evolution of the original framework. The primary contributions herein are the targeted improvements to the metric's feature set and scoring mechanism to increase its robustness for application across diverse domains and languages. To validate these enhancements, we present a comprehensive evaluation across four distinct English-language domains and extend its application to 14 languages. A crucial component of this validation is the creation and public release of a large-scale listening test dataset, containing over 11,000 subjective ratings collected under controlled conditions. We also establish an automated, recurring pipeline and benchmark for the ongoing evaluation of #abbr.a[TTS] systems, ensuring up-to-date and uncontaminated comparisons. Finally, we conduct a systematic comparison of TTSDS2 against 16 other objective metrics, demonstrating its superior and more consistent correlation with human perception. An overview of the TTSDS2 pipeline and validation process is shown in @fig:fig_ttsds_pipeline. These contributions were covered in the following publication:
 
-// #figure(
-//   image("../figures/9/xvector.svg", width: 100%),
-//   placement: top,
-//   caption: [KDE of X-Vector speaker embeddings in 2D PCA space for ground truth, synthetic, and noise data, with normalized density scaled by $10^(-5)$.],
-// ) <fig_vector>
+- #cite(<minixhofer_ttsds2_2025>, form: "full", style: "iso-690-author-date").
 
-An intuitive approach to quantifying the dissimilarity between two distributions is the #abbr.a[EMD], a concept initially conceptualized and introduced by #citep(<rubner_earth_2000>) for the purpose of assessing perceptual similarity in image retrieval tasks. This metric is conceptually derived from the Wasserstein distance @vaserstein_markov_1969, which, in turn, draws upon the Kantorovich–Rubinstein metric @kantorovich_planning_1939. The fundamental motivation behind the #abbr.a[EMD] is articulated as follows:
+#figure(
+  image("../figures/9/neurips_ttsds.png", width: 100%),
+  placement: top,
+  caption: [Overview of TTSDS2 -- both public (YouTube, LibriVox) and academic (Linguistic Data Consortium) sources were used for validating TTSDS2 as a metric, by showing robust correlations with listening test results across domains. A multilingual YouTube dataset is automatically scraped and synthesised quarterly, and with TTSDS2, provides ranking of TTS.],
+) <fig_ttsds_pipeline>
 
-#q(
-  [#citep(<rubner_earth_2000>)],
-  [#emph("The Earth Mover's Distance as a Metric for Image Retrieval")],
-  [Intuitively, given two distributions, one can be seen as a mass of earth properly spread in space, the other
-as a collection of holes in that same space. Then, the #abbr.a[EMD] measures the least amount of work needed to fill the holes with earth. Here, a unit of work corresponds to transporting a unit of earth by a unit of ground
-distance.]
-)
+=== Background on Speech Evaluation
 
-This conceptualization situates the #abbr.a[EMD] within the broader class of transport problems @hitchcock_transport_1941, which can be analytically solved for specific cases, such as the two-dimensional representation of image histograms as presented in the original formulation @rubner_earth_2000. However, when applied to speech representations, which are frequently characterized by high dimensionality @wan_generalized_2018, the direct computation of the #abbr.a[EMD] can become computationally expensive.
+To establish the context for a new distributional metric, it is necessary to first review the existing landscape of synthetic speech evaluation, which is broadly divided into subjective and objective methods.
 
-=== Wasserstein metric
+==== Subjective Listening Tests
 
-While the generalized #abbr.a[EMD] is associated with significant computational complexity, a particular variant, specifically the #emph[2-Wasserstein distance], offers computationally tractable solutions in certain contexts that are highly pertinent to the comparison of speech representation distributions.
+Subjective tests are the gold standard for synthetic speech evaluation as they directly measure human perception. However, their results are inherently variable and depend heavily on the experimental design. Recent advancements in #abbr.a[TTS], where synthetic speech often achieves human parity #citep(<chen_vall-e_2024>), have made subjective evaluation more challenging, as listeners struggle to distinguish real from synthetic audio.
 
-Formally, the Wasserstein distance quantifies the dissimilarity between two empirical probability distributions, which we denote as the real distribution $Q$ and the synthetic distribution $tilde(Q)$. Its definition is predicated on determining the minimum cost required to transform one distribution into the other. This cost is determined by multiplying the quantity of mass transported by the Euclidean distance over which it is moved. The collective set of all conceivable methods for mass redistribution is termed the transport plans, denoted as $Pi(Q, tilde(Q))$. Within this framework, each transport plan $gamma(x,y)$ represents a joint probability distribution, whose marginal distributions correspond to $Q$ and $tilde(Q)$.
-The $p$-Wasserstein distance is then defined as the minimum cost across all valid transport plans:
+A general best practice is to clearly define the experimental parameters before conducting a test, as recommended in guidelines for #abbr.a[TTS] evaluation @wester_listeners_2015@cooper_review_2024. This includes defining the listener pool, typically native speakers of the language being tested; the setting, preferably a quiet lab environment with headphones; and the specific instructions given to the listeners, which should clearly define the attribute being rated, such as #emph[naturalness]. The design of the stimuli presentation, such as the number of samples per page and whether re-listening is allowed, also influences the results @wells_bws_2024. Despite these best practices, subjective tests face challenges of standardisation, making results difficult to compare across studies, and they are resource-intensive.
 
-$ W_p (Q, tilde(Q)) = (inf_(gamma in Pi(Q, tilde(Q))) E_((x,y)~gamma)[d(x,y)^p])^(1/p) $
+#figure(
+  image("../figures/9/mos_instructions.png", width: 75%),
+  caption: [Initial instructions given for listening tests.],
+  placement: top,
+) <fig_mos_instructions_init>
 
-where $d(x,y)$ signifies the distance between points $x$ and $y$. For simplicity, we focus on the case where $p=2$ and $d(x,y)$ corresponds to the Euclidean distance $||x-y||_2$, rather than the #abbr.a[EMD] for which $p=1$. Analogous to the generalized #abbr.a[EMD], direct computation of this distance for arbitrary high-dimensional distributions remains a challenging endeavor. However, two specific scenarios permit efficient, closed-form solutions.
+The most common methodologies are the Mean Opinion Score (#abbr.a[MOS]), Comparison #abbr.a[MOS] (#abbr.a[CMOS]), and Speaker Similarity #abbr.a[MOS] (#abbr.a[SMOS]). For a #abbr.a[MOS] test, listeners rate isolated audio samples on a 5-point scale from 1 (bad) to 5 (excellent), as shown in @fig:fig_mos_instructions. #abbr.a[CMOS] tests present listeners with two samples, A and B, and ask them to rate their relative naturalness on a 7-point scale from -3 (A is much worse than B) to +3 (A is much better than B), which can be seen in @fig:fig_cmos_instructions. This is particularly useful for fine-grained comparisons when absolute scores may saturate. #abbr.a[SMOS] is used for voice cloning evaluation and operates similarly to #abbr.a[CMOS], but listeners rate the speaker similarity between two clips on a 5-point scale, as illustrated in @fig:fig_smos_instructions. We provide the full text for initial instructions given to listeners in @fig:fig_mos_instructions_init, and the survey can be accessed at #underline[#link("http://ttsdsbenchmark.com/survey",[ttsdsbenchmark.com/survey])].
 
-#emph[One-dimensional case]
+#figure(
+  image("../figures/9/mos.png", width: 75%),
+  caption: [Interface for Mean Opinion Score (MOS) listening tests.],
+  placement: top,
+) <fig_mos_instructions>
 
-In the one-dimensional case, the 2-Wasserstein distance possesses a straightforward closed-form solution, thereby precluding the necessity of an exhaustive search across all possible transport plans. This distance can be computed directly from the inverse cumulative distribution functions (#abbr.a[CDF]s) of the two distributions. Given the #abbr.a[CDF]s for the real and synthetic distributions, denoted as $C_R$ and $C_S$, respectively, the squared 2-Wasserstein distance is simply the squared L2-distance between their inverse functions @kolouri_optimal_2017:
+#figure(
+  image("../figures/9/cmos.png", width: 75%),
+  caption: [Interface for Comparison MOS (CMOS) listening tests.],
+  placement: top,
+) <fig_cmos_instructions>
 
-$ W_2^2(P_R, P_S) = integral_0^1(C_R^(-1)(z)-C_S^(-1)(z))^2d z $
+#figure(
+  image("../figures/9/smos.png", width: 75%),
+  caption: [Interface for Speaker Similarity MOS (SMOS) listening tests.],
+  placement: top,
+) <fig_smos_instructions>
 
-This intrinsic property forms the theoretical underpinning of the Sliced-Wasserstein distance, an approach that computes the average Wasserstein distance between distributions by projecting them onto numerous random one-dimensional subspaces. However, an alternative closed-form solution exists for the high-dimensional scenario that does not rely on such slicing.
+==== Objective Metrics
 
-#emph[High-dimensional case with Gaussian assumption]
+Due to the resource-intensive nature of subjective tests, objective metrics are frequently used, especially for experimental iteration. These metrics can be categorised into several families. Signal-based reference metrics are the oldest group and consist of intrusive metrics that compare a synthetic utterance to a time-aligned real reference. Representatives include Perceptual Evaluation of Speech Quality (#abbr.l[PESQ]) #citep(<rix_pesq_2001>), Short-Time Objective Intelligibility (#abbr.l[STOI]) #citep(<taal_stoi_2011>), and Mel-Cepstral Distortion (#abbr.l[MCD]) #citep(<kominek_mcd_2008>). These were often designed for telecommunications or enhancement scenarios and can struggle with modern #abbr.a[TTS] systems.
 
-For sets of high-dimensional vectors, which are frequently encountered with #abbr.a[DNN] features, the computation of quantile functions becomes computationally infeasible. Nevertheless, as proposed by @heusel_fid_2017 in the context of image generation, a simplifying assumption can be made: that the embedding distributions can be approximated by multivariate Gaussians. This is considered a reasonable assumption for embeddings that have been mapped into a well-behaved latent space @heusel_fid_2017. This approximation enables the calculation of the 2-Wasserstein distance in a closed form, requiring only the mean vectors and covariance matrices of the distributions.
+Model-based metrics involve training a neural network to predict subjective scores directly from an audio signal. This approach was introduced by MOSNet #citep(<lo_mosnet_2019>) and has been followed by systems like UTMOS #citep(<saeki_utmos_2022>), NISQA-MOS #citep(<mittag_nisqa_2021>), and SQUIM-MOS #citep(<kumar_torchaudio-squim_2023>). While effective in-domain, their performance often degrades on out-of-domain data, and they need to be continually re-validated as #abbr.a[TTS] technology evolves. Other metrics focus on specific attributes. Intelligibility is often proxied using Word Error Rate (#abbr.l[WER]) from an #abbr.a[ASR] system. Speaker similarity is measured by the cosine similarity of speaker embeddings, such as d-vectors #citep(<wan_generalized_2018>) or from systems like ECAPA-TDNN #citep(<desplanques_ecapa_2020>).
 
-In this case, let the real and synthetic embedding distributions be modeled by multivariate Gaussians $N(mu, Sigma)$ and $N(tilde(mu), tilde(Sigma))$, respectively. The squared 2-Wasserstein distance, also recognized as the Fréchet distance @frechet_1925, between these two Gaussian distributions is given by @dowson_frechet_1982:
+Finally, distributional metrics, inspired by the image domain's Fréchet Inception Distance (#abbr.l[FID]) #citep(<heusel_fid_2017>), measure the distance between entire corpora of synthetic and real speech. Fréchet Audio Distance (#abbr.l[FAD]) #citep(<kilgour_fad_2019>) adapts this principle for audio. These metrics do not require corresponding samples but often necessitate thousands of utterances, which may have limited their widespread adoption. This work builds upon this distributional approach.
 
-$ W_2^2(Q, tilde(Q)) = ||mu - tilde(mu)||_2^2 + text("Tr")(Sigma + tilde(Sigma) - 2(Sigma tilde(Sigma))^(1/2)) $
+=== TTSDS Robustness Improvements
 
-where:
-- $mu$ and $tilde(mu)$ represent the mean vectors of the real and synthetic embeddings.
-- $Sigma$ and $tilde(Sigma)$ denote the covariance matrices of the real and synthetic embeddings.
-- $text("Tr")(dot)$ refers to the trace of a matrix.
-- $(Sigma tilde(Sigma))^(1/2)$ signifies the matrix square root of the product of the covariance matrices.
+Our methodology is founded on the principle of quantifying distributional dissimilarity. Here, we introduce the changes made to TTSDS to increase the robustness of the metric and its applicability to a wide range of domains.
 
-The initial term, $|| mu - tilde(mu) ||_2^2$, quantifies the dissimilarity between the central tendencies of the two distributions. The second term, conversely, measures the differences in their spread and orientation, encapsulated by their covariance structures. In practical applications, the sample mean and covariance are estimated from a substantial number of real and synthetic embeddings, respectively, and the distance is then computed using the aforementioned formula. This metric forms the #abbr.a[FID] @heusel_fid_2017 in the field of image generation, and the identical principle can be extended to audio embeddings to derive a Fréchet Audio Distance @kilgour_fad_2019.
+The TTSDS framework provides a factorised evaluation of synthetic speech by measuring distributional distances across several perceptually motivated attributes.
 
-=== Perceptually-motivated factorized evaluation
+The initial version, TTSDS, was validated primarily on clean, English audiobook speech and delineated five factors: #smallcaps[Generic], #smallcaps[Ambient], #smallcaps[Intelligibility], #smallcaps[Prosody], and #smallcaps[Speaker]. These were assessed using features like #abbr.a[SSL] embeddings, noise correlates, #abbr.l[WER], and speaker embeddings. While effective, its robustness to diverse conditions was limited.
 
-As elaborated in @03_objective_metrics, various objective methodologies exist for evaluating the alignment of synthetic speech with its real counterpart.
-The task of synthetic speech generation inherently lacks a singular ground truth, given the one-to-many nature of the task. Instead, #abbr.a[TTS] evaluation is framed as a problem of distributional similarity. Here, $D$ denotes an audio dataset and $cal(R)(S)$ represents a feature extracted from it. The objective is to quantify the fidelity of synthetic speech in mirroring real speech by deriving correlates for each perceptual factor and assessing their distance from both genuine speech datasets and various noise dataset distributions.
-
-The initial iteration of this metric, TTSDS2 version 1.0 (hereafter referred to as TTSDS1), evaluates the quality of synthetic speech across multiple perceptual factors and ascertains its correlation with human judgments over a substantial period, spanning from legacy systems of 2008 to more contemporary ones from 2024. This foundational version benchmarks 35 #abbr.a[TTS] systems, demonstrating that a score computed as an unweighted average of various factors exhibits a strong correlation with human evaluations from each distinct time period. TTSDS1 delineates five primary factors, each assessed through specific features, to offer a comprehensive evaluation:
-
-- #smallcaps[Generic]: This factor assesses overall distributional similarity, typically achieved by utilizing #abbr.a[SSL] representations of speech, such as those derived from HuBERT (base) @hsu_hubert_2021  and wav2vec 2.0 (base) models @baevski_wav2vec_2020. These representations are extracted from the intermediate layers of the neural networks, which are thought to be the most generalist @pasad_layer-wise_2021.
-- #smallcaps[Ambient]: This factor quantifies the presence of noise or distortion within the speech signal. It leverages two one-dimensional correlates of noise: VoiceFixer @liu_voicefixer_2021 is employed to mitigate noise, followed by the application of #abbr.l[PESQ] @rix_pesq_2001 to measure the perceived quality between the noise-enhanced and original samples. Additionally, WADA SNR @kim_wada_2008 is used to estimate the signal-to-noise ratio of each individual sample.
-- #smallcaps[Intelligibility]: This factor measures the ease with which the lexical content of the speech can be recognized. This is achieved by computing the #abbr.l[WER] from reference transcripts and automated transcripts generated by a wav2vec 2.0 model @baevski_wav2vec_2020 fine-tuned on 960 hours of LibriSpeech @panayotov_librispeech_2015, and additionally by a Whisper (small) model @radford_robust_2023.
-- #smallcaps[Prosody]: This factor evaluates the realism of speech #smallcaps[Prosody]. It employs frame-level representations derived from our self-supervised prosody model and frame-level pitch features extracted using the WORLD vocoder @morise_world_2016. Furthermore, a proxy for segmental durations is obtained by utilizing HuBERT tokens and measuring their lengths, which corresponds to the number of consecutive occurrences of the same token.
-- #smallcaps[Speaker]: This factor quantifies the degree of similarity between the synthetic speaker's voice and that of a real speaker. This is achieved by employing representations obtained from speaker verification systems, specifically d-vectors @wan_generalized_2018 and the more contemporary WeSpeaker @wang_wespeaker_2023 representations.
-
-// #figure(
-//   table(
-//     columns: (auto, 1fr),
-//     align: (left, left), // Left-align content in both columns
-//     [#strong[Factor]], [#strong[Feature]], // Table headers, bolded as in the original LaTeX
-//     toprule(),
-//     // Environment Factor
-//     [#strong[Environment]], [#strong[Noise/Artifacts]],
-//     [], [VoiceFixer #cite(<liu_voicefixer_2021>) + PESQ #cite(<rix_pesq_2001>)],
-//     [], [WADA SNR #cite(<kim_wada_2008>)],
-//     // Speaker Factor
-//     toprule(),
-//     [#strong[Speaker]], [#strong[Speaker Embedding]],
-//     [], [d-vector #cite(<wan_generalized_2018>)],
-//     [], [WeSpeaker #cite(<wang_wespeaker_2023>)],
-//     // Prosody Factor
-//     toprule(),
-//     [#strong[Prosody]], [#strong[Segmental Length]],
-//     [], [Hubert #cite(<hsu_hubert_2021>) token length],
-//     [], [#strong[Pitch]],
-//     [], [WORLD #cite(<morise_world_2016>)],
-//     [], [#strong[SSL Representations]],
-//     [], [MPM (Ours)],
-//     // Intelligibility Factor
-//     toprule(),
-//     [#strong[Intelligibility]], [#strong[ASR WER]],
-//     [], [wav2vec 2.0 #cite(<baevski_wav2vec_2020>)],
-//     [], [Whisper #cite(<radford_robust_2023>)],
-//     // General Factor
-//     toprule(),
-//     [#strong[General]], [#strong[SSL Representations]],
-//     [], [Hubert #cite(<hsu_hubert_2021>)],
-//     [], [wav2vec 2.0 #cite(<baevski_wav2vec_2020>)],
-//   ),
-//   caption: [Features used in the benchmark and their respective factors. The overall TTSDS1 score is computed as an average of individual factor scores.],
-//   placement: top,
-// ) <fig_ttsds1_features>
-
-The specific features integrated into TTSDS1 for each factor are visually represented and detailed in @tbl:tab_ttsds1_features.
-
-The scoring mechanism for each feature within TTSDS1 is derived by comparing its empirical distribution in synthetic speech $hat(P)(cal(R)(tilde(S))|tilde(D))$ to the distributions obtained from real speech datasets $hat(P)(cal(R)(S)|D)$ and noise datasets $hat(P)(cal(R)(S)|D^"NOISE"_i)$, drawn from a set of differing noise datasets $cal(D)^"NOISE"$, leveraging the 2-Wasserstein distance. The normalised similarity score for a given feature $cal(R)(S)$ is mathematically defined as follows:
-$ "TTSDS"(D,tilde(D),D^"NOISE") = 100 times (min[W_2(tilde(D),D^"NOISE"_i)]_(i=0)^N) / (W_2(tilde(D),D) + min[W_2(tilde(D),D^"NOISE"_i)]_(i=0)^N $
-In this formulation, $(min[W_2(tilde(D),D^"NOISE"_i)]_(i=0)^N)$ represents the minimum 2-Wasserstein distance between the synthetic speech and a designated set of distractor noise datasets, while $W_2(tilde(D),D)$ denotes the 2-Wasserstein distance to the distribution of real speech. An example of this scoring method, specifically for the one-dimensional pitch feature, is provided in @fig_f0, where the equation yields scores ranging from 0 to 100. Values exceeding 50 signify a stronger similarity to genuine speech than to noise. The final TTSDS1 score is computed as the unweighted arithmetic mean of the individual factor scores, with each factor score itself being the mean of its belonging feature scores.
-
-// #figure(
-//   image("../figures/9/pitch_distributions.png", width: 80%),
-//   placement: top,
-//   caption: [Distribution of $F_0$ in TTSDS for ground-truth, synthetic, and noise datasets. The distance between the synthetic and real distributions ($d_"gt"$) and the distance to noise ($d_"n"$) are shown, as well as how the overall score is computed.],
-// ) <fig_f0>
-
-// #figure(
-//   image("../figures/9/heatmaps_ttsds1.png", width: 100%),
-//   placement: top,
-//   caption: [Development of factor score correlation coefficients over time from early speech synthesis (Blizzard'08) to the latest systems (TTS Arena).],
-// ) <fig_ttsds1_factor_correlation>
-
-The correlations observed between TTSDS1 factor scores and subjective evaluation metrics across different temporal stages are depicted in @fig_ttsds1_factor_correlation, illustrating the increasing importance of factors such as #smallcaps[Prosody] over time as TTS systems gain in perceived naturalness.
-
-Building upon the framework established by TTSDS1, we introduce an augmented and more robust iteration, designated as TTSDS version 2.0 (subsequently referred to as TTSDS2). This advancement is aimed at ensuring its applicability across a wider range of domains and languages. While retaining the fundamental principle of factorized distributional similarity, specific feature implementations were refined: Within TTSDS2, the #smallcaps[Intelligibility] factor transitioned from relying on direct WER values to utilizing the final-layer activations of #abbr.a[ASR] models. This modification was implemented to enhance robustness, as prior #abbr.a[WER] features occasionally yielded anomalously low scores for authentic data across various domains. Regarding #smallcaps[Prosody], TTSDS2 now computes the utterance-level speaking rate by dividing the count of deduplicated HuBERT tokens within an utterance by the corresponding number of frames, thereby replacing earlier token length features that sometimes resulted in diminished scores for real speech. The #smallcaps[Generic] factor in TTSDS2 is also augmented by incorporating WavLM features @chen_wavlm_2022, alongside the existing HuBERT and wav2vec 2.0 features, to foster increased diversity in representation. For enhanced multilingual compatibility, HuBERT was substituted with mHuBERT-147 @boito_mhubert-147_2024 and wav2vec 2.0 with its cross-lingual counterpart, XLSR-53 @conneau_xlsr_2021. The aggregate set of features utilized in TTSDS2 is summarized in @ttsds2_features.
-
-#import "../abbr.typ" // Assuming this import is available
-#import "../quote.typ": * // Assuming this import is available
 
 #figure(
   table(
@@ -197,28 +131,21 @@ Building upon the framework established by TTSDS1, we introduce an augmented and
   caption: [Revised feature set used for each TTSDS2 factor.],
 ) <ttsds2_features>
 
-=== Datasets and Systems for TTSDS1 and TTSDS2
+TTSDS2 was developed to enhance robustness across domains and to add multilingual capabilities. This involved several key refinements to the feature set. For the #smallcaps[Intelligibility] factor, we moved from using direct #abbr.l[WER] values, to using the final-layer activations of the #abbr.a[ASR] model's head -- this comes with the additional advantage of not requiring the original transcriptions in this case. For the #smallcaps[Prosody] factor, the original feature based on the length of consecutive HuBERT tokens was replaced with an utterance-level speaking rate metric, which proved to be a more stable correlate of speech rhythm. The #smallcaps[Generic] factor was augmented by adding WavLM embeddings to the existing HuBERT and wav2vec 2.0 features to increase representational diversity. For multilingual support, the English-centric models were replaced with their multilingual counterparts, mHuBERT-147 and XLSR-53. The full feature set for TTSDS2 is detailed in @ttsds2_features. As in @08_dist[Chapter], the scoring mechanism for each feature computes a normalised similarity score yielding a value between 0 and 100. The aforementioned changes were informed by splitting datasets with solely real speech across the domains we introduce in @09_domains and aiming for high similarity (scores $>90$) of the speech with itself.
 
-Here, we detail the specific datasets and #abbr.a[TTS] systems employed for the evaluation of both TTSDS1 and TTSDS2, along with their observed correlations with human subjective ratings.
 
-==== TTSDS1 Datasets
-For the evaluation of TTSDS1, datasets were meticulously chosen to encompass a broad spectrum of #abbr.a[TTS] systems, ranging from established legacy technologies to cutting-edge state-of-the-art architectures. The subjective measures utilized for comparison were derived from three primary sources:
-- The Blizzard Challenge 2008 @king_blizzard_2008: This challenge provided #abbr.a[MOS] ratings for 22 distinct #abbr.a[TTS] systems across a variety of synthesis tasks. For the purposes of TTSDS1 evaluation, the "Voice A" audiobook task, which encompasses 15 hours of audio data, was specifically utilized.
-- The "Back to the Future" (BTTF) dataset: This dataset facilitates comparisons between unit selection, hybrid, and statistical parametric #abbr.a[HMM]-based systems from the Blizzard Challenge 2013 @le_maguer_back_2022 and more advanced deep learning systems inspired by the Blizzard Challenge 2021 @ling_blizzard_2021, which included architectures such as FastPitch @lancucki_fastpitch_2021 and Tacotron @wang_tacotron_2017.
-- The #abbr.a[TTS] Arena leaderboard @ttsarena: This publicly accessible resource offers crowdsourced A/B preference tests for contemporary #abbr.a[TTS] systems, predominantly those leveraging discrete speech representations generated by large language model-like systems. Only systems released between 2023 and 2024 were incorporated into this evaluation.
+=== Experimental Validation <09_domains>
 
-The reference speech datasets employed to compute the distributional distances in TTSDS1 include LibriTTS @zen_libritts_2019, LibriTTS-R @koizumi_libritts-r_2023, LJSpeech @ito_lj_2017, VCTK @vctk, and the training sets provided by the various Blizzard challenges @king_blizzard_2008@ling_blizzard_2021@le_maguer_back_2022. From each of these datasets, 100 utterances were randomly sampled, preferentially from their respective test splits if available. For the generation of distractor noise datasets, TTSDS1 utilized the ESC dataset @piczak_esc_2015 of background noises, in conjunction with synthetic noise types, including random uniform noise, random normal noise, and silent (all zeros and all ones) samples.
 
-==== TTSDS2 Datasets
-TTSDS2 expands the scope of evaluation to ensure robustness across four distinct domains within the English language, and further extends its applicability across 14 diverse languages. The English-language datasets comprised:
-- #smallcaps[Clean]: This dataset served as the foundational baseline and consisted of samples drawn from the LibriTTS test split @zen_libritts_2019. It specifically features clean, read speech, having undergone filtration based on #abbr.a[SNR]. Utterances selected for this dataset ranged in duration from 3 to 30 seconds and originated from a single speaker.
-- #smallcaps[Noisy]: This dataset was constructed by scraping LibriVox recordings from 2025, deliberately excluding #abbr.a[SNR] filtering during acquisition. This methodology was designed to rigorously assess how evaluation metrics are influenced by the presence of ambient noise within recordings.
-- #smallcaps[Wild]: This dataset was compiled from recently uploaded YouTube videos in 2025. Utterances from these videos were extracted and subsequently diarized using the Whisper system @clapa_WhisperSpeech_2024. The data collection strategy for this dataset was specifically tailored to emphasize diverse speaking styles and varying recording conditions, drawing inspiration from the Emilia dataset @he_emilia_2024.
-- #smallcaps[Kids]: This dataset constitutes a subset of the My Science Tutor Corpus @pradhan_my_2024, characterized by children's conversational speech interacting with a virtual tutor in an educational setting. This dataset served to evaluate the generalization capabilities of the developed evaluation metrics to less conventional #abbr.a[TTS] domains.
-For all evaluated #abbr.a[TTS] systems, a cohort of 100 distinct speakers was randomly selected, with each speaker contributing two utterances. The acquired data underwent a manual filtering process to exclude content that was difficult to transcribe, potentially controversial, or offensive, ultimately yielding a refined set of 60 speakers per dataset. The first utterance from each selected speaker functioned as the reference for the #abbr.a[TTS] system, while the transcript corresponding to the second, entirely distinct utterance was employed as the input for text-to-speech synthesis.
+To validate the TTSDS framework, we conducted a large-scale experimental evaluation. This involved collecting new subjective ratings for a wide range of modern #abbr.a[TTS] systems across several challenging domains and comparing these human judgments against the scores produced by TTSDS2 and a comprehensive set of 16 other objective metrics.
 
-==== TTS Systems Evaluated
-For TTSDS2, a selection of 20 open-source, open-weight #abbr.a[TTS] systems released between 2022 and 2024 were chosen for evaluation. These systems collectively spanned 14 languages and were selected based on their capability to utilize a speaker reference and a transcript to govern their output. Noteworthy exceptions included MetaVoice @sharma_metavoice_2024 and GPT-SOVITS @RVCBoss_gptsovits_2024, which were excluded due to specific constraints related to reference audio length requirements. The most recent available checkpoints for each system, preceding January 1, 2025, were utilized, with the exception of XTTSv2 @casanova_xtts_2024, for which challenges in grapheme-to-phoneme conversion necessitated a downgrade to XTTSv1.
+==== Datasets and Systems for Evaluation 
+
+The evaluation was designed to test the robustness of the metrics beyond clean, read speech. We constructed four distinct English-language datasets, each targeting a different acoustic or stylistic condition:
+- #smallcaps[Clean]: This dataset served as the baseline and was sourced from the test split of the LibriTTS corpus #citep(<zen_libritts_2019>). It contains high-quality, single-speaker audiobook recordings that have been filtered for a high signal-to-noise ratio.
+- #smallcaps[Noisy]: To test robustness to environmental noise, this dataset was created by scraping LibriVox recordings from 2025 without applying any #abbr.a[SNR] filtering, thereby retaining the natural ambient noise present in the original recordings.
+- #smallcaps[Wild]: To assess performance on conversational and in-the-wild speech, this dataset was compiled from recently uploaded YouTube videos. Utterances were extracted using Whisper diarisation #citep(<clapa_WhisperSpeech_2024>), capturing a wide variety of speaking styles, accents, and recording conditions, inspired by the Emilia dataset #citep(<he_emilia_2024>).
+- #smallcaps[Kids]: To evaluate generalisation to a significantly different speaker population, this dataset was created from a subset of the My Science Tutor Corpus #citep(<pradhan_my_2024>), which contains conversational speech from children interacting with a virtual tutor.
 
 // Helper for superscript citations, mimicking the LaTeX \supercite command
 #let supercite(ref_key) = {
@@ -287,7 +214,31 @@ For TTSDS2, a selection of 20 open-source, open-weight #abbr.a[TTS] systems rele
 ) <tab_ttsds2_systems>
 ]
 
-A comprehensive enumeration of the #abbr.a[TTS] systems evaluated for TTSDS2, along with their respective publication years, objective and subjective evaluation statuses, reported parity with real speech, and Replicate.com identifiers, is presented in @tab_ttsds2_systems. Of the 20 systems included, 13 were accompanied by peer-reviewed research papers, with 10 of these reporting both subjective and objective evaluation results. Notably, seven of these systems claimed #abbr.a[MOS] or #abbr.a[CMOS] scores within 0.05 of the ground-truth values or even surpassing them. Regarding objective evaluation methods, #abbr.l[WER] and #smallcaps[Speaker] Similarity were reported in five instances, UTMOS, #abbr.l[CER], Fréchet-type distances, and #abbr.l[MCD] in two instances each, and #abbr.l[PESQ] and #abbr.l[STOI] were reported only once.
+For evaluation, we selected 20 open-source, open-weight #abbr.a[TTS] systems released between 2022 and 2024, as detailed in @tbl:tab_ttsds2_systems. These systems were chosen based on their ability to perform voice cloning from a speaker reference utterance and a text transcript. The selection covers a wide range of modern architectures. For each system, we used the most recent publicly available checkpoint before January 1, 2025.
+
+==== Subjective Data Collection and Ethical Considerations
+
+A critical component of this validation was the collection of a new, large-scale set of subjective human judgments. This process was guided by rigorous logistical and ethical considerations.
+
+#figure(
+  image("../figures/9/real_fake_tts.png", width: 100%),
+  placement: top,
+  caption: [Ethical TTS evaluation through resynthesis. A reference utterance from a speaker is used to clone their voice, which then synthesises the text from a separate, distinct utterance by the same speaker. No novel content is generated.],
+) <fig_ethical_tts>
+
+Our data collection methodology was designed with a strong ethical framework to protect speaker privacy and prevent the misuse of voice cloning technology. As illustrated in @fig:fig_ethical_tts, we employed a two-utterance-per-speaker approach. For each of the 60 speakers selected per dataset, one utterance served as the reference to capture the vocal identity for the #abbr.a[TTS] system. The text content from a second, entirely distinct utterance from the same speaker was then used as the input for synthesis. This ensures that the generated speech, while in the target speaker's voice, only ever contains words that the speaker had actually spoken in a separate context, mitigating the risk of creating deepfakes with novel, unattributed content. This study was certified according to the Informatics Research Ethics Process, reference number 112246.
+
+We recruited 200 annotators via the Prolific platform to provide ratings. Participants were screened to be native English speakers from the UK or US and were required to use headphones in a quiet environment. Each participant was assigned to one of the four datasets. The listening test, administered via Qualtrics, was structured into three parts, evaluating #abbr.a[MOS], #abbr.a[CMOS], and #abbr.a[SMOS], with the order randomised for each participant. We collected a total of 11,846 anonymised ratings, which have been made publicly available.
+
+==== Compared Objective Metrics
+
+To contextualise the performance of TTSDS2, we compared it against 16 other publicly available objective metrics using the VERSA evaluation toolkit #citep(<shi_versa_2024>) and other sources. This comparison set included signal-based metrics (#abbr.l[STOI], #abbr.l[PESQ], #abbr.l[MCD]), several model-based #abbr.a[MOS] predictors (UTMOS, UTMOSv2, NISQA-MOS, DNSMOS, SQUIM-MOS), speaker similarity metrics based on different embeddings (X-Vector, RawNet3, ECAPA-TDNN), distributional metrics (#abbr.l[FAD]), and multi-dimensional perceptual metrics (Audiobox Aesthetics sub-scores). This comprehensive set allows for a thorough analysis of the current state of objective evaluation for high-quality synthetic speech.
+
+=== Results and Discussion
+
+Our experimental results demonstrate a clear hierarchy in the performance of objective metrics, with TTSDS2 showing the most robust and consistent correlation with human judgments across all tested conditions.
+
+==== Correlation with Human Judgments
 
 // Define colors as per LaTeX original
 #let negstrong = rgb("#F3C2C1") // –1 … –0.5
@@ -308,79 +259,51 @@ A comprehensive enumeration of the #abbr.a[TTS] systems evaluated for TTSDS2, al
 }
 
 #context[
-  #set text(size: 9pt)
+  #set text(size: 6.5pt)
   #figure(
-  table(
-    columns: (auto, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr),
+    table(
+      columns: (auto, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr),
+      stroke: (top: 1.5pt + black, bottom: 1.5pt + black),
+      table.cell(rowspan: 2, [#strong[Metric]]), table.cell(colspan: 3, align: center, [#strong[Clean]]), table.cell(colspan: 3, align: center, [#strong[Noisy]]), table.cell(colspan: 3, align: center, [#strong[Wild]]), table.cell(colspan: 3, align: center, [#strong[Kids]]),
+      table.hline(start: 1),
+      [#smallcaps[mos]], [#smallcaps[cmos]], [#smallcaps[smos]], [#smallcaps[mos]], [#smallcaps[cmos]], [#smallcaps[smos]], [#smallcaps[mos]], [#smallcaps[cmos]], [#smallcaps[smos]], [#smallcaps[mos]], [#smallcaps[cmos]], [#smallcaps[smos]],
+      [TTSDS2 (Ours)], scorecell("0.75", bold: true), scorecell("0.69", bold: true), scorecell("0.73", bold: true), scorecell("0.59"), scorecell("0.54"), scorecell("0.71"), scorecell("0.75"), scorecell("0.71"), scorecell("0.75"), scorecell("0.61"), scorecell("0.50"), scorecell("0.70"),
+      [TTSDS (Ours)], scorecell("0.60"), scorecell("0.62"), scorecell("0.52"), scorecell("0.49"), scorecell("0.61"), scorecell("0.66"), scorecell("0.67"), scorecell("0.57"), scorecell("0.67"), scorecell("0.70"), scorecell("0.52"), scorecell("0.60"),
+      [X‑Vector], scorecell("0.46"), scorecell("0.42"), scorecell("0.56"), scorecell("0.40"), scorecell("0.29"), scorecell("0.77"), scorecell("0.82", bold: true), scorecell("0.82", bold: true), scorecell("0.62"), scorecell("0.70"), scorecell("0.57"), scorecell("0.75", bold: true),
+      [RawNet3], scorecell("0.36"), scorecell("0.26"), scorecell("0.52"), scorecell("0.44"), scorecell("0.37"), scorecell("0.82", bold: true), scorecell("0.85", bold: true), scorecell("0.80"), scorecell("0.64"), scorecell("0.73", bold: true), scorecell("0.61", bold: true), scorecell("0.77", bold: true),
+      [SQUIM], scorecell("0.68"), scorecell("0.46"), scorecell("0.37"), scorecell("0.48"), scorecell("0.48"), scorecell("0.60"), scorecell("0.62"), scorecell("0.75"), scorecell("0.79", bold: true), scorecell("0.57"), scorecell("0.55"), scorecell("0.45"),
+      [ECAPA‑TDNN], scorecell("0.36"), scorecell("0.29"), scorecell("0.47"), scorecell("0.29"), scorecell("0.22"), scorecell("0.72"), scorecell("0.81"), scorecell("0.78"), scorecell("0.58"), scorecell("0.69"), scorecell("0.60"), scorecell("0.72"),
+      [DNSMOS], scorecell("0.41"), scorecell("0.37"), scorecell("0.22"), scorecell("0.57"), scorecell("0.36"), scorecell("0.22"), scorecell("0.35"), scorecell("0.28"), scorecell("0.03"), scorecell("0.31"), scorecell("0.10"), scorecell("0.28"),
+      [AE-CE], scorecell("0.60"), scorecell("0.46"), scorecell("0.32"), scorecell("0.58"), scorecell("0.53"), scorecell("0.21"), scorecell("0.19"), scorecell("0.10"), scorecell("0.11"), scorecell("-0.02"), scorecell("-0.12"), scorecell("-0.10"),
+      [AE-CU], scorecell("0.49"), scorecell("0.37"), scorecell("0.30"), scorecell("0.60", bold: true), scorecell("0.58", bold: true), scorecell("0.13"), scorecell("0.35"), scorecell("0.24"), scorecell("0.22"), scorecell("-0.09"), scorecell("-0.21"), scorecell("-0.13"),
+      [AE-PQ], scorecell("0.49"), scorecell("0.33"), scorecell("0.21"), scorecell("0.55"), scorecell("0.48"), scorecell("0.04"), scorecell("0.21"), scorecell("0.16"), scorecell("0.12"), scorecell("0.03"), scorecell("-0.08"), scorecell("-0.05"),
+      [UTMOSv2], scorecell("0.39"), scorecell("0.25"), scorecell("0.09"), scorecell("0.34"), scorecell("0.36"), scorecell("0.19"), scorecell("0.16"), scorecell("0.14"), scorecell("-0.04"), scorecell("0.05"), scorecell("0.03"), scorecell("-0.02"),
+      [FAD (CLAP)], scorecell("-0.22"), scorecell("0.06"), scorecell("-0.01"), scorecell("0.45"), scorecell("0.30"), scorecell("0.16"), scorecell("-0.03"), scorecell("0.08"), scorecell("0.25"), scorecell("0.12"), scorecell("0.26"), scorecell("0.04"),
+      [UTMOS], scorecell("0.51", bold: true), scorecell("0.30"), scorecell("0.31"), scorecell("0.47"), scorecell("0.29"), scorecell("0.00"), scorecell("-0.12"), scorecell("-0.12"), scorecell("-0.26"), scorecell("-0.02"), scorecell("-0.18"), scorecell("-0.04"),
+      [STOI], scorecell("-0.11"), scorecell("0.01"), scorecell("0.02"), scorecell("-0.06"), scorecell("0.00"), scorecell("0.19"), scorecell("0.07"), scorecell("0.41"), scorecell("0.24"), scorecell("-0.32"), scorecell("-0.08"), scorecell("0.05"),
+      [PESQ], scorecell("0.01"), scorecell("-0.16"), scorecell("0.27"), scorecell("-0.34"), scorecell("0.00"), scorecell("0.07"), scorecell("-0.14"), scorecell("0.01"), scorecell("-0.06"), scorecell("-0.08"), scorecell("-0.04"), scorecell("-0.38"),
+      [NISQA], scorecell("0.05"), scorecell("0.00"), scorecell("0.06"), scorecell("0.05"), scorecell("-0.21"), scorecell("-0.53"), scorecell("-0.32"), scorecell("-0.33"), scorecell("-0.64"), scorecell("-0.29"), scorecell("-0.27"), scorecell("-0.46"),
+      [MCD], scorecell("-0.46"), scorecell("-0.37"), scorecell("-0.27"), scorecell("-0.45"), scorecell("-0.58"), scorecell("-0.74"), scorecell("-0.33"), scorecell("-0.45"), scorecell("-0.51"), scorecell("-0.31"), scorecell("-0.13"), scorecell("-0.38"),
+      [WER], scorecell("-0.19"), scorecell("-0.18"), scorecell("-0.17"), scorecell("-0.11"), scorecell("-0.30"), scorecell("-0.13"), scorecell("-0.28"), scorecell("-0.17"), scorecell("-0.22"), scorecell("-0.45"), scorecell("-0.26"), scorecell("-0.39"),
+    ),
+    caption: [Spearman rank correlations. Colours: #box(fill: negstrong, rect(width: 5pt, height: 5pt)) –1 … –0.5, #box(fill: negweak, rect(width: 5pt, height: 5pt)) –0.5 … 0, #box(fill: posweak, rect(width: 5pt, height: 5pt)) 0 … 0.5, #box(fill: posstrong, rect(width: 5pt, height: 5pt)) 0.5 … 1.],
+    placement: top,
+  ) <tab_ttsds2_spearman_correlation>
+] 
 
-    // Top rule from booktabs
-    toprule(),
-    
-    // Header row with multirow and multicolumn
-      table.cell(
-      colspan: 1, rowspan: 2, [\ #strong[Metric]]),
-      table.vline(),
-      // Multirow for Metric
-      table.cell(colspan: 3, [#strong[Clean]]), // Multicolumn for Clean
-      table.cell(colspan: 3, [#strong[Noisy]]), // Multicolumn for Noisy
-      table.cell(colspan: 3, [#strong[Wild]]), // Multicolumn for Wild
-      table.cell(colspan: 3, [#strong[Kids]]), // Multicolumn for Kids
-    // ),
-    // table.crule(start: 2, end: 4), // Trimmed c_midrule for Clean
-    // crule(start: 5, end: 7), // Trimmed c_midrule for Noisy
-    // crule(start: 8, end: 10), // Trimmed c_midrule for Wild
-    // crule(start: 11, end: 13), // Trimmed c_midrule for Kids
-    table.hline(start: 1, end: 13),
-    
-    // Second header row (sub-headers)
-    [#smallcaps[mos]], [#smallcaps[cmos]], [#smallcaps[smos]], [#smallcaps[mos]], [#smallcaps[cmos]], [#smallcaps[smos]], [#smallcaps[mos]], [#smallcaps[cmos]], [#smallcaps[smos]], [#smallcaps[mos]], [#smallcaps[cmos]], [#smallcaps[smos]],
-    
-    // Mid rule after headers
-    midrule(),
+The primary results of our study are summarised in the Spearman rank correlation matrix shown in @tbl:tab_ttsds2_spearman_correlation. TTSDS2 achieves the highest and most consistent performance, with an average correlation of 0.67 across all domains and subjective scores. Crucially, it is the only metric of the 16 compared to maintain a correlation coefficient greater than 0.5 in every single test condition. This indicates a high degree of robustness.
 
-    // Content rows
-    [TTSDS2 (Ours)], scorecell("0.75", bold: true), scorecell("0.69", bold: true), scorecell("0.73", bold: true), scorecell("0.59"), scorecell("0.54"), scorecell("0.71"), scorecell("0.75"), scorecell("0.71"), scorecell("0.75"), scorecell("0.61"), scorecell("0.50"), scorecell("0.70"),
-    [TTSDS1 (Ours)], scorecell("0.60"), scorecell("0.62"), scorecell("0.52"), scorecell("0.49"), scorecell("0.61"), scorecell("0.66"), scorecell("0.67"), scorecell("0.57"), scorecell("0.67"), scorecell("0.70"), scorecell("0.52"), scorecell("0.60"),
-    midrule(),
-    [X‑Vector], scorecell("0.46"), scorecell("0.42"), scorecell("0.56"), scorecell("0.40"), scorecell("0.29"), scorecell("0.77"), scorecell("0.82"), scorecell("0.82", bold: true), scorecell("0.62"), scorecell("0.70"), scorecell("0.57"), scorecell("0.75", bold: true),
-    [RawNet3], scorecell("0.36"), scorecell("0.26"), scorecell("0.52"), scorecell("0.44"), scorecell("0.37"), scorecell("0.82", bold: true), scorecell("0.85", bold: true), scorecell("0.80"), scorecell("0.64"), scorecell("0.73", bold: true), scorecell("0.61", bold: true), scorecell("0.77", bold: true),
-    [SQUIM], scorecell("0.68"), scorecell("0.46"), scorecell("0.37"), scorecell("0.48"), scorecell("0.48"), scorecell("0.60"), scorecell("0.62"), scorecell("0.75"), scorecell("0.79", bold: true), scorecell("0.57"), scorecell("0.55"), scorecell("0.45"),
-    [ECAPA‑TDNN], scorecell("0.36"), scorecell("0.29"), scorecell("0.47"), scorecell("0.29"), scorecell("0.22"), scorecell("0.72"), scorecell("0.81"), scorecell("0.78"), scorecell("0.58"), scorecell("0.69"), scorecell("0.60"), scorecell("0.72"),
-    [DNSMOS], scorecell("0.41"), scorecell("0.37"), scorecell("0.22"), scorecell("0.57"), scorecell("0.36"), scorecell("0.22"), scorecell("0.35"), scorecell("0.28"), scorecell("0.03"), scorecell("0.31"), scorecell("0.10"), scorecell("0.28"),
-    [AE-CE], scorecell("0.60"), scorecell("0.46"), scorecell("0.32"), scorecell("0.58"), scorecell("0.53"), scorecell("0.21"), scorecell("0.19"), scorecell("0.10"), scorecell("0.11"), scorecell("-0.02"), scorecell("-0.12"), scorecell("-0.10"),
-    [AE-CU], scorecell("0.49"), scorecell("0.37"), scorecell("0.30"), scorecell("0.60", bold: true), scorecell("0.58", bold: true), scorecell("0.13"), scorecell("0.35"), scorecell("0.24"), scorecell("0.22"), scorecell("-0.09"), scorecell("-0.21"), scorecell("-0.13"),
-    [AE-PQ], scorecell("0.49"), scorecell("0.33"), scorecell("0.21"), scorecell("0.55"), scorecell("0.48"), scorecell("0.04"), scorecell("0.21"), scorecell("0.16"), scorecell("0.12"), scorecell("0.03"), scorecell("-0.08"), scorecell("-0.05"),
-    [UTMOSv2], scorecell("0.39"), scorecell("0.25"), scorecell("0.09"), scorecell("0.34"), scorecell("0.36"), scorecell("0.19"), scorecell("0.16"), scorecell("0.14"), scorecell("-0.04"), scorecell("0.05"), scorecell("0.03"), scorecell("-0.02"),
-    [FAD (CLAP)], scorecell("-0.22"), scorecell("0.06"), scorecell("-0.01"), scorecell("0.45"), scorecell("0.30"), scorecell("0.16"), scorecell("-0.03"), scorecell("0.08"), scorecell("0.25"), scorecell("0.12"), scorecell("0.26"), scorecell("0.04"),
-    [UTMOS], scorecell("0.51", bold: true), scorecell("0.30"), scorecell("0.31"), scorecell("0.47"), scorecell("0.29"), scorecell("0.00"), scorecell("-0.12"), scorecell("-0.12"), scorecell("-0.26"), scorecell("-0.02"), scorecell("-0.18"), scorecell("-0.04"),
-    [STOI], scorecell("-0.11"), scorecell("0.01"), scorecell("0.02"), scorecell("-0.06"), scorecell("0.00"), scorecell("0.19"), scorecell("0.07"), scorecell("0.41"), scorecell("0.24"), scorecell("-0.32"), scorecell("-0.08"), scorecell("0.05"),
-    [PESQ], scorecell("0.01"), scorecell("-0.16"), scorecell("0.27"), scorecell("-0.34"), scorecell("0.00"), scorecell("0.07"), scorecell("-0.14"), scorecell("0.01"), scorecell("-0.06"), scorecell("-0.08"), scorecell("-0.04"), scorecell("-0.38"),
-    [NISQA], scorecell("0.05"), scorecell("0.00"), scorecell("0.06"), scorecell("0.05"), scorecell("-0.21"), scorecell("-0.53"), scorecell("-0.32"), scorecell("-0.33"), scorecell("-0.64"), scorecell("-0.29"), scorecell("-0.27"), scorecell("-0.46"),
-    [MCD], scorecell("-0.46"), scorecell("-0.37"), scorecell("-0.27"), scorecell("-0.45"), scorecell("-0.58"), scorecell("-0.74"), scorecell("-0.33"), scorecell("-0.45"), scorecell("-0.51"), scorecell("-0.31"), scorecell("-0.13"), scorecell("-0.38"),
-    [WER], scorecell("-0.19"), scorecell("-0.18"), scorecell("-0.17"), scorecell("-0.11"), scorecell("-0.30"), scorecell("-0.13"), scorecell("-0.28"), scorecell("-0.17"), scorecell("-0.22"), scorecell("-0.45"), scorecell("-0.26"), scorecell("-0.39"),
-
-    // Bottom rule from booktabs
-    bottomrule(),
-  ),
-  caption: [
-    Spearman rank correlations. Colours: #box(fill: negstrong, rect(width: 7pt, height: 7pt)) –1 … –0.5, #box(fill: negweak, rect(width: 7pt, height: 7pt)) –0.5 … 0, #box(fill: posweak, rect(width: 7pt, height: 7pt)) 0 … 0.5, #box(fill: posstrong, rect(width: 7pt, height: 7pt)) 0.5 … 1.
-  ],
-  placement: top
-) <fig_ttsds2_spearman_correlation>]
-
-
-#emph[*Correlations:*]
-For each of the 20 evaluated #abbr.a[TTS] systems, human ratings for #abbr.a[MOS], #abbr.a[CMOS], and #abbr.a[SMOS] were aggregated and averaged across the #smallcaps[Clean], #smallcaps[Noisy], #smallcaps[Wild], and #smallcaps[Kids] datasets, establishing a set of gold standard ratings. Spearman rank correlation coefficients were then computed between these human judgments and the aforementioned objective metrics, with emphasis on their ability to accurately rank the performance of the systems.
-As presented in @fig_ttsds2_spearman_correlation, TTSDS2 demonstrated the most robust correlation across all evaluated datasets, achieving an average correlation coefficient of 0.67. This performance represented a 10% relative improvement over the original TTSDS1. All computed correlations for both TTSDS1 and TTSDS2 were found to be statistically significant (p < 0.05). #smallcaps[Speaker] Similarity metrics, specifically RawNet3 and X-Vector, ranked second in performance with average correlations of 0.6. Among the #abbr.a[MOS] Prediction networks, only SQUIM-MOS exhibited robust performance, with an average correlation of 0.57. Following the ECAPA-TDNN metric, other objective metrics showed substantially lower average correlations, generally falling below 0.3. It was observed that many metrics, including Audiobox Aesthetics and UTMOSv2, performed well on #smallcaps[Noisy] and #smallcaps[Clean] audiobook speech. However, their performance notably deteriorated on #smallcaps[Kids] data, which is an expected outcome given that children's speech is perceptually and acoustically further removed from the typical domains on which most #abbr.a[TTS] systems are trained.
+The next best performing category of metrics is speaker similarity, with RawNet3 and X-Vector achieving average correlations of 0.6. Among the #abbr.a[MOS] prediction networks, SQUIM-MOS is the strongest performer with an average correlation of 0.57. However, many other metrics, including several recent #abbr.a[MOS] predictors and the Audiobox Aesthetics sub-scores, show a significant performance drop when moving from in-domain clean and noisy audiobook data to the more challenging #smallcaps[Wild] and #smallcaps[Kids] domains. This highlights a common issue of overfitting or lack of generalisation in current learned objective metrics.
 
 #figure(
   image("../figures/9/scatterplot_ttsds_combined.png", width: 100%),
   placement: top,
-  caption: [Correlation of three representative objective metrics with human MOS across the four datasets.  
-  Each colour/marker denotes a domain. Solid line = overall least-squares fit; dashed/dotted lines = domain-specific fits; each with corresponding Pearson $r$.],
+  caption: [Correlation of three representative objective metrics with human MOS across the four datasets. Each colour/marker denotes a domain. Solid line = overall least-squares fit; dashed/dotted lines = domain-specific fits; each with corresponding Pearson $r$.],
 ) <ttsds_correlations_plot>
 
-Additionally, as illustrated in @ttsds_correlations_plot, TTSDS2 generally exhibits a continuous scale of evaluation, whereas both SQUIM-MOS and X-Vector #smallcaps[Speaker] Similarity display a tendency towards some clustering behavior. The precise underlying causes for these observed behaviors are not certain, but they could potentially suggest instances of overfitting to particular #abbr.a[TTS] systems.
+The scatter plot in @fig:ttsds_correlations_plot further illustrates these findings. It shows that TTSDS2 scores form a continuous and well-distributed correlation with human #abbr.a[MOS] ratings. In contrast, both SQUIM-MOS and X-Vector exhibit some clustering behaviour, which may suggest that they are less discriminative for systems at the higher end of the quality spectrum or are potentially overfitting to specific system characteristics.
+
+==== Factor-wise and Multilingual Analysis
 
 #figure(
   placement: top,
@@ -408,41 +331,7 @@ Additionally, as illustrated in @ttsds_correlations_plot, TTSDS2 generally exhib
   caption: [Pearson correlation ($r$) between each factor and #abbr.a[MOS].],
 ) <fig_ttsds2_factor_correlation>
 
-The Pearson correlation coefficients quantifying the relationship between the individual TTSDS2 factors and #abbr.a[MOS] ratings are presented in @fig_ttsds2_factor_correlation. For the #smallcaps[Clean] and #smallcaps[Noisy] datasets, the #smallcaps[Speaker] factor consistently demonstrates a dominant influence on the overall #abbr.a[MOS] score. Conversely, for the #smallcaps[Wild] and #smallcaps[Kids] datasets, the #smallcaps[Speaker] factor exhibits reduced impact, with the #smallcaps[Intelligibility] and #smallcaps[Generic] factors showing comparable correlations. The #smallcaps[Prosody] factor achieves its highest correlation for the #smallcaps[Kids] dataset, showing its utility in evaluating the prosodic patterns in children’s speech. Overall, while the #smallcaps[Speaker] factor proves to be the most generally beneficial across diverse contexts, the other factors are complementary, particularly for non-read speech categories such as #smallcaps[Wild] and #smallcaps[Kids]. All observed factor correlations were found to be statistically significant (p < 0.05).
-
-=== Multilingual and Recurring Evaluation
-
-Building upon the English-language evaluation, the TTSDS2 framework is extended to allow for multilingual applications, providing a publicly accessible benchmark encompassing 14 distinct languages. This benchmark is designed for frequent updates to prevent data leakage and to ensure representativeness across a wide range of recording conditions, speakers, and acoustic environments. To achieve these objectives, an automated data collection and processing pipeline is introduced.
-
-#figure(
-  image("../figures/9/neurips_ttsds.png", width: 100%),
-  placement: top,
-  caption: [*Overview of TTSDS2:* Both public (YouTube, LibriVox) and academic (Linguistic Data Consortium) sources were used for validating TTSDS2 as a metric, by showing robust correlations with listening test results across domains. A multilingual YouTube dataset is automatically scraped and synthesised quarterly, and with TTSDS2, provides ranking of TTS.],
-) <fig_ttsds_pipeline>
-
-#emph[Pipeline:]
-The TTSDS2 pipeline, the source code of which is publicly available at github.com/ttsds/pipeline, is systematically employed to quarterly reconstruct the multilingual dataset, as schematically depicted in @fig_ttsds_pipeline. This comprehensive process encompasses several sequential stages:
-
-#enum(
-[
-#emph[Data Scraping]: The initial stage involves the collection of 250 videos per language. To achieve this, ten distinct keywords are translated into each target language, and a narrowly focused YouTube search is conducted using the platform's API, specifically targeting content uploaded within the previous quarter. The search results are then ordered by view count to prioritize higher quality or authentic content, and only videos exceeding 20 minutes in duration are retained to filter out low-quality or synthetic material. Videos are then diarized using the Whisper system @radford_robust_2023, and FastText @joulin_fasttext_2016@bojanowski_fasttext_2016 is applied for language identification on the automatically generated transcripts to ensure that the content aligns with the specified target language.
-],
-[
-#emph[Preprocessing]: In this stage, up to 16 utterances are extracted from the central portion of each video. Only utterances originating from a single speaker are retained, as identified by the preceding diarization process.
-],
-[
-#emph[Filtering]: Extracted utterances undergo a filtering process to identify and exclude potentially offensive or controversial content, utilizing XNLI @conneau_xnli_2018 for entailment-based classification. Pyannote #smallcaps[Speaker] diarisation @bredin_pyannote_2023 is employed to detect instances of crosstalk within the audio. Concurrently, Demucs @rouard_demucs_2022 source separation is utilized to identify and remove any background music present in the recordings. From the remaining clean and filtered utterances, 50 speaker-matched pairs are meticulously selected for each language, which are then partitioned into distinct #smallcaps[Reference] and #smallcaps[Synthesis] sets.
-],
-[
-#emph[Synthesis]: For all #abbr.a[TTS] systems integrated into the benchmark, the speaker identities extracted from the #smallcaps[Reference] set are used to synthesize speech with the textual content provided by the #smallcaps[Synthesis] set. This entire synthesis process is accessible and facilitated through replicate.com/ttsds.
-],
-[
-#emph[TTSDS2]: The multilingual TTSDS2 metric is then applied to compute evaluation scores for each synthesized system. These computed scores are subsequently published on ttsdsbenchmark.com. This quarterly repetition of the entire pipeline, incorporating systems released in the previous quarter, serves as a crucial mechanism to prevent data contamination from newly released models. Future plans include expanding the number of evaluated systems and languages in subsequent evaluation rounds.
-]
-)
-
-#emph[Multilingual validity of TTSDS:]
-While the endeavor of collecting gold standard #abbr.a[MOS] labels for 14 languages falls outside the practical scope of this specific work, the applicability of TTSDS2 to the multilingual context was validated using Uriel+ @khan_uriel_2024. This resource provides typological distances for a set of 7970 languages. We posit that if TTSDS2 distances exhibited a correlation with linguistic distances established by linguists, this would be a strong indicator for the viability of application to a multi-lingual setting. Analysis conducted on each individual TTSDS2 factor reveales that when comparing ground-truth language datasets, the derived scores correlate with typological distances ($rho = -0.39$ for regular TTSDS2 and $rho = -0.51$ for multilingual TTSDS2, with both correlations being statistically significant at p < 0.05). The observed negative correlations are expected, as a higher TTSDS2 score signifies a smaller perceptual distance, and the stronger correlation by the multilingual TTSDS2 scores is an encouraging indication of its cross-linguistic efficacy.
+The factorised nature of TTSDS2 provides interpretable insights into which aspects of speech quality are most salient in different domains. As shown in @tbl:fig_ttsds2_factor_correlation, the #smallcaps[Speaker] factor is the most dominant correlate of perceived quality in the #smallcaps[Clean] and #smallcaps[Noisy] audiobook domains. However, in the more complex #smallcaps[Wild] and #smallcaps[Kids] domains, its influence diminishes, and factors like #smallcaps[Intelligibility] and #smallcaps[Generic] similarity become equally important. Notably, the #smallcaps[Prosody] factor shows its highest correlation in the #smallcaps[Kids] dataset, highlighting its utility for evaluating the more expressive and dynamic speech of children.
 
 #figure(
   image("../figures/9/ttsds_boxplot.png", width: 100%),
@@ -450,7 +339,12 @@ While the endeavor of collecting gold standard #abbr.a[MOS] labels for 14 langua
   caption: [TTSDS2 scores across 14 languages.],
 ) <fig_language_scores>
 
+The TTSDS2 framework has also been extended for multilingual and recurring evaluation. A fully automated pipeline, depicted in @fig:fig_ttsds_pipeline, scrapes new data from YouTube quarterly, processes it, and synthesises speech using the latest #abbr.a[TTS] models to maintain an up-to-date benchmark across 14 languages. The multilingual validity of TTSDS2 was confirmed by showing that its distances between ground-truth language datasets correlate significantly with established typological distances from Uriel+ #citep(<khan_uriel_2024>). 
+// TODO: uriel+ plot
+The performance of TTSDS2 across these languages, shown in @fig:fig_language_scores, demonstrates its robust capability to quantify synthetic speech quality in a multilingual context.
 
-The TTSDS2 scores obtained across 14 distinct languages are visually represented in @fig_language_scores, which graphically illustrates the metric's performance across a diverse spectrum of linguistic families. This comprehensive evaluation demonstrates the robust capability of TTSDS2 to quantify the quality of synthetic speech in a multilingual context.
+==== Conclusions
 
-This chapter has detailed the methodology employed for measuring distributional distances in synthetic speech, explaining the motivation, development and validation of #abbr.a[TTSDS] version 1.0 and its enhanced iteration, version 2.0. The robust correlations observed with human subjective evaluations across various domains and languages show its utility as a reliable objective metric for assessing synthetic speech quality. This evaluation framework, alongside the previously established TTS-for-ASR based evaluation, help quantify the gap between real and synthetic speech. Next, we discuss the overall conclusions drawn from this work and an outline its inherent limitations.
+Despite its robust performance, TTSDS2 has several limitations. Its computation is more intensive than simpler metrics due to the extraction of multiple complex features. While it correlates strongly with human perception, it is not a replacement for subjective evaluation, as it cannot capture the full nuance of the human listening experience. Furthermore, it is not designed to detect certain specific failure modes, such as a model perfectly reproducing a reference transcript instead of the target text. Finally, the current implementation does not evaluate long-form speech generation, a growing area of interest in #abbr.a[TTS] research.
+
+This chapter has detailed the methodology, development, and extensive validation of the TTSDS framework. The robust correlations observed with human judgments across diverse domains and languages establish its utility as a reliable objective metric for assessing and guiding the development of synthetic speech technology. This evaluation framework, together with the TTS-for-ASR analysis, provides a comprehensive set of tools to quantify and understand the persistent gap between real and synthetic speech.

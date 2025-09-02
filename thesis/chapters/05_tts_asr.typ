@@ -19,13 +19,14 @@ Using synthetic data for training has been instrumental for machine learning sin
 
 While synthetic data is frequently used to augment real datasets, in this work, we primarily treat it as a proxy for real speech: If the distributions of real speech $S$ and synthetic speech $tilde(S)$ were fully equivalent, we would in turn expect equivalent ASR performance when training on either. Training an ASR model on TTS-generated data -- TTS-for-ASR -- serves as an objective way to quantify the distributional distance between real and synthetic speech. This approach probes how well synthetic speech captures the variability of real speech in a way that directly impacts a downstream task. Relating to TTS-for-ASR, we ask the following research questions in this chapter: 
 
-#emph[How can we reliably compare and quantify TTS-for-ASR performance?] To this end, we introduce a controlled TTS-for-ASR setup, minimising bias and ensure a fair comparison. We also introduce the #abbr.a[WERR] heuristic to compare previous efforts in TTS-for-ASR.
+#emph[How can we reliably compare and quantify TTS-for-ASR performance?]
 
-#emph[How well has previous work approximated real speech for the TTS-for-ASR task?] Using WERR, we find that while TTS-for-ASR performance has increased, there seems to be a plateau, with synthetic speech performing by a factor of around 1.7 worse than real speech in the most recent works.
+#emph[How well has previous work approximated real speech for the TTS-for-ASR task?] 
 
-#emph[Are there any obvious explanations for any arising gaps in performance, such as limitations of the vocoder or regularity of the synthetic speech?] We evaluate WERR in our own experiments setup, and find that the vocoder does not play a significant role. Additionally, we find that synthetic speech is highly regular, leading to much lower WER when evaluating ASR performance on synthetic speech.
+#emph[Are there any obvious explanations for any arising gaps in performance, such as limitations of the vocoder or regularity of the synthetic speech?] 
 
-While most of these contributions are preliminaries for later work which were not published outside of this thesis, the controlled TTS-for-ASR setup is covered in the following publication:
+
+To this end, we introduce a controlled TTS-for-ASR setup, minimising bias and ensuring fair comparison. We also introduce the #abbr.a[WERR] heuristic to compare previous efforts in TTS-for-ASR. Using WERR, we find that while TTS-for-ASR performance has increased, there seems to be a plateau, with synthetic speech performing by a factor of around 1.7 worse than real speech in the most recent works. We also evaluate WERR in our own experimental setup, and find that the vocoder does not play a significant role. Additionally, we find that synthetic speech is highly regular, leading to much lower WER when evaluating ASR performance on synthetic speech. While most of these contributions are preliminaries for later work which were not published outside of this thesis, the controlled TTS-for-ASR setup is covered in the following publication:
 
 - #cite(<minixhofer_evaluating_2023>, form: "full")
 
