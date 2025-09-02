@@ -71,7 +71,7 @@ The disparity between synthetic and true data distributions can be conceptualise
 
 *Unnatural:* Synthetic speech may contain systematic errors or artificial sounds (e.g., structured noise, unnatural co-articulation, or unrealistic speaking styles) that are not present in real data. These patterns can be detrimental to downstream models, but are usually also penalised by listeners.
 
-*Natural:* The synthesis process will most accurately represent the acoustic or prosodic patterns that most common and regular (i.e. predictable) in the training data.
+*Natural:* The synthesis process will most accurately represent the acoustic or prosodic patterns that are most common and regular (i.e. predictable) in the training data.
 
 *Missing:* Conversely, certain valid variations inherent in real speech (e.g., specific speaking styles, rare phonetic combinations, or subtle emotional nuances) might be under-represented or entirely missing from the synthetic distribution.
 
@@ -96,13 +96,13 @@ We now introduce our controlled sequence of steps we follow to ensure our TTS-fo
 
 To quantify the disparity between ASR performance when trained on synthetic versus real speech, we also introduce the Word Error Rate Ratio (WERR). This heuristic directly compares the effectiveness of different training data types using ASR-derived #abbr.a[WER]. The WERR is defined as the ratio of the WER achieved by an ASR model trained exclusively on synthetic speech to the WER achieved by an ASR model trained exclusively on real speech, when both are evaluated on the same real test set:
 
-$ "WERR"(D_"test", theta, tilde(theta)) = "WER"(D, tilde(theta)) / "WER"(D, theta) $ <eq_werr>
+$ "WERR"(D_"test", theta, tilde(theta)) = "WER"(D_"test", tilde(theta)) / "WER"(D_"test", theta) $ <eq_werr>
 
 As $theta$ is derived using the real data $D$ and $tilde(theta)$ using the synthetic data $tilde(D)$, while the test set, TTS model and ASR models stays fixed, we refer to WERR as a heuristic of said datasets $"WERR"(D,tilde(D))$ for simplicity. A WERR of 1 indicates that the given synthetic speech is acoustically equivalent to real speech for ASR training purposes. A value greater than 1 signifies that training on synthetic speech yields a higher error rate, indicating a performance gap. Our methodology for evaluating WERR emphasises acoustic modeling by using ASR setups with minimal language model interference, ensuring the WER differences primarily reflect differences in the acoustic properties of the training data.
 
 ==== WERR and Symmetricity
 
-While the WERR provides a quantitative measure of the performance disparity between ASR models trained on synthetic versus real speech, its interpretation as a formal statistical distance metric requires careful consideration. For $"WERR"$ to be a true metric, it would need to satisfy non-negativity ($"WERR"(X,Y)=0$), identity ($"WERR"(X,X)=0$) and symmetry ($"WERR"(X,Y)="WERR"(Y,Y)$). The former two are trivial to satisfy, however it is not immediately the clear if $"WERR"$ behaves in a symmetric way. For this to be the case, training on synthetic data and evaluating on real data would have to lead to similar results as vice versa. As shown in @tbl:tab_cross_ttsasr, we find that while the ratios are similar, with $"WERR"(tilde(D),D)=3.66$ and $"WERR"(D,tilde(D))=3.75$ (see @tbl:tab_cross_ttsasr) they are not equal due to the inherent stochasticity in model training.
+While the WERR provides a quantitative measure of the performance disparity between ASR models trained on synthetic versus real speech, its interpretation as a formal statistical distance metric requires careful consideration. For $"WERR"$ to be a true metric, it would need to satisfy non-negativity ($"WERR"(X,Y)=0$), identity ($"WERR"(X,X)=0$) and symmetry ($"WERR"(X,Y)="WERR"(Y,Y)$). The former two are trivial to satisfy, however it is not immediately clear if $"WERR"$ behaves in a symmetric way. For this to be the case, training on synthetic data and evaluating on real data would have to lead to similar results as vice versa. As shown in @tbl:tab_cross_ttsasr, we find that while the ratios are similar, with $"WERR"(tilde(D),D)=3.66$ and $"WERR"(D,tilde(D))=3.75$ (see @tbl:tab_cross_ttsasr) they are not equal due to the inherent stochasticity in model training.
 To enforce symmetry, we define Mean Word Error Rate Ratio (MWERR) as the average of forward and reverse WERR:
 
 $
@@ -116,7 +116,7 @@ In the following sections, we analyse prior work and conduct a series of prelimi
 === WERR of Previous Works <05_werr_results>
 
 #let gain(s,r) = {
-  [#calc.round((1-(s/r))*100,digits:2)%]
+  [#calc.round((1-(s/r))*100,digits:1)%]
 }
 
 #let werr(s,r) = {
@@ -125,12 +125,12 @@ In the following sections, we analyse prior work and conduct a series of prelimi
 
 #figure(
   table(
-  columns: (.5fr, 4.7fr, 1fr, 1fr, 1fr, 1fr, 1fr),
+  columns: (.5fr, 4.7fr, 1.2fr, 1.2fr, 1.2fr, .9fr, .9fr),
   align: center,
   toprule(),
-  table.header([*\#*], [*Paper*], table.cell(colspan: 3, [*WER*]), [*Gain*], [*WERR*]),
+  table.cell(rowspan: 2, [#v(1.5em)*\#*]), table.cell(rowspan: 2, [#v(1.5em)*Paper*]), table.cell(colspan: 3, [*WER*]), table.cell(rowspan: 2, rotate(-90deg, reflow: true)[*Gain*#h(.5em)]), table.cell(rowspan: 2, rotate(-90deg, reflow: true)[*WERR*]),
 
-  [], [], [$theta_tilde(D)$], [$theta_D$], [$theta_(D+tilde(D))$], [], [],
+  [#v(.5em)$tilde(D)$], [#v(.5em)$D$], [#v(.5em)$D+tilde(D)$],
   toprule(),
   
   [1], [#citep(<li_synthaug_2018>)], [49.80], [5.10], [4.66], [#gain(4.66,5.10)], [#werr(49.80,5.10)],
@@ -186,7 +186,7 @@ The results of our baseline experiments, summarised in @tbl:tab_cross_ttsasr, co
 
 Further analysis reveals the effects of synthetic speech's inherent regularity. When the ASR model trained on real speech is evaluated on synthetic speech, its WER is surprisingly low at 11.4%, which is better than its performance on real evaluation data (13.3%). This occurs despite the synthetic speech being out-of-distribution for a model trained solely on real speech. The explanation lies in the reduced complexity of synthetic speech; it tends to be cleaner, more consistent, and exhibits an oversmoothed quality @ren_revisiting_2022. An ASR model accustomed to the variability of real speech finds this "idealised" input easier to transcribe.
 
-Conversely, when an ASR model is trained and evaluated exclusively on synthetic speech, its WER plummets to an extremely low value of 3.0%. This dramatic improvement suggests the model is not merely recognising speech but is effectively learning to transcribe the unique and highly consistent acoustic patterns of the TTS system. While this leads to excellent in-domain performance, it severely limits the model's ability to generalise to the unpredictable variability of real human speech. This highlights that for TTS-for-ASR to be truly effective, synthetic speech must emulate the full distributional diversity of real speech, not just present a simplified, recognisable acoustic pattern. These cross-evaluation experiments also allow for an examination of WERR's symmetricity. While $"WERR"(tilde(D),D)=3.66$, the reverse, $"WERR"(D,tilde(D))=3.75$, is similar but not identical, a discrepancy attributable to the inherent stochasticity of model training.
+Conversely, when an ASR model is trained and evaluated exclusively on synthetic speech, its WER decreases significantly to a value of 3.0%. This significant improvement suggests the model is not merely recognising speech but is effectively learning to transcribe the unique and highly consistent acoustic patterns of the TTS system. While this leads to excellent in-domain performance, it severely limits the model's ability to generalise to the unpredictable variability of real human speech. This highlights that for TTS-for-ASR to be truly effective, synthetic speech must emulate the full distributional diversity of real speech, not just present a simplified, recognisable acoustic pattern. These cross-evaluation experiments also allow for an examination of WERR's symmetricity. While $"WERR"(tilde(D),D)=3.66$, the reverse, $"WERR"(D,tilde(D))=3.75$, is similar but not identical, a discrepancy attributable to the inherent stochasticity of model training.
 
 #figure(
 table(

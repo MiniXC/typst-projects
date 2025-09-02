@@ -55,8 +55,8 @@
   ("TTSDS", "Text-to-Speech Distribution Score"),
   ("FLAC", "Free Lossless Audio Codec"),
   ("MPM", "Masked Prosody Model"),
-  ("CWT", "Continous Wavelet Transform"),
-  ("STFT", "Short-time Fourier transform"),
+  ("CWT", "Continuous Wavelet Transform"),
+  ("STFT", "Short-Time Fourier transform"),
   ("NLL", "Negative log-liklihood"),
   ("SLM", "Spoken Language Model"),
   ("GMM", "Gaussian Mixture Model"),
@@ -64,7 +64,11 @@
   ("MWERR", "Mean Word Error Rate Ratio"),
   ("TDNN", "Time-delay Neural Network"),
   ("EMA", "Exponentional Moving Average"),
-  ("CLIP", "Contrastive Language-Image Pre-training")
+  ("CLIP", "Contrastive Language-Image Pre-training"),
+  ("DDIM", "Denoising Diffusion Implicit Model"),
+  ("CMVN", "Cepstral Mean and Variance Normalisation"),
+  ("VTLN", "Vocal Tract Length Normalisation"),
+  ("PLP", "Perceptual Linear Predictive")
 )
 
 // CONFIG
@@ -367,7 +371,7 @@ If the distribution of real speech was perfectly modeled, we would assume simila
 
 #include "chapters/07_scaling.typ"
 
-= Distributional distance of synthetic and real speech <part_02>
+= Distributional Distance of Synthetic and Real Speech <part_02>
 
 Since our work in TTS-for-ASR suggested a large discrepancy between expected and actual performance due to a mismatch in distributions, we explore in which ways TTS evaluation can be improved by considering these distributions rather than individual samples alone. We introduce the Text-to-Speech Distribution Distance (TTSDS) a measure utilising the distributional Wasserstein distance across several factors of speech, and show it correlates well with human judgement across domains and could feasibly be applied across languages.
 
@@ -440,7 +444,7 @@ Since our work in TTS-for-ASR suggested a large discrepancy between expected and
 
 == Abbreviations
 
-#abbr.list(columns: 2)
+#abbr.list(columns: 1)
 
 
 == Open Source Contributions
@@ -448,7 +452,7 @@ Since our work in TTS-for-ASR suggested a large discrepancy between expected and
 As far as licenses and resources permitted, all code and datasets used in the making of this thesis have been published at the web locations below.
 
 - *Phones* #sym.arrow #underline[#link("https://minixc.github.io/phones",[minixc.github.io/phones])]: A library for calculating distances between phones across languages.
-- *TTSDS* #sym.arrow #underline[#link("https://ttsdsbenchmark.com",[ttsdsbenchmark.com])] and #underline[#link("https://github.com/ttsds/ttsds",[github.com/ttsds/ttsds])]: The TTSDS score libary and datasets introduced in @09_dist[Chapter].
+- *TTSDS* #sym.arrow #underline[#link("https://ttsdsbenchmark.com",[ttsdsbenchmark.com])] and #underline[#link("https://github.com/ttsds/ttsds",[github.com/ttsds/ttsds])]: The TTSDS score library and datasets introduced in @09_dist[Chapter].
 - *MPM* #sym.arrow #underline[#link("https://github.com/MiniXC/masked_prosody_model",[github.com/MiniXC/masked_prosody_model])]: #abbr.a[SSL] prosody correlate model introduced in @02_factors[Chapter].
 - *Speech Diffusion* #sym.arrow #underline[#link("https://github.com/MiniXC/speech-diffusion",[github.com/MiniXC/speech-diffusion])]: The diffusion architecture introduced in @07_scaling[Chapter].
 - *LightningFastSpeech2* #sym.arrow #underline[#link("https://github.com/MiniXC/LightningFastSpeech2", [github.com/MiniXC/LightningFastSpeech2])]: A reimplemention of FastSpeech2 with additional prosodic correlates and conditioning, introduced in @06_diversity[Chapter].
@@ -473,7 +477,7 @@ The general process for using GenAI in this work was conducted as follows: 1) Ou
 - Summarising/searching long-form content -- for example, asking if certain viewpoints are featured in a lengthy paper or book.
 
 *Minimising Bias*: We use the following rules/techniques to minimise the introduction of GenAI-induced bias.
-- Never copy prose: No prose is every copied, nor is the GenAI output displayed to the author while writing.
+- Never copy prose: No prose is ever copied, nor is the GenAI output displayed to the author while writing. We copy tables, etc. with care.
 - Critique, not revision: We never ask to create a "better version" of any given input, but instead ask for specific critique of potential shortcomings. We had to sometimes explicitly specify this to the GenAI tools since they seemed prone to replacing the input with their own version, even when we did not ask for it.
 - Be specific: We never asked open-ended questions to GenAI, such as "My thesis topic is [...] how would you structure this thesis?" - we always posed a narrow, specific problem with text we had already created.
 
@@ -494,4 +498,4 @@ This is a Lay Summary in informal language, which I used to inform family and fr
 If you are reading this, you have probably heard Text-to-Speech voices before. It could be the one telling you to stay on the line when calling your GP, the voice giving directions in your car, or the voiceover in TikToks. The models making those voices need a lot of data and computing power -- and recently they have gotten enough of both to become really good. We now think that soon they will be impossible to tell apart from real voices.
 You have probably also heard of speech recognition, which is how your voice gets converted to text when speaking to Siri or dictating something to your phone, or how YouTube subtitles get generated. This also needs a lot of data.
 Since the Text-to-Speech voices are getting so good, we thought we could use them for helping with speech recognition, since these voices could give us good data to learn from.
-But unfortunately, while they sound very good, the voices were really bad for speech recognition. This made us think that maybe there is some differences between these voices and real speech that we can't detect by just listening to them. So instead of looking at single recordings, we took a bunch of Text-to-Speech recordings and a bunch of real recordings and compared how they were spread out in many different areas that researchers have looked into for a long time. These areas measure how we speak (for example, how loud or quiet), who is speaking and how easily we can understand the words. We found out that when we look at a bunch of recordings this way, we can see differences in how they are spread out in these different areas -- and real speech is actually still quite different to synthetic speech. And the Text-to-Speech systems that sound good when listening to them were spread out more similarly to the real speech than the ones that didn't sound so good -- and this still works if the speech has background noise, or if it's children speaking instead of adults. We also looked into multiple languages, and figured out how to apply this to 14 of them without big changes. This means our work is robust and can hopefully be extended to new settings quite easily. To summarise, our main point is that while Text-to-Speech is really good at this point, when we look at a bunch of recordings instead of single ones, we can see its not quite the same as real speech, and that explains why we can't yet use it in the same way. Our method can be used to measure how close new Text-to-Speech systems get to the real speech, to make sure they keep advancing.
+But unfortunately, while they sound very good, the voices were really bad for speech recognition. This made us think that maybe there are some differences between these voices and real speech that we can't detect by just listening to them. So instead of looking at single recordings, we took a bunch of Text-to-Speech recordings and a bunch of real recordings and compared how they were spread out in many different areas that researchers have looked into for a long time. These areas measure how we speak (for example, how loud or quiet), who is speaking and how easily we can understand the words. We found out that when we look at a bunch of recordings this way, we can see differences in how they are spread out in these different areas -- and real speech is actually still quite different to synthetic speech. And the Text-to-Speech systems that sound good when listening to them were spread out more similarly to the real speech than the ones that didn't sound so good -- and this still works if the speech has background noise, or if it's children speaking instead of adults. We also looked into multiple languages, and figured out how to apply this to 14 of them without big changes. This means our work is robust and can hopefully be extended to new settings quite easily. To summarise, our main point is that while Text-to-Speech is really good at this point, when we look at a bunch of recordings instead of single ones, we can see it's not quite the same as real speech, and that explains why we can't yet use it in the same way. Our method can be used to measure how close new Text-to-Speech systems get to the real speech, to make sure they keep advancing.

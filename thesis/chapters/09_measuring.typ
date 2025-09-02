@@ -38,7 +38,7 @@ To establish the context for a new distributional metric, it is necessary to fir
 
 ==== Subjective Listening Tests
 
-Subjective tests are the gold standard for synthetic speech evaluation as they directly measure human perception. However, their results are inherently variable and depend heavily on the experimental design. Recent advancements in #abbr.a[TTS], where synthetic speech often achieves human parity #citep(<chen_vall-e_2024>), have made subjective evaluation more challenging, as listeners struggle to distinguish real from synthetic audio.
+Subjective tests are the gold standard for synthetic speech evaluation as they directly measure human perception. However, their results are inherently variable and depend heavily on the experimental design. Recent advancements in #abbr.a[TTS], where synthetic speech often achieves human parity @chen_vall-e_2024, have made subjective evaluation more challenging, as listeners struggle to distinguish real from synthetic audio.
 
 A general best practice is to clearly define the experimental parameters before conducting a test, as recommended in guidelines for #abbr.a[TTS] evaluation @wester_listeners_2015@cooper_review_2024. This includes defining the listener pool, typically native speakers of the language being tested; the setting, preferably a quiet lab environment with headphones; and the specific instructions given to the listeners, which should clearly define the attribute being rated, such as #emph[naturalness]. The design of the stimuli presentation, such as the number of samples per page and whether re-listening is allowed, also influences the results @wells_bws_2024. Despite these best practices, subjective tests face challenges of standardisation, making results difficult to compare across studies, and they are resource-intensive.
 
@@ -70,11 +70,11 @@ The most common methodologies are the Mean Opinion Score (#abbr.a[MOS]), Compari
 
 ==== Objective Metrics
 
-Due to the resource-intensive nature of subjective tests, objective metrics are frequently used, especially for experimental iteration. These metrics can be categorised into several families. Signal-based reference metrics are the oldest group and consist of intrusive metrics that compare a synthetic utterance to a time-aligned real reference. Representatives include Perceptual Evaluation of Speech Quality (#abbr.l[PESQ]) #citep(<rix_pesq_2001>), Short-Time Objective Intelligibility (#abbr.l[STOI]) #citep(<taal_stoi_2011>), and Mel-Cepstral Distortion (#abbr.l[MCD]) #citep(<kominek_mcd_2008>). These were often designed for telecommunications or enhancement scenarios and can struggle with modern #abbr.a[TTS] systems.
+Due to the resource-intensive nature of subjective tests, objective metrics are frequently used, especially for experimental iteration. These metrics can be categorised into several families. Signal-based reference metrics are the oldest group and consist of intrusive metrics that compare a synthetic utterance to a time-aligned real reference. Representatives include Perceptual Evaluation of Speech Quality (#abbr.l[PESQ]) @rix_pesq_2001, Short-Time Objective Intelligibility (#abbr.l[STOI]) @taal_stoi_2011, and Mel-Cepstral Distortion (#abbr.l[MCD]) @kominek_mcd_2008. These were often designed for telecommunications or enhancement scenarios and can struggle with modern #abbr.a[TTS] systems.
 
-Model-based metrics involve training a neural network to predict subjective scores directly from an audio signal. This approach was introduced by MOSNet #citep(<lo_mosnet_2019>) and has been followed by systems like UTMOS #citep(<saeki_utmos_2022>), NISQA-MOS #citep(<mittag_nisqa_2021>), and SQUIM-MOS #citep(<kumar_torchaudio-squim_2023>). While effective in-domain, their performance often degrades on out-of-domain data, and they need to be continually re-validated as #abbr.a[TTS] technology evolves. Other metrics focus on specific attributes. Intelligibility is often proxied using Word Error Rate (#abbr.l[WER]) from an #abbr.a[ASR] system. Speaker similarity is measured by the cosine similarity of speaker embeddings, such as d-vectors #citep(<wan_generalized_2018>) or from systems like ECAPA-TDNN #citep(<desplanques_ecapa_2020>).
+Model-based metrics involve training a neural network to predict subjective scores directly from an audio signal. This approach was introduced by MOSNet @lo_mosnet_2019 and has been followed by systems like UTMOS @saeki_utmos_2022, NISQA-MOS @mittag_nisqa_2021, and SQUIM-MOS @kumar_torchaudio-squim_2023. While effective in-domain, their performance often degrades on out-of-domain data, and they need to be continually re-validated as #abbr.a[TTS] technology evolves. Other metrics focus on specific attributes. Intelligibility is often proxied using Word Error Rate (#abbr.l[WER]) from an #abbr.a[ASR] system. Speaker similarity is measured by the cosine similarity of speaker embeddings, such as d-vectors @wan_generalized_2018 or from systems like ECAPA-TDNN @desplanques_ecapa_2020.
 
-Finally, distributional metrics, inspired by the image domain's Fréchet Inception Distance (#abbr.l[FID]) #citep(<heusel_fid_2017>), measure the distance between entire corpora of synthetic and real speech. Fréchet Audio Distance (#abbr.l[FAD]) #citep(<kilgour_fad_2019>) adapts this principle for audio. These metrics do not require corresponding samples but often necessitate thousands of utterances, which may have limited their widespread adoption. This work builds upon this distributional approach.
+Finally, distributional metrics, inspired by the image domain's Fréchet Inception Distance (#abbr.l[FID]) @heusel_fid_2017, measure the distance between entire corpora of synthetic and real speech. Fréchet Audio Distance (#abbr.l[FAD]) @kilgour_fad_2019 adapts this principle for audio. These metrics do not require corresponding samples but often necessitate thousands of utterances, which may have limited their widespread adoption. This work builds upon this distributional approach.
 
 === TTSDS Robustness Improvements
 
@@ -88,7 +88,7 @@ The initial version, TTSDS, was validated primarily on clean, English audiobook 
 #figure(
   table(
     columns: (auto, 0.6fr), // First column adjusts to content, second column takes 60% of remaining space
-    stroke: (top: 1.5pt + black, bottom: 1.5pt + black), // Thicker top and bottom rules
+    stroke: (top: 1pt + black, bottom: 1pt + black), // Thicker top and bottom rules
     align: (left, left), // Left-align content in both columns
 
     // Table header row
@@ -142,10 +142,10 @@ To validate the TTSDS framework, we conducted a large-scale experimental evaluat
 ==== Datasets and Systems for Evaluation 
 
 The evaluation was designed to test the robustness of the metrics beyond clean, read speech. We constructed four distinct English-language datasets, each targeting a different acoustic or stylistic condition:
-- #smallcaps[Clean]: This dataset served as the baseline and was sourced from the test split of the LibriTTS corpus #citep(<zen_libritts_2019>). It contains high-quality, single-speaker audiobook recordings that have been filtered for a high signal-to-noise ratio.
+- #smallcaps[Clean]: This dataset served as the baseline and was sourced from the test split of the LibriTTS corpus @zen_libritts_2019. It contains high-quality, single-speaker audiobook recordings that have been filtered for a high signal-to-noise ratio.
 - #smallcaps[Noisy]: To test robustness to environmental noise, this dataset was created by scraping LibriVox recordings from 2025 without applying any #abbr.a[SNR] filtering, thereby retaining the natural ambient noise present in the original recordings.
-- #smallcaps[Wild]: To assess performance on conversational and in-the-wild speech, this dataset was compiled from recently uploaded YouTube videos. Utterances were extracted using Whisper diarisation #citep(<clapa_WhisperSpeech_2024>), capturing a wide variety of speaking styles, accents, and recording conditions, inspired by the Emilia dataset #citep(<he_emilia_2024>).
-- #smallcaps[Kids]: To evaluate generalisation to a significantly different speaker population, this dataset was created from a subset of the My Science Tutor Corpus #citep(<pradhan_my_2024>), which contains conversational speech from children interacting with a virtual tutor.
+- #smallcaps[Wild]: To assess performance on conversational and in-the-wild speech, this dataset was compiled from recently uploaded YouTube videos. Utterances were extracted using Whisper diarisation @clapa_WhisperSpeech_2024>, capturing a wide variety of speaking styles, accents, and recording conditions, inspired by the Emilia dataset @he_emilia_2024.
+- #smallcaps[Kids]: To evaluate generalisation to a significantly different speaker population, this dataset was created from a subset of the My Science Tutor Corpus @pradhan_my_2024, which contains conversational speech from children interacting with a virtual tutor.
 
 // Helper for superscript citations, mimicking the LaTeX \supercite command
 #let supercite(ref_key) = {
@@ -232,7 +232,7 @@ We recruited 200 annotators via the Prolific platform to provide ratings. Partic
 
 ==== Compared Objective Metrics
 
-To contextualise the performance of TTSDS2, we compared it against 16 other publicly available objective metrics using the VERSA evaluation toolkit #citep(<shi_versa_2024>) and other sources. This comparison set included signal-based metrics (#abbr.l[STOI], #abbr.l[PESQ], #abbr.l[MCD]), several model-based #abbr.a[MOS] predictors (UTMOS, UTMOSv2, NISQA-MOS, DNSMOS, SQUIM-MOS), speaker similarity metrics based on different embeddings (X-Vector, RawNet3, ECAPA-TDNN), distributional metrics (#abbr.l[FAD]), and multi-dimensional perceptual metrics (Audiobox Aesthetics sub-scores). This comprehensive set allows for a thorough analysis of the current state of objective evaluation for high-quality synthetic speech.
+To contextualise the performance of TTSDS2, we compared it against 16 other publicly available objective metrics using the VERSA evaluation toolkit @shi_versa_2024. This comparison set included signal-based metrics (#abbr.l[STOI], #abbr.l[PESQ], #abbr.l[MCD]), several model-based #abbr.a[MOS] predictors (UTMOS, UTMOSv2, NISQA-MOS, DNSMOS, SQUIM-MOS), speaker similarity metrics based on different embeddings (X-Vector, RawNet3, ECAPA-TDNN), distributional metrics (#abbr.l[FAD]), and multi-dimensional perceptual metrics (Audiobox Aesthetics sub-scores). This comprehensive set allows for a thorough analysis of the current state of objective evaluation for high-quality synthetic speech.
 
 === Results and Discussion
 
@@ -259,11 +259,12 @@ Our experimental results demonstrate a clear hierarchy in the performance of obj
 }
 
 #context[
-  #set text(size: 6.5pt)
+  #show table.cell: c => {
+    return text(10pt, c)
+  }
   #figure(
     table(
       columns: (auto, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr),
-      stroke: (top: 1.5pt + black, bottom: 1.5pt + black),
       table.cell(rowspan: 2, [#strong[Metric]]), table.cell(colspan: 3, align: center, [#strong[Clean]]), table.cell(colspan: 3, align: center, [#strong[Noisy]]), table.cell(colspan: 3, align: center, [#strong[Wild]]), table.cell(colspan: 3, align: center, [#strong[Kids]]),
       table.hline(start: 1),
       [#smallcaps[mos]], [#smallcaps[cmos]], [#smallcaps[smos]], [#smallcaps[mos]], [#smallcaps[cmos]], [#smallcaps[smos]], [#smallcaps[mos]], [#smallcaps[cmos]], [#smallcaps[smos]], [#smallcaps[mos]], [#smallcaps[cmos]], [#smallcaps[smos]],
@@ -286,7 +287,7 @@ Our experimental results demonstrate a clear hierarchy in the performance of obj
       [MCD], scorecell("-0.46"), scorecell("-0.37"), scorecell("-0.27"), scorecell("-0.45"), scorecell("-0.58"), scorecell("-0.74"), scorecell("-0.33"), scorecell("-0.45"), scorecell("-0.51"), scorecell("-0.31"), scorecell("-0.13"), scorecell("-0.38"),
       [WER], scorecell("-0.19"), scorecell("-0.18"), scorecell("-0.17"), scorecell("-0.11"), scorecell("-0.30"), scorecell("-0.13"), scorecell("-0.28"), scorecell("-0.17"), scorecell("-0.22"), scorecell("-0.45"), scorecell("-0.26"), scorecell("-0.39"),
     ),
-    caption: [Spearman rank correlations. Colours: #box(fill: negstrong, rect(width: 5pt, height: 5pt)) –1 … –0.5, #box(fill: negweak, rect(width: 5pt, height: 5pt)) –0.5 … 0, #box(fill: posweak, rect(width: 5pt, height: 5pt)) 0 … 0.5, #box(fill: posstrong, rect(width: 5pt, height: 5pt)) 0.5 … 1.],
+    caption: [Spearman rank correlations.#linebreak()Colours: #box(fill: negstrong, rect(width: 5pt, height: 5pt)) –1 … –0.5, #box(fill: negweak, rect(width: 5pt, height: 5pt)) –0.5 … 0, #box(fill: posweak, rect(width: 5pt, height: 5pt)) 0 … 0.5, #box(fill: posstrong, rect(width: 5pt, height: 5pt)) 0.5 … 1.],
     placement: top,
   ) <tab_ttsds2_spearman_correlation>
 ] 
@@ -339,9 +340,20 @@ The factorised nature of TTSDS2 provides interpretable insights into which aspec
   caption: [TTSDS2 scores across 14 languages.],
 ) <fig_language_scores>
 
-The TTSDS2 framework has also been extended for multilingual and recurring evaluation. A fully automated pipeline, depicted in @fig:fig_ttsds_pipeline, scrapes new data from YouTube quarterly, processes it, and synthesises speech using the latest #abbr.a[TTS] models to maintain an up-to-date benchmark across 14 languages. The multilingual validity of TTSDS2 was confirmed by showing that its distances between ground-truth language datasets correlate significantly with established typological distances from Uriel+ #citep(<khan_uriel_2024>). 
-// TODO: uriel+ plot
-The performance of TTSDS2 across these languages, shown in @fig:fig_language_scores, demonstrates its robust capability to quantify synthetic speech quality in a multilingual context.
+The TTSDS2 framework has also been extended for multilingual and recurring evaluation. A fully automated pipeline, depicted in @fig:fig_ttsds_pipeline, scrapes new data from YouTube quarterly, processes it, and synthesises speech using the latest #abbr.a[TTS] models to maintain an up-to-date benchmark across 14 languages. The multilingual validity of TTSDS2 was confirmed by showing that its distances between ground-truth language datasets correlate significantly with established typological distances from Uriel+ @khan_uriel_2024, which can also be seen in @fig:fig_uriel.  We find that when comparing the ground truth language datasets to each other using TTSDS2, the scores correlate with the distances with $rho = −0.39$ for regular and $rho = −0.51$ (both
+significant with p < 0.05). The negative correlations
+are expected since a higher score correlates with a smaller distance.
+Additionally, the performance of TTSDS2 across these languages, shown in @fig:fig_language_scores, demonstrates its robust capability to quantify synthetic speech quality in a multilingual context.
+
+#figure(
+  image("../figures/9/uriel.png", width: 100%),
+  placement: top,
+  caption: [Multidimensional scaling (MDS) distance plots between languages (left to right) for i)
+Uriel+ typological distances ii) TTSDS2 without multilingual changes iii) multilingual TTSDS2. The
+three closest neighbors of each language are connected via lines.],
+) <fig_uriel>
+
+
 
 ==== Conclusions
 
