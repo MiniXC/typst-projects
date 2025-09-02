@@ -1,4 +1,4 @@
-#import "../abbr.typ": *
+#import "../abbr.typ"
 #import "../quote.typ": *
 #import "../math.typ": *
 #import "../moremath.typ": *
@@ -39,7 +39,7 @@ where $alpha_k$ are the attention weights learned from the reference $S$. These 
 
 ===== Variational Autoencoders
 
-Variational Autoencoders (VAEs) extend the concept of latent style modelling by learning a continuous latent distribution, allowing for smoother and more nuanced sampling of stylistic variations @kingma_auto-encoding_2013. A VAE consists of an encoder and a decoder. During training, the encoder maps a given reference speech utterance $S$ into the parameters of a probabilistic latent distribution, typically assumed to be a Gaussian posterior distribution. Specifically, the encoder learns to output the mean $mu_phi (S)$ and variance $sigma_phi (S)$ (or log-variance) of this Gaussian:
+#abbr.pla[VAE] extend the concept of latent style modelling by learning a continuous latent distribution, allowing for smoother and more nuanced sampling of stylistic variations @kingma_auto-encoding_2013. A VAE consists of an encoder and a decoder. During training, the encoder maps a given reference speech utterance $S$ into the parameters of a probabilistic latent distribution, typically assumed to be a Gaussian posterior distribution. Specifically, the encoder learns to output the mean $mu_phi (S)$ and variance $sigma_phi (S)$ (or log-variance) of this Gaussian:
 $ q_phi (Z | S) = cal(N)(mu_phi (S), sigma_phi (S)) $
 This approximate posterior $q_phi (Z|S)$ is trained to approximate the true posterior distribution $p(Z|S)$ by maximising the Evidence Lower Bound (ELBO). The ELBO objective balances two terms: the reconstruction likelihood and a Kullback-Leibler (KL) divergence term that regularises the latent space $Z$ by pushing $q_phi (Z|S)$ to be close to a simple prior distribution $p (Z)$ (i.e. a standard Gaussian $cal(N)(0, I)$):
 $ cal(L)_"ELBO" = EE_(q_phi (Z|S)) [log p_theta (S | Z)] - "KL"(q_phi (Z|S) || p (Z)) $
@@ -134,25 +134,7 @@ The #emph[Oracle System] serves as an empirical upper bound for the effectivenes
   placement: top,
 ) <tab_div_dist>
 
-Our experimental results confirm that targeted diversity enhancements reduce the synthetic-real gap, a conclusion supported by both the WERR metric and direct distributional distance measurements. @tbl:tab_div_systems summarises the WER and WERR values, while @tbl:tab_div_dist shows the corresponding Wasserstein-2 distances for the different attributes.
-
-The #emph[Baseline System] yielded a WERR of 3.66, underscoring the significant initial gap. As seen in the top row of @fig:fig_div_dist_plot, the synthetic attribute distributions for the baseline diverge noticeably from the real ones. The pitch (F0) distribution is bimodal, the energy distribution is shifted, and the duration (SR) distribution has a smaller variance.
-
-The #emph[Environment System], which attempted to internally model environmental factors, resulted in a slightly higher WERR of 3.70 and mixed results on distributional distances, suggesting this approach was not effective. Conversely, the #emph[Attributes System] reduced the WERR to 3.55. This improvement is mirrored in @tbl:tab_div_dist, which shows substantial reductions in the distances for prosody features, most notably for F0 (from 0.57 to 0.06) and energy (from 1.97 to 0.15). This demonstrates that explicitly conditioning on and sampling attributes helps the model generate more realistic prosody.
-
-The most effective approach was the #emph[Augmentation System], which achieved a WERR of 3.31. This system not only retained the prosodic improvements of the #emph[Attributes] system but also drastically reduced the distances for environmental factors, with the SRMR distance dropping from 1.23 to 0.05 and the WADA SNR distance from 0.58 to 0.23. The bottom row of @fig:fig_div_dist_plot visually confirms this, showing the synthetic distributions for the improved system aligning much more closely with the real ones. This highlights the significant impact of simulating a realistic acoustic environment through post-generation augmentation.
-
-The #emph[Oracle System] achieved the lowest WERR of 3.24. In @tbl:tab_div_dist, it shows the smallest distance for intra-speaker variability (0.17), suggesting that the GMM sampling for d-vectors is a limiting factor in the other systems. However, a substantial gap remains between the Oracle system's performance and training on real data (a WER of 43.0% vs. 13.3%). This demonstrates that even with perfect knowledge of the attributes we modelled, a large portion of the distributional difference remains unexplained.
-
-
 #figure(grid(columns: 1, row-gutter: 2mm, column-gutter: 1mm,
-
-  // image("Figures/SEM/100nm_1.jpg"), image("Figures/SEM/100nm_1.jpg"), 
-
-  // "a) test 1", "b) test2"),
-
-  // caption: "Caption"
-
   image("../figures/6/tts_dist_a.png", width: 110%),
   [
     a) Distributions produced by the baseline TTS system.
@@ -161,14 +143,28 @@ The #emph[Oracle System] achieved the lowest WERR of 3.24. In @tbl:tab_div_dist,
   [
     b) Distributions produced by the TTS system utilising measures and with acoustic environment augmentation.
   ]),
-  
-  caption: [Distributions for baseline (top) and augmented (bottom) systems],
-
+  caption: [Distributions of the real (blue) and synthetic (orange) measures for the baseline (top) and improved (bottom) systems.],
+  placement: top,
 ) <fig_div_dist_plot>
 
+Our experimental results confirm that targeted diversity enhancements reduce the synthetic-real gap, a conclusion supported by both the WERR metric and direct distributional distance measurements. @tab_div_systems summarises the WER and WERR values, while @tab_div_dist shows the corresponding Wasserstein-2 distances for the different attributes. The #emph[Baseline System] yielded a WERR of 3.66, underscoring the significant initial disparity between synthetic and real speech for ASR training.
 
-==== Discussion of Limitations
+===== Impact on Prosodic Realism
+The prosody of the #emph[Baseline System] shows significant deviation from real speech. As illustrated in the top row of @fig_div_dist_plot and quantified in @tab_div_dist, the synthetic distributions for prosodic attributes diverge noticeably. The pitch (F0) distribution is bimodal rather than unimodal, the energy distribution is shifted, and the duration (SR) distribution exhibits a smaller variance. The #emph[Attributes System], which conditions on GMM-sampled prosody statistics, dramatically reduces these distances. The Wasserstein-2 distance for F0 plummets from 0.57 to 0.06, and for energy from 1.97 to 0.15. This confirms that explicitly modelling and sampling from attribute distributions enables the generation of significantly more realistic prosody. This improvement in distributional similarity translates to a reduction in WERR to 3.55.
 
-The results indicate that while the explored methods for enhancing diversity are beneficial, inherent limitations persist. The experimental design minimised interference from #smallcaps[Semantic] factors by keeping the ASR setup and lexical content consistent, focusing on acoustic modelling. The significant improvement from post-generation augmentation, coupled with the large residual gap even in the #emph[Oracle] condition, suggests several potential sources for the remaining discrepancy.
+===== Impact on Environmental Diversity
+Modelling the acoustic environment proves to be a more complex challenge. The #emph[Environment System], which attempted to predict environmental attributes internally via the variance adapter, was ineffective. It resulted in a slightly higher WERR of 3.70 and had a limited effect on the SRMR and WADA SNR distances. This suggests that the TTS model struggles to synthesise the complex characteristics of noise and reverberation directly. In stark contrast, the #emph[Augmentation System], which applied these effects in a post-processing step, yielded the most substantial improvement. It achieved the lowest WERR of 3.31 among the practical systems and drastically reduced the environmental attribute distances, with the SRMR distance dropping from 1.58 (in the baseline) to 0.05. The visual alignment in the bottom row of @fig_div_dist_plot confirms this success. This finding strongly indicates that for complex acoustic phenomena like environmental conditions, direct simulation via augmentation is a more effective strategy than internal generation within the synthesis model.
 
-Firstly, the probabilistic models used for attribute sampling may not be sufficient. The speaker-dependent GMMs are a simplification and may not fully capture the complexity and correlations of the true attribute distributions in real speech, as suggested by the improved speaker distance in the #emph[Oracle] system. Secondly, the TTS architecture itself might have inherent limitations. The FastSpeech 2 model, despite conditioning, is trained with an MSE objective that can encourage regression to the mean, potentially limiting the fine-grained acoustic detail it can produce. Thirdly, there are likely unmodelled sources of diversity. The differences between synthetic and real speech may extend beyond the specific attributes explicitly modelled in this work, involving more subtle, entangled acoustic phenomena that current synthesis models fail to capture. The persistent gap motivates investigation into scaling paradigms and alternative training methodologies, which may offer another avenue to generate more diverse and robust synthetic data, as explored in the next chapter.
+===== Impact on Speaker Diversity
+For speaker characteristics, the #emph[Attributes System] reduced both the intra-speaker distance (from 0.36 to 0.30) and the inter-speaker distance (from 0.57 to 0.50). This suggests that conditioning on utterance-level statistics helps to better model the specific vocal characteristics of a speaker for a given utterance, improving both consistency within a speaker and distinctiveness between speakers. However, the #emph[Oracle System] achieves a significantly lower intra-speaker distance of 0.17. This implies that our GMM-based sampling of a single d-vector per speaker is a key limitation and does not fully capture the range of intra-speaker variability present in the real data.
+
+===== Overall Performance and the Remaining Gap
+The incremental enhancements lead to a progressive reduction in the WERR, from 3.66 for the baseline to 3.31 for the #emph[Augmentation System], a relative improvement of nearly 10%. The #emph[Oracle System] provides an empirical upper bound, reaching a WERR of 3.24. While these improvements are significant, a large gap remains when compared to training on real data (WERR of 1.0). The WER of the Oracle system is 43.0%, more than three times higher than the 13.3% WER achieved with real data. This substantial residual gap demonstrates that even with perfect knowledge of the specific speaker, prosodic, and environmental attributes modelled in this work, the synthetic speech is still not a complete substitute for real speech in the context of ASR training.
+
+=== Summary of Findings and Limitations
+
+The experimental results provide valuable insights into both the effectiveness and the limitations of enhancing synthetic speech diversity through explicit conditioning and augmentation -- our systematic evaluation demonstrates that explicitly introducing diversity across #smallcaps[Prosody], #smallcaps[Speaker], and #smallcaps[Ambient] factors can significantly reduce the distributional gap between synthetic and real speech, leading to tangible improvements in downstream ASR performance. The most effective strategy was a combination of conditioning on GMM-sampled attributes and applying post-generation augmentation, which reduced the WERR by approximately 10%. The analysis of distributional distances confirmed that these improvements were a direct result of the synthetic distributions becoming more similar to the real ones.
+However, the large residual WERR, even in the #emph[Oracle] condition, points to several inherent limitations. Firstly, the probabilistic models used for attribute sampling may not be sufficient. The speaker-dependent GMMs are a simplification and may not fully capture the complexity and correlations of the true attribute distributions in real speech. Secondly, the TTS architecture itself has inherent limitations. The FastSpeech 2 model, despite conditioning, is trained with an MSE objective that can encourage regression to the mean, potentially limiting the fine-grained acoustic detail it can produce. Thirdly, there are likely unmodelled sources of diversity. The differences between synthetic and real speech may extend beyond the specific attributes explicitly modelled in this work, involving more subtle, entangled acoustic phenomena that current synthesis models fail to capture.
+
+These findings have several implications for the fields of speech synthesis and recognition. The pronounced success of post-generation augmentation for environmental effects suggests that a modular approach may be most effective: TTS systems could focus on generating clean speech with high-fidelity core characteristics (speaker and prosody), while separate, specialised modules handle the simulation of complex acoustic environments. This decouples two very different generation tasks.
+Furthermore, the existence of a substantial performance gap even under oracle conditions strongly motivates moving beyond the specific techniques explored here. It suggests that simply improving the control over a fixed set of attributes within an MSE-based framework has its limits. This points towards the need for more fundamental changes in TTS modelling. The persistent gap motivates our investigation into scaling paradigms and alternative training methodologies, such as the diffusion models explored in the next chapter, which may offer a more promising avenue for generating truly diverse and distributionally complete synthetic data.

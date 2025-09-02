@@ -434,6 +434,10 @@ Since our work in TTS-for-ASR suggested a large discrepancy between expected and
 
 #abbr.list(columns: 2)
 
+== List of Figures
+
+
+
 == Open source contributions
 
 As far as licenses and resources permitted, all code and datasets used in the making of this thesis have been published at the web locations below.
@@ -446,7 +450,7 @@ As far as licenses and resources permitted, all code and datasets used in the ma
 - #emph[Various datasets and pretrained models] #sym.arrow #underline[#link("https://huggingface.co/cdminix", [huggingface.co/cdminix])]: Includes forced-aligned versions of LibriTTS (@06_diversity[Chapter]), Vocex (@02_factors[Chapter]), and detailed listening test results from TTSDS (@09_dist[Chapter]).
 
 
-== GenAI
+== GenAI used in this Thesis
 
 Generative AI (GenAI) was used in the making of this thesis in accordance with the University of Edinburgh's GenAI policy#footnote[#link(
   "https://information-services.ed.ac.uk/computing/comms-and-collab/elm/guidance-for-working-with-generative-ai",
