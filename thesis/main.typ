@@ -8,7 +8,7 @@
 #set footnote(numbering: "*")
 
 #set quote(block: true)
-#set cite(style: "annual-reviews-author-date")
+#set cite(style: "american-psychological-association")
 
 #abbr.make(
   ("KDE", "Kernel Density Estimation", "Kernel Density Estimates"),
@@ -177,6 +177,25 @@
   ]
 ]
 
+// #show ref.where(
+//   form: "normal"
+// ): set ref(supplement: it => {
+//   if it.func() == heading and it.level <= 1 {
+//     "Chapter"
+//   } else if it.func() == heading and it.level > 1 {
+//     "Section"
+//   } else {
+//     it.supplement
+//   }
+  // } else if type(it) == Equation {
+  //   "Equation"
+  // } else if it.has("cell") or it.kind.contains("table") {
+  //   "Table"
+  // } else if it.kind.contains("figure") {
+  //   "Figure"
+  // }
+// })
+
 
 
 // TITLE PAGE
@@ -253,14 +272,14 @@ In conclusion, while single computer-generated voices can sound human, their com
 // Acknowledgements
 #frontmatter-heading([Acknowledgements])
 
-I would like to thank my supervisors Ondrej Klejch and Peter Bell who were encouraging and patient, and I admire how they managed to guide me in my research. The fellow students and scholars I have met throughout the years, within and without of CSTR have contributed to many ideas and insights for my work. Gustav Eje Henter was an endless source of advice and enthusiasm. Nick Rossenbach's research on TTS-for-ASR and discussions on the topic were inspiring and helped me find my footing in the field. Maria Dolak, Zeyu Zhao and Sung-Lin Yeh were awesome fellow 5th-floor-researchers and friends. I also had a great time with Ariadna Sanchez, Shahar Elisha, Ed Storey and Peter Vietling at various speech conferences, as well as many great discussions with fellow members of CSTR and the wider speech research community, too many to list them all.
+I would like to thank my supervisors Ondrej Klejch and Peter Bell who were encouraging and patient, and I admire how they managed to guide me in my research -- encouraging flexibility while helping me find a promising direction at the same time. The fellow students and scholars I have met throughout the years, within and without of CSTR, have contributed to many ideas and insights for my work. Gustav Eje Henter was an endless source of advice and enthusiasm. Nick Rossenbach's research on TTS-for-ASR and discussions on the topic were inspiring and helped me find my footing in the field. Maria Dolak, Zeyu Zhao and Sung-Lin Yeh were awesome fellow 5th-floor-researchers and friends. I also had a great time with Ariadna Sanchez, Shahar Elisha, Ed Storey and Peter Vietling at various speech conferences, as well as many great discussions with fellow members of CSTR and the wider speech research community, too many to list them all.
 
-My partner Celina always lent an ear and having her by my side means the world to me. She was there for all the ups and downs on this journey, and I am looking forward to spending the rest of our lives together.
+My partner Celina always lent an ear and having her by my side means the world to me. She was there for all the ups and downs on this journey, and I am looking forward to spending the rest of our life together.
 I am also lucky to have an incredibly supportive family. My parents always believed I could do this, even when I did not, and came for a much-needed visit to Edinburgh when times were tough. My brother Benjamin, beyond being my best friend, has been a great source of inspiration and advice, and I am excited to read his thesis when the time comes. My grandmother was also always just a call away despite the big physical distance.
 
-My friends, beyond listening to me about the perils of academia, have helped me keep up my resolve in so many ways. My flatmates over the years, Angus, Rory and David, have been nothing but lovely and kind. The D&D sessions with Kat, David, Elo, Alex and Sven were always amazing, as were the runs with Sam, the hikes and climbs with Erik, gaming with the TreemTeam and the discussions about German hip-hop with Dom.
+My friends, beyond listening to me about the perils of academia, have helped me keep up my resolve in so many ways. My flatmates over the years, Angus, Rory and David, have been nothing but lovely and kind. The D&D sessions with Ania, Alex, Celina, David, Denis, Elo, Kat and Sven were always amazing, as were the runs with Sam, the hikes and climbs with Erik, gaming with the TreemTeam and the discussions about German hip-hop with Dom.
 
-Finally, I would also like to thank Huawei for funding this work and for the feedback their team in Cambridge provided.
+Finally, I would also like to thank Huawei for funding this work and for the helpful feedback their team provided.
 
 #frontmatter-heading([Declaration])
 
@@ -433,7 +452,7 @@ Since our work in TTS-for-ASR suggested a large discrepancy between expected and
     "references/asr.bib",
     "references/own.bib"
   ),
-  style: "iso-690-author-date",
+  style: "references/apa.csl",
 )
 
 #set text(top-edge: if review {1em} else {"cap-height"}, bottom-edge: if review {-.8em} else {"baseline"})

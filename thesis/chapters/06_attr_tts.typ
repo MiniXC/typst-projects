@@ -1,3 +1,5 @@
+--- START OF FILE text/plain ---
+
 #import "../abbr.typ"
 #import "../quote.typ": *
 #import "../math.typ": *
@@ -5,15 +7,28 @@
 #import "@preview/booktabs:0.0.4": *
 #show: booktabs-default-table-style
 
+#show ref.where(
+  form: "normal"
+): set ref(supplement: it => {
+  if it.func() == heading {
+    "Chapter"
+  } else if it.kind.contains("table") {
+    "Table"
+  } else if it.kind.contains("figure") {
+    "Figure"
+  }
+})
+
+
 == Enhancing Synthetic Speech Diversity <06_diversity>
 
 #q(
-[#citep(<oord_wavenet_2016>)],
-[#emph[WaveNet: A Generative Model for Raw Audio]],
-[We condition the model $dots$ in two different ways: global conditioning and local conditioning.]
+  [#citep(<bishop_mixture_1994>)],
+  [#emph[Mixture Density Networks]],
+  [For problems involving the prediction of continuous variables, however, the conditional averages provide only a very limited description $dots$ particularly true for problems in which the mapping to be learned is multi-valued $dots$ we must model the conditional probability distribution of the target data, again conditioned on the input vector.]
 )
 
-Building on the significant performance gap between ASR models trained on real versus synthetic speech, as quantified by the Word Error Rate Ratio (WERR) in @05_werr, this chapter introduces and evaluates methodologies to increase the diversity of synthetic speech. As established in the previous chapter, synthetic speech, despite its high human naturalness ratings, often lacks the intricate variability inherent in real human speech. This limitation directly impedes its utility for training robust ASR systems. Here, we systematically explore three complementary paradigms aimed at bridging this distributional gap: learning latent representations, explicit conditioning on attributes, and post-generation data augmentation. By introducing and controlling these aspects of speech, we aim to reduce the distributional distance between synthetic and real speech, which should, in turn, manifest as a reduction in WERR. Throughout this chapter, we adhere to the formal notation established in the introduction, where $Q_theta$ represents the Text-to-Speech (TTS) model's approximation of the true speech distribution $Q(S|T)$.
+Building on the significant performance gap between ASR models trained on real versus synthetic speech, as quantified by the Word Error Rate Ratio (WERR) in @05_werr, this chapter introduces and evaluates methodologies to increase the diversity of synthetic speech. Synthetic speech, despite its high human naturalness ratings, lacks the some of the variability inherent in real human speech, as shown by its limited utility for training robust ASR systems in @05_ttsasr. Here, we systematically explore three complementary paradigms aimed at bridging this distributional gap: learning latent representations, explicit conditioning on attributes, and post-generation data augmentation. By introducing and controlling these aspects of speech, we aim to reduce the distributional distance between synthetic and real speech, which should, in turn, manifest as a reduction in WERR. Throughout this chapter, we adhere to the formal notation established in the introduction, where $Q_theta$ represents the Text-to-Speech (TTS) model's approximation of the true speech distribution $Q(S|T)$.
 
 The preceding chapter established that the synthetic-real gap stems from a lack of diversity in the generated speech. This conclusion motivates the central research questions we address in this chapter: 
 
@@ -71,7 +86,7 @@ caption: [The TTS architecture including the variance adapter which predicts pho
 placement: top,
 ) <fig_variance_adapter>
 
-These systems operate on a phone sequence, which is aligned with the audio using forced alignment during data preprocessing, as detailed in @02_prosody_rep. In FastSpeech 2, after the duration for each phone is predicted by the variance adapter, the hidden representations from the encoder are expanded accordingly using a length regulator (LR). This mechanism addresses the alignment problem in non-autoregressive models, mapping a short text sequence to a much longer acoustic sequence. Simultaneously, other predictors within the variance adapter predict frame-level pitch (F0) and energy contours from the reference speech $S$. This modified representation is then passed to the acoustic decoder to generate the Mel spectrogram.
+These systems operate on a phone sequence, which is aligned with the audio using forced alignment during data preprocessing, as detailed in @02_prosody_rep. In FastSpeech 2, after the duration for each phone is predicted by the variance adapter, the hidden representations from the encoder are expanded accordingly using a length regulator (LR). This mechanism addresses the alignment problem in non-autoregressive models, mapping a short text sequence to a much longer acoustic sequence. Simultaneously, other predictors within the variance adapter predict frame-level pitch (F0) and energy contours from the reference speech $S$. This modified representation is then passed to the acoustic decoder to generate the mel spectrogram.
 
 ==== Attribute Selection and Probabilistic Sampling
 
@@ -97,9 +112,11 @@ To evaluate the effectiveness of these diversity enhancement paradigms, we condu
 The experiments follow the controlled TTS-for-ASR setup detailed in @05_setup. All experiments utilise data from the `train-clean-360` split of the LibriTTS dataset @zen_libritts_2019, with data splits for TTS training, synthetic speech generation, and ASR training kept strictly separate to ensure fair comparison. 10 hours were held out for TTS-for-ASR training, with the rest split into $D^"TTS"_"train"$ and $D^"ASR"_"train"$. The TTS system is a multi-speaker FastSpeech~2 model, and the ASR system is the hybrid HMM-TDNN model described previously. We define five incrementally enhanced systems for evaluation:
 The #emph[Baseline System] generates speech conditioned only on speaker d-vectors.
 The #emph[Environment System] extends the baseline by incorporating environmental attributes (#smallcaps[Ambient] factor) into the variance adapter, training the model to predict frame-level SRMR and WADA SNR.
-The #emph[Attributes System] builds on the baseline by explicitly conditioning on utterance-level attributes sampled from speaker-dependent GMMs. These attributes are mean pitch, energy, duration, SRMR, and WADA SNR.
+The #emph[Attributes System] builds on the #emph[Environment System] by additionally explicitly conditioning on utterance-level attributes sampled from speaker-dependent GMMs. These attributes are mean pitch, energy, duration, SRMR, and WADA SNR.
 The #emph[Augmentation System] applies post-generation augmentation (additive noise and RIRs) to the output of the #emph[Attributes System].
 The #emph[Oracle System] serves as an empirical upper bound for the effectiveness of explicit conditioning. It uses the ground-truth values for all attributes for conditioning, instead of sampling from GMMs, and also includes post-generation augmentation. This allows us to quantify the maximum potential improvement if attributes could be perfectly controlled.
+
+It is important to note that the systems presented in @tbl:tab_div_systems and @tbl:tab_div_dist are cumulative. specifically, `+ Environment` refers to the Baseline with added internal environmental modelling; `+ Attributes` refers to the previous system with the addition of GMM-based attribute conditioning; and `+ Augmentation` refers to the previous system with added post-generation augmentation.
 
 ==== Results and Analysis
 
@@ -157,6 +174,29 @@ The #emph[Oracle System] serves as an empirical upper bound for the effectivenes
 ) <fig_div_dist_plot>
 
 Our experimental results confirm that targeted diversity enhancements reduce the synthetic-real gap, a conclusion supported by both the WERR metric and direct distributional distance measurements. @tbl:tab_div_systems summarises the WER and WERR values, while @tbl:tab_div_dist shows the corresponding Wasserstein-2 distances for the different attributes. The #emph[Baseline System] yielded a WERR of 3.66, underscoring the significant initial disparity between synthetic and real speech for ASR training.
+
+===== Independent Contributions of Diversity Enhancements
+
+To disentangle the contributions of each method, we also evaluated them in isolation. While @tbl:tab_div_systems presents a cumulative ablation path (where the best performing methods were stacked), @tbl:tab_div_separate shows the impact of applying the Environment modelling (internal), Attribute conditioning (GMM), and Acoustic Augmentation (post-processing) individually to the Baseline.
+
+#figure(
+  table(
+    columns: (auto, auto, auto),
+    align: center,
+    toprule(),
+    table.header([*System*], [*WER*], [*WERR*]),
+    toprule(),
+    [Baseline], [48.6 ± 0.43], [3.66 ± 0.03],
+    [Baseline + Environment], [49.2 ± 0.51], [3.70 ± 0.04],
+    [Baseline + Attributes], [48.5 ± 0.39], [3.64 ± 0.04],
+    [Baseline + Augmentation ], [46.0 ± 0.53], [3.45 ± 0.04],
+    bottomrule(),
+  ),
+  caption: [Comparison of individual diversity enhancements applied separately to the Baseline system.],
+  placement: top,
+) <tab_div_separate>
+
+As shown in @tbl:tab_div_separate, the internal environment modelling alone does not yield improvements over the baseline (WERR 3.70), confirming the difficulty of learning these features internally. Attribute conditioning alone provides a small gain (WERR 3.64). However, post-generation augmentation achieves the single strongest impact in isolation, lowering the WERR to 3.45. Crucially, comparing this to the cumulative results in @tbl:tab_div_systems (where the combination achieved a WERR of 3.31) demonstrates that attribute conditioning and augmentation are complementary strategies, yielding the best performance when deployed together.
 
 ===== Impact on Prosodic Realism
 The prosody of the #emph[Baseline System] shows significant deviation from real speech. As illustrated in the top row of @fig:fig_div_dist_plot and quantified in @tbl:tab_div_dist, the synthetic distributions for prosodic attributes diverge noticeably. The pitch (F0) distribution is bimodal rather than unimodal, the energy distribution is shifted, and the duration (SR) distribution exhibits a smaller variance. The #emph[Attributes System], which conditions on GMM-sampled prosody statistics, dramatically reduces these distances. The Wasserstein-2 distance for F0 plummets from 0.57 to 0.06, and for energy from 1.97 to 0.15. This confirms that explicitly modelling and sampling from attribute distributions enables the generation of significantly more realistic prosody. This improvement in distributional similarity translates to a reduction in WERR to 3.55.
