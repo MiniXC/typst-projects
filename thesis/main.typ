@@ -68,7 +68,10 @@
   ("DDIM", "Denoising Diffusion Implicit Model"),
   ("CMVN", "Cepstral Mean and Variance Normalisation"),
   ("VTLN", "Vocal Tract Length Normalisation"),
-  ("PLP", "Perceptual Linear Predictive")
+  ("PLP", "Perceptual Linear Predictive"),
+  ("KLD", "Kullback-Leibler Divergence"),
+  ("VQ-VAE", "Vector-Quantized Variational Autoencoder"),
+  ("GAN", "Generative Adversarial Network")
 )
 
 // CONFIG
@@ -449,7 +452,8 @@ Since our work in TTS-for-ASR suggested a large discrepancy between expected and
     "references/datasets.bib",
     "references/scaling.bib",
     "references/asr.bib",
-    "references/own.bib"
+    "references/own.bib",
+    "references/corrections.bib"
   ),
   style: "references/apa.csl",
 )

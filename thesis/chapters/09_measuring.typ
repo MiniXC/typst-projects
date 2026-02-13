@@ -82,7 +82,7 @@ Our methodology is founded on the principle of quantifying distributional dissim
 
 The TTSDS framework provides a factorised evaluation of synthetic speech by measuring distributional distances across several perceptually motivated attributes.
 
-The initial version, TTSDS, was validated primarily on clean, English audiobook speech and delineated five factors: #smallcaps[Generic], #smallcaps[Ambient], #smallcaps[Intelligibility], #smallcaps[Prosody], and #smallcaps[Speaker]. These were assessed using features like #abbr.a[SSL] embeddings, noise correlates, #abbr.l[WER], and speaker embeddings. While effective, its robustness to diverse conditions was limited.
+The initial version, TTSDS, was validated primarily on clean, English audiobook speech and delineated five factors: #smallcaps[Generic], #smallcaps[Ambient], #smallcaps[Intelligibility], #smallcaps[Prosody], and #smallcaps[Speaker]. These were assessed using features like #abbr.a[SSL] embeddings, noise correlates, #abbr.l[WER], and speaker embeddings. While effective, its robustness to diverse conditions was limited. To verify this robustness prior to conducting correlations with subjective evaluation, we analysed the TTSDS scores of each potential factor on real data. Specifically, we split each real dataset into two halves and compared the score between them. Ideally, real speech compared against itself should yield a near-perfect score. Factors that scored below 95 on average or exhibited high standard deviation between datasets were excluded from the final metric. This factor selection process was finalised before running any correlation experiments.
 
 
 #figure(
@@ -232,13 +232,13 @@ We recruited 200 annotators via the Prolific platform to provide ratings. Partic
 
 ==== Compared Objective Metrics
 
-To contextualise the performance of TTSDS2, we compared it against 16 other publicly available objective metrics using the VERSA evaluation toolkit @shi_versa_2024. This comparison set included signal-based metrics (#abbr.l[STOI], #abbr.l[PESQ], #abbr.l[MCD]), several model-based #abbr.a[MOS] predictors (UTMOS, UTMOSv2, NISQA-MOS, DNSMOS, SQUIM-MOS), speaker similarity metrics based on different embeddings (X-Vector, RawNet3, ECAPA-TDNN), distributional metrics (#abbr.l[FAD]), and multi-dimensional perceptual metrics (Audiobox Aesthetics sub-scores). This comprehensive set allows for a thorough analysis of the current state of objective evaluation for high-quality synthetic speech.
+To contextualise the performance of TTSDS2, we compared it against 16 other publicly available objective metrics using the VERSA evaluation toolkit @shi_versa_2024. This comparison set included signal-based metrics (#abbr.l[STOI], #abbr.l[PESQ], #abbr.l[MCD]), several model-based #abbr.a[MOS] predictors (UTMOS, UTMOSv2, NISQA-MOS, DNSMOS, SQUIM-MOS), speaker similarity metrics based on different embeddings (X-Vector, RawNet3, ECAPA-TDNN), distributional metrics (#abbr.l[FAD]), and multi-dimensional perceptual metrics (Audiobox Aesthetics sub-scores). These sub-scores consist of Content Enjoyment (AE-CE), Content Usefulness (AE-CU), and Production Quality (AE-PQ) @tjandra_meta_2025. This comprehensive set allows for a thorough analysis of the current state of objective evaluation for high-quality synthetic speech.
+
+The reference speech datasets employed to compute the distributional distances in TTSDS include LibriTTS @zen_libritts_2019, LibriTTS-R @koizumi_libritts-r_2023, LJSpeech @ito_lj_2017, VCTK @vctk, and the training sets provided by the various Blizzard challenges @king_blizzard_2008@ling_blizzard_2021@le_maguer_back_2022. From each of these datasets, 100 utterances were randomly sampled, preferentially from their respective test splits if available. We selected 100 utterances as the reference set size to maintain computational tractability while ensuring the objective evaluation setup mirrors the scale of data typically presented to listeners in subjective evaluations. For the generation of distractor noise datasets, TTSDS utilised the ESC dataset @piczak_esc_2015 of background noises, in conjunction with synthetic noise types, including random uniform noise, random normal noise, and silent (all zeros and all ones) samples.
+
+We compare our benchmark with two #abbr.a[MOS] prediction methods. The first is WVMOS @andreev_hifi_2022, which uses a wav2vec 2.0 model fine-tuned to predict #abbr.a[MOS] scores. While originally designed for assessing speech enhancement, WVMOS was included to evaluate how well a model trained on a different task generalizes to the #abbr.a[TTS] domain, allowing for a comparison of #abbr.a[MOS] prediction models trained on differing tasks. The second is UTMOS @saeki_utmos_2022, an ensemble #abbr.a[MOS] prediction system that performed well in the 2022 VoiceMOS challenge, chosen as a strong baseline trained specifically for the speech synthesis task.
 
 === Results and Discussion
-
-Our experimental results demonstrate a clear hierarchy in the performance of objective metrics, with TTSDS2 showing the most robust and consistent correlation with human judgments across all tested conditions.
-
-==== Correlation with Human Judgments
 
 // Define colors as per LaTeX original
 #let negstrong = rgb("#F3C2C1") // –1 … –0.5
@@ -292,6 +292,8 @@ Our experimental results demonstrate a clear hierarchy in the performance of obj
   ) <tab_ttsds2_spearman_correlation>
 ] 
 
+==== Correlation with Human Judgments
+
 The primary results of our study are summarised in the Spearman rank correlation matrix shown in @tbl:tab_ttsds2_spearman_correlation. TTSDS2 achieves the highest and most consistent performance, with an average correlation of 0.67 across all domains and subjective scores. Crucially, it is the only metric of the 16 compared to maintain a correlation coefficient greater than 0.5 in every single test condition. This indicates a high degree of robustness.
 
 The next best performing category of metrics is speaker similarity, with RawNet3 and X-Vector achieving average correlations of 0.6. Among the #abbr.a[MOS] prediction networks, SQUIM-MOS is the strongest performer with an average correlation of 0.57. However, many other metrics, including several recent #abbr.a[MOS] predictors and the Audiobox Aesthetics sub-scores, show a performance drop when moving from in-domain clean and noisy audiobook data to the more challenging #smallcaps[Wild] and #smallcaps[Kids] domains. This highlights a common issue of overfitting or lack of generalisation in current learned objective metrics.
@@ -340,10 +342,11 @@ The factorised nature of TTSDS2 provides interpretable insights into which aspec
   caption: [TTSDS2 scores across 14 languages.],
 ) <fig_language_scores>
 
-The TTSDS2 framework has also been extended for multilingual and recurring evaluation. A fully automated pipeline, depicted in @fig:fig_ttsds_pipeline, scrapes new data from YouTube quarterly, processes it, and synthesises speech using the latest #abbr.a[TTS] models to maintain an up-to-date benchmark across 14 languages. The multilingual validity of TTSDS2 was confirmed by showing that its distances between ground-truth language datasets correlate significantly with established typological distances from Uriel+ @khan_uriel_2024, which can also be seen in @fig:fig_uriel.  We find that when comparing the ground truth language datasets to each other using TTSDS2, the scores correlate with the distances with $rho = −0.39$ for regular and $rho = −0.51$ (both
-significant with p < 0.05). The negative correlations
-are expected since a higher score correlates with a smaller distance.
-Additionally, the performance of TTSDS2 across these languages, shown in @fig:fig_language_scores, demonstrates its robust capability to quantify synthetic speech quality in a multilingual context.
+The TTSDS2 framework has also been extended for multilingual and recurring evaluation. A fully automated pipeline, depicted in @fig:fig_ttsds_pipeline, scrapes new data from YouTube quarterly, processes it, and synthesises speech using the latest #abbr.a[TTS] models to maintain an up-to-date benchmark across 14 languages. The multilingual validity of TTSDS2 was confirmed by showing that its distances between ground-truth language datasets correlate significantly with established typological distances from Uriel+ @khan_uriel_2024. Uriel+ is a typological knowledge base that provides vector representations of languages based on syntactic, phonological, and inventory features, allowing for the calculation of linguistic distances between languages.
+
+We find that when comparing the ground truth language datasets to each other using TTSDS2, the scores correlate with the distances with $rho = −0.39$ for regular and $rho = −0.51$ (both significant with $p < 0.05$). The negative correlations are expected since a higher score correlates with a smaller distance. @fig:fig_uriel visualises these relationships using Multidimensional Scaling (MDS) to project the pairwise distances into 2D space, illustrating that TTSDS2 captures linguistic similarities akin to typological classifications.
+
+Additionally, @fig:fig_language_scores shows the distribution of TTSDS2 scores for the available #abbr.a[TTS] systems across the 14 supported languages ($N$ varies per language). While we do not have subjective ground truth for all these languages to strictly prove robustness, the range of scores combined with the typological correlation suggests the metric differentiates between systems across languages.
 
 #figure(
   image("../figures/9/uriel.png", width: 100%),
@@ -358,5 +361,7 @@ three closest neighbors of each language are connected via lines.],
 ==== Conclusions
 
 Despite its robust performance, TTSDS2 has several limitations. Its computation is more intensive than simpler metrics due to the extraction of multiple complex features. While it correlates strongly with human perception, it is not a replacement for subjective evaluation, as it cannot capture the full nuance of the human listening experience. Furthermore, it is not designed to detect certain specific failure modes, such as a model perfectly reproducing a reference transcript instead of the target text. Finally, the current implementation does not evaluate long-form speech generation, a growing area of interest in #abbr.a[TTS] research.
+
+While the primary focus of this work is #abbr.a[TTS], the TTSDS framework is largely task-agnostic and could be applied to Voice Conversion (VC). However, careful construction of the datasets is required to ensure that the reference dataset matches the lexical content of the synthetic output. While TTSDS could potentially function with mismatched lexical content (as would be necessary for cross-lingual VC), we have restricted our validation here to matched content to control for as many variables as possible.
 
 This chapter has detailed the methodology, development, and extensive validation of the TTSDS framework. The robust correlations observed with human judgments across diverse domains and languages establish its utility as a reliable objective metric for assessing and guiding the development of synthetic speech technology. This evaluation framework, together with the TTS-for-ASR analysis, provides a comprehensive set of tools to quantify and understand the persistent gap between real and synthetic speech.
