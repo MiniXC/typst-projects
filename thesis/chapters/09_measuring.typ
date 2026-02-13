@@ -38,7 +38,7 @@ To establish the context for a new distributional metric, it is necessary to fir
 
 ==== Subjective Listening Tests
 
-Subjective tests are the gold standard for synthetic speech evaluation as they directly measure human perception. However, their results are inherently variable and depend heavily on the experimental design. Recent advancements in #abbr.a[TTS], where synthetic speech often achieves human parity @chen_vall-e_2024, have made subjective evaluation more challenging, as listeners struggle to distinguish real from synthetic audio.
+Subjective tests are the gold standard for synthetic speech evaluation as they directly measure human perception. However, their results are inherently variable and depend heavily on the experimental design. As discussed in @03_subjective, recent #abbr.a[TTS] work has reported near-parity subjective scores under particular protocols, but such results are highly protocol-dependent and should not be over-interpreted as universal "human parity".
 
 A general best practice is to clearly define the experimental parameters before conducting a test, as recommended in guidelines for #abbr.a[TTS] evaluation @wester_listeners_2015@cooper_review_2024. This includes defining the listener pool, typically native speakers of the language being tested; the setting, preferably a quiet lab environment with headphones; and the specific instructions given to the listeners, which should clearly define the attribute being rated, such as #emph[naturalness]. The design of the stimuli presentation, such as the number of samples per page and whether re-listening is allowed, also influences the results @wells_bws_2024. Despite these best practices, subjective tests face challenges of standardisation, making results difficult to compare across studies, and they are resource-intensive.
 
@@ -209,7 +209,7 @@ The evaluation was designed to test the robustness of the metrics beyond clean, 
     Open-source #abbr.a[TTS] systems, prior evaluation, and results for each system relative to ground‑truth (GT) speech:
     $dagger$ = accompanied by publication;
     $ast$ = third‑party implementation; \
-    Parity column: Reported #abbr.a[MOS]/#abbr.a[CMOS] are close to GT (#parityeq), surpassing GT (#paritygt) or below GT (#paritylt).
+    Parity column: coarse summary based on reported #abbr.a[MOS]/#abbr.a[CMOS] relative to GT in the source evaluation. #parityeq indicates near‑parity (often within confidence intervals or without significant difference when reported); #paritygt indicates higher reported scores than GT under that specific protocol (not a general claim of being "better than human"), and #paritylt indicates lower reported scores.
   ],
 ) <tab_ttsds2_systems>
 ]
