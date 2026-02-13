@@ -1,5 +1,3 @@
---- START OF FILE text/plain ---
-
 #import "../abbr.typ"
 #import "../quote.typ": *
 #import "../math.typ": *
