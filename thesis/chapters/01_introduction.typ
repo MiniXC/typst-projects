@@ -29,6 +29,7 @@ The inherent complexity of modeling all possible real speech realisations withou
 
 Given these difficulties, the evaluation of TTS systems typically relies on human judges. This methodology involves synthesising a number of utterances from a test set such that for each synthetic pair $(T,tilde(S))$ there exists a matching reference $(T,S)$. Human judges are then requested to rate both the synthetic and real speech (without prior knowledge of which is which) based on attributes such as #emph[naturalness] or #emph[quality]. This approach is intended to emphasise differences in speech that are perceptually relevant to listeners, while de-emphasising those that are perceptually irrelevant. Recent research has indicated that with advancements in TTS, the observation made by #citep(<taylor_tts_2009>) -- that it is normally fairly easy to tell that it is a computer talking -- no longer consistently applies. In several recent studies, contemporary synthetic utterances receive subjective scores that are close to (and in some cases not significantly different from) those of real human speech under a specific test design and rater pool #citep(<chen_vall-e_2024>) #citep(<tan_naturalspeech_2024>) #citep(<eskimez_e2_2024>). These recent improvements have prompted investigations into whether such high-quality synthetic data can be leveraged for tasks where large quantities of speech data are advantageous.
 
+
 === Automatic Speech Recognition (ASR)
 
 The inverse of #abbr.a[TTS] is #abbr.l[ASR], which aims to automatically transcribe a speech utterance into its corresponding text sequence. Therefore, the objective of ASR is to model the conditional probability distribution $P(T|S)$. This is typically framed as a prediction task, where a model $f^"ASR"_phi$ with parameters $phi$ is trained on $(S,T)$ pairs to learn an approximation of this distribution. This model can then be used to infer the most probable text sequence $asrT$ for a given input utterance $S$:
@@ -46,7 +47,7 @@ However, in this work, we find that the high human ratings of synthetic speech d
 This thesis is based on the following publications, which have been adapted and extended to form its core chapters.
 
 In our earlier works, we addressed TTS-for-ASR and the gap between synthetic and real speech for ASR model training:
-- #cite(<minixhofer_evaluating_2023>, form: "full", style: "../references/apa.csl")
+- #cite(<minixhofer_evaluating_2023>, form: "full")
 - #cite(<minixhofer_oversmoothing_2025>, form: "full")
 
 This work inspired us to investigate synthetic speech distributions more holistically using distributional distance measures, which lead to the Text-to-Speech Distribution Score (TTSDS):
