@@ -2,16 +2,17 @@
 #import "../quote.typ": *
 #import "../math.typ": *
 #import "../moremath.typ": *
+#import "../changes.typ": minorchange, majorchange, frame-style, styles
 
 == Introduction <01_intro>
 
-#q(
+#minorchange[Addition][added chapter][#q(
   [#citep(<taylor_tts_2009>)], 
-  [#emph[Text-to-Speech Synthesis]],
+  [#emph[Text-to-Speech Synthesis, Introduction]],
   [… it is normally fairly
   easy to tell that it is a computer talking rather than a human, and so substantial progress is still to
   be made.]
-)
+)]
 
 Synthetic speech refers to any speech that is artificially generated, without the direct use of a human's vocal tract. This technology has found applications in diverse fields such as assistive technology, entertainment, and education for several decades. The most prevalent paradigm within synthetic speech generation is #abbr.l[TTS], the primary objective of which is to automatically convert a sequence of text into an utterance that sounds natural. However, the space of possible utterances is inherently vast. For instance, even a brief utterance can exhibit an immense number of variations in prosody, intonation, and recording conditions, a complexity that far exceeds the current capabilities of any single TTS system. A given sentence can be realised in a multitude of ways, contingent upon factors such as the speaker's emotional state, the surrounding environment, or their specific communicative intent, thereby defining a high-dimensional space of potential acoustic outputs. Consequently, TTS systems, by their fundamental design, must approximate a subset of this extensive space, frequently prioritising the naturalness of the output over an exhaustive coverage of all conceivable realisations.
 
@@ -27,7 +28,7 @@ While @eqt:tts_formula represents the simplest case of #abbr.a[TTS], the resulti
 
 The inherent complexity of modeling all possible real speech realisations without a perfect model of each speaker often leads to fundamental differences between real and synthetic speech. For example, some synthetic speech might exhibit characteristics that could not be produced by a human, such as the robotic quality sometimes introduced by certain vocoders. This is often characterised by a buzzy or metallic timbre resulting from insufficient fidelity in the synthesis of mel spectrograms, as noted by #citep(<hu_syntpp_2022>) and #citep(<morise_world_2016>). Conversely, these differences could be more subtle and imperceptible to human listeners, as is the explicit goal in applications such as speech watermarking @nematollahi_watermarking_2013.
 
-Given these difficulties, the evaluation of TTS systems typically relies on human judges. This methodology involves synthesising a number of utterances from a test set such that for each synthetic pair $(T,tilde(S))$ there exists a matching reference $(T,S)$. Human judges are then requested to rate both the synthetic and real speech (without prior knowledge of which is which) based on attributes such as #emph[naturalness] or #emph[quality]. This approach is intended to emphasise differences in speech that are perceptually relevant to listeners, while de-emphasising those that are perceptually irrelevant. Recent research has indicated that with advancements in TTS, the observation made by #citep(<taylor_tts_2009>) -- that it is normally fairly easy to tell that it is a computer talking -- no longer consistently applies. In several recent studies, contemporary synthetic utterances receive subjective scores that are close to (and in some cases not significantly different from) those of real human speech under a specific test design and rater pool #citep(<chen_vall-e_2024>) #citep(<tan_naturalspeech_2024>) #citep(<eskimez_e2_2024>). These recent improvements have prompted investigations into whether such high-quality synthetic data can be leveraged for tasks where large quantities of speech data are advantageous.
+Given these difficulties, the evaluation of TTS systems typically relies on human judges. This methodology involves synthesising a number of utterances from a test set such that for each synthetic pair $(T,tilde(S))$ there exists a matching reference $(T,S)$. Human judges are then requested to rate both the synthetic and real speech (without prior knowledge of which is which) based on attributes such as #emph[naturalness] or #emph[quality]. This approach is intended to emphasise differences in speech that are perceptually relevant to listeners, while de-emphasising those that are perceptually irrelevant. Recent research has indicated that with advancements in TTS, the observation made by #citep(<taylor_tts_2009>) -- that it is normally fairly easy to tell that it is a computer talking -- no longer consistently applies. #majorchange[Rephrasing][clarified parity claims][In several recent studies, contemporary synthetic utterances receive subjective scores that are close to (and in some cases not significantly different from) those of real human speech under a specific test design and rater pool #cite(<chen_vall-e_2024>) #cite(<tan_naturalspeech_2024>) #cite(<eskimez_e2_2024>). These recent improvements have prompted investigations into whether such high-quality synthetic data can be leveraged for tasks where large quantities of speech data are advantageous.]
 
 
 === Automatic Speech Recognition (ASR)
@@ -61,14 +62,23 @@ An extended pre-print of TTSDS including multilingual results is under review at
 === Structure
 
 This manuscript is divided into three parts, with background on speech and its representations, TTS and ASR covered in Part I, our TTS-for-ASR contributions in Part II, and TTSDS in Part III.
+
+#v(1em)
+
 ===== Part I
 -  *@02_factors[Chapter]*: This chapter provides an examination of various factors and representations of speech, classifying them based on their properties and purposes within speech technology.
 -   *@03_tts[Chapter]*: This chapter offers an overview of Text-to-Speech (TTS) systems, detailing their evolution, core architectures, training objectives, and evaluation.
 -   *@04_asr[Chapter]*: This chapter describes Automatic Speech Recognition (ASR), its underlying principles, the challenges posed by speech variability, and an overview of various ASR architectures, modeling and training techniques.
+
+#v(1em)
+
 ===== Part II
 -   *@05_ttsasr[Chapter]*: This chapter investigates the synthetic-real gap in ASR training, quantifying the performance disparity between models trained on real versus synthetic speech using the Word Error Rate Ratio (WERR).
 -   *@06_diversity[Chapter]*: This chapter explores methodologies for enhancing the diversity of synthetic speech through explicit attribute conditioning and post-generation data augmentation.
 -   *@07_scaling[Chapter]*: This chapter analyses the scaling properties of synthetic data for ASR training, comparing the effectiveness of Mean Squared Error (MSE)-based and Denoising Diffusion Probabilistic Model (DDPM)-based TTS models with increasing training data size.
+
+#v(1em)
+
 ===== Part III
 -   *@08_dist[Chapter]*: This chapter outlines the measurement of distributional distance for synthetic speech, and detailing the development and validation of the Text-to-Speech Distribution Score (TTSDS).
 -   *@09_dist[Chapter]*: This chapter covers improvements to TTSDS which increase its robustness and versatility, as well as additional validation of TTSDS across domains and languages.
@@ -77,7 +87,7 @@ This manuscript is divided into three parts, with background on speech and its r
 
 === Notation
 
-To maintain clarity and consistency when discussing both speech synthesis and recognition, the following conventions are adopted throughout this thesis. A speech signal, representing an audio waveform recording, is denoted by $S$, while its corresponding linguistic content, a text sequence, is indicated by $T$. When a synthetic speech utterance is specifically referred to, which is one that has been artificially generated, the tilde notation $tilde(S)$ is employed. A transcribed text sequence, typically as predicted by an ASR model, is represented by $asrT$. True probability distributions, particularly when referring to an underlying distribution, are denoted by $Q (dot)$ or $P (dot)$. When a probability distribution is modeled by a system with learned parameters, it is represented as $Q_theta (dot)$ or $P_theta (dot)$, with the subscript $theta$ explicitly indicating these parameters. A generic model or function is denoted by $f (dot)$ or $f_theta (dot)$, where $theta$ explicitly signifies its learned parameters; specific models, such as a Text-to-Speech model or an Automatic Speech Recognition model, may be further indicated by superscripts like $f^"TTS"_theta (dot)$ or $f^"ASR"_phi (dot)$.
+To maintain clarity and consistency when discussing both speech synthesis and recognition, the following conventions are adopted throughout this thesis. #minorchange[Wording][#strike("raw")][A speech signal, representing an audio waveform recording, is denoted by $S$, while its corresponding linguistic content, a text sequence, is indicated by $T$.] When a synthetic speech utterance is specifically referred to, which is one that has been artificially generated, the tilde notation $tilde(S)$ is employed. A transcribed text sequence, typically as predicted by an ASR model, is represented by $asrT$. True probability distributions, particularly when referring to an underlying distribution, are denoted by $Q (dot)$ or $P (dot)$. When a probability distribution is modeled by a system with learned parameters, it is represented as $Q_theta (dot)$ or $P_theta (dot)$, with the subscript $theta$ explicitly indicating these parameters. A generic model or function is denoted by $f (dot)$ or $f_theta (dot)$, where $theta$ explicitly signifies its learned parameters; specific models, such as a Text-to-Speech model or an Automatic Speech Recognition model, may be further indicated by superscripts like $f^"TTS"_theta (dot)$ or $f^"ASR"_phi (dot)$.
 
 The concept of a general space or set is represented by $cal(X)$, where $X$ can be drawn from $cal(T)$ (text sequences), $cal(S)$ (utterances). A dataset of real speech-text pairs is denoted by $D$, while a synthetic dataset is indicated by $tilde(D)$. Superscripts such as $"train"$ or $"test"$ are used to specify the role of the dataset within experimental setups, for instance, $D^"TEST"$ denotes a held-out test dataset used for evaluation. A dataset or set of datasets comprising noise samples, utilised as distractors in distributional distance calculations, is denoted as $D^"NOISE"$. Additional conditioning variables in generative models, which might include speaker identity or prosodic attributes, are generally referred to collectively as $cal(Z)$.
 

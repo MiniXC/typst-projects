@@ -1,8 +1,8 @@
 // PACKAGES
-
 #import "abbr.typ"
 #import "@preview/wordometer:0.1.4": word-count, total-words, total-characters
 #import "@preview/i-figured:0.2.4"
+#import "changes.typ": minorchange, majorchange, frame-style, styles
 
 #show: word-count
 #set footnote(numbering: "*")
@@ -71,13 +71,18 @@
   ("PLP", "Perceptual Linear Predictive"),
   ("KLD", "Kullback-Leibler Divergence"),
   ("VQ-VAE", "Vector-Quantized Variational Autoencoder"),
-  ("GAN", "Generative Adversarial Network")
+  ("GAN", "Generative Adversarial Network"),
+  ("MUSHRA", "Multiple Stimuli with Hidden Reference and Anchor")
 )
 
 // CONFIG
 #let review = false
 
 #let print = false
+
+#show: frame-style(styles.boxy)
+// #show: frame-style(kind: "_minorchange", styles.boxy)
+// #show: frame-style(kind: "_majorchange", styles.thmbox)
 
 #set page(
     paper: "a4",
@@ -180,25 +185,6 @@
   ]
 ]
 
-// #show ref.where(
-//   form: "normal"
-// ): set ref(supplement: it => {
-//   if it.func() == heading and it.level <= 1 {
-//     "Chapter"
-//   } else if it.func() == heading and it.level > 1 {
-//     "Section"
-//   } else {
-//     it.supplement
-//   }
-  // } else if type(it) == Equation {
-  //   "Equation"
-  // } else if it.has("cell") or it.kind.contains("table") {
-  //   "Table"
-  // } else if it.kind.contains("figure") {
-  //   "Figure"
-  // }
-// })
-
 
 
 // TITLE PAGE
@@ -247,12 +233,12 @@
 
 #set text(top-edge: if review {1em} else {"cap-height"}, bottom-edge: if review {-.8em} else {-.2em})
 
-
-
 // Abstract
 #frontmatter-heading([Abstract])
 
+#majorchange[Rephrasing][clarified closeness to ground truth claim][
 This thesis addresses the discrepancy between the high perceived naturalness of synthetic speech and its comparatively limited utility for training robust downstream applications, specifically Automatic Speech Recognition (ASR) systems. While recent Text-to-Speech (TTS) models can achieve subjective ratings that are close to ground truth under some listening test protocols, ASR models trained exclusively on synthetic data consistently exhibit significantly higher error rates when evaluated on real speech. We posit that this persistent #emph[synthetic-real gap] arises from the inability of current TTS models to fully approximate the nuanced, high-dimensional probability distribution of real speech, particularly concerning its inherent variability.
+]
 
 To quantify this disparity, we introduce the Word Error Rate Ratio (WERR), a heuristic that directly compares ASR performance when trained on synthetic versus real data. Our empirical investigations confirm a substantial WERR, indicating that ASR models trained on synthetic speech perform considerably worse than those trained on real speech, even when the synthetic utterances are subjectively perceived as highly natural. This observation suggests that synthetic speech, while perceptually clean, often lacks the intricate acoustic and prosodic variability crucial for ASR model robustness.
 
@@ -266,7 +252,7 @@ Technology that turns text into spoken words, known as Text-to-Speech (TTS), has
 
 However, despite how natural the synthetic speech sounds, using it to train ASR models leads to a large drop in the systems' performance. This unexpected result indicates that there must be underlying differences between synthetic and real speech that affect how well machines can learn from them. This work investigates these differences.
 
-We create a new method for comparing collections of synthetic and real speech, rather than just single voice clips. We analyze how various sound features -- such as the rhythm and melody of speech, the unique qualities of a speaker's voice, and the clarity of the words -- are spread out across these sets of recordings. This analysis reveals measurable differences between the synthetic and real speech collections.
+We create a new method for comparing collections of synthetic and real speech, rather than just single voice clips. We analyse how various sound features -- such as the rhythm and melody of speech, the unique qualities of a speaker's voice, and the clarity of the words -- are spread out across these sets of recordings. This analysis reveals measurable differences between the synthetic and real speech collections.
 
 We find that the TTS systems that sound most natural to people also show distributions that are more similar to those of real speech. This result remains true under various conditions, including speech with background noise and recordings of children's voices, proving that our method is robust.
 
@@ -383,8 +369,9 @@ I declare that this thesis was composed by myself, that the work contained herei
 
 = Synthetic speech for speech recognition <part_01>
 
-
-In this part of our work, we use ASR training as a probe of how closely synthetic speech matches real speech. While synthetic speech can be used as a practical augmentation technique—particularly when it introduces lexical content that is not present in a limited transcribed corpus—augmentation is not the primary objective here. Our aim is to compare synthetic and real speech directly, under controlled conditions, by treating synthetic speech as a proxy for real speech rather than as an additive source of variability. This motivates training ASR models on real and synthetic speech in isolation, with lexical content and speaker distributions controlled as in @05_setup, so that any performance gap reflects differences in the acoustic and prosodic properties of the training data rather than incremental gains from increased data volume or language-model effects. We first quantify the extent of this gap in @05_ttsasr[Chapter], then reduce it through conditioning and augmentation in @06_diversity[Chapter] and finally investigate how far it could be reduced using scaling in @07_scaling[Chapter].
+#majorchange[Rephrasing][referred to ASR as a proxy, and clarified our aim is not data augmentation][
+In this part of our work, we use ASR training as a proxy of how closely synthetic speech matches real speech. While synthetic speech can be used as a practical augmentation technique, particularly when it introduces lexical content that is not present in a limited transcribed corpus, augmentation is not the primary objective. Our aim is to compare synthetic and real speech directly, under controlled conditions, by treating synthetic speech as a proxy for real speech rather than as an additive source of variability. We first quantify the extent of this gap in @05_ttsasr[Chapter] by training ASR models on real and synthetic speech in isolation, with controlled lexical content and speaker distributions, then reduce it through conditioning and augmentation in @06_diversity[Chapter] and finally investigate how far it could be reduced using scaling in @07_scaling[Chapter].
+]
 
 #include "chapters/05_tts_asr.typ"
 
