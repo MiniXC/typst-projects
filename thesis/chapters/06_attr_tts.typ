@@ -102,7 +102,7 @@ The #emph[Environment System] extends the baseline by incorporating environmenta
 The #emph[Augmentation System] applies post-generation augmentation (additive noise and RIRs) to the output of the #emph[Attributes System].
 The #emph[Oracle System] serves as an empirical upper bound for the effectiveness of explicit conditioning. It uses the ground-truth values for all attributes for conditioning, instead of sampling from GMMs, and also includes post-generation augmentation. This allows us to quantify the maximum potential improvement if attributes could be perfectly controlled.
 
-#majorchange[Addition][clarify cumulative table][It is important to note that the systems presented in @tbl:tab_div_systems and @tbl:tab_div_dist are cumulative. specifically, `+ Environment` refers to the Baseline with added internal environmental modelling; `+ Attributes` refers to the previous system with the addition of GMM-based attribute conditioning; and `+ Augmentation` refers to the previous system with added post-generation augmentation.]
+#majorchange[Addition][clarify cumulative table][It is important to note that the systems presented in @tbl:tab_div_systems and @tbl:tab_div_dist are cumulative. Specifically, `+ Environment` refers to the Baseline with added internal environmental modelling; `+ Attributes` refers to the previous system with the addition of GMM-based attribute conditioning; and `+ Augmentation` refers to the previous system with added post-generation augmentation.]
 
 ==== Results and Analysis
 
@@ -163,7 +163,7 @@ Our experimental results confirm that targeted diversity enhancements reduce the
 
 #majorchange[Addition][independent results (not cumulative)][===== Independent Contributions of Diversity Enhancements
 
-To disentangle the contributions of each method, we also evaluated them in isolation. While @tbl:tab_div_systems presents a cumulative ablation path (where the best performing methods were stacked), @tbl:tab_div_separate shows the impact of applying the Environment modelling (internal), Attribute conditioning (GMM), and Acoustic Augmentation (post-processing) individually to the Baseline.
+To disentangle the contributions of each method, we also evaluated them in isolation. While @tbl:tab_div_systems presents a cumulative evaluation (where the best performing methods were stacked), @tbl:tab_div_separate shows the impact of applying the Environment modelling (internal), Attribute conditioning (GMM), and Acoustic Augmentation (post-processing) individually to the Baseline.
 
 #figure(
   table(

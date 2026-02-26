@@ -91,7 +91,7 @@ Most TTS systems have a distinct #emph[frontend], transforming the input text in
 ==== Frontend <03_frontend>
 Text can be ambiguous, for example in terms of pronunciation, or representation of numbers and dates.
 #minorchange[Wording]["semantic" #sym.arrow "content", #strike["raw"]][
-This makes the frontend, or text analysis module, a critical component of many TTS systems. Its purpose is to transform unstructured text into a clean, structured linguistic feature representation suitable for the acoustic model @taylor_tts_2009. This process is fundamentally about converting the highest-level #smallcaps[Content] representations into a format that can be more easily mapped to acoustics. This can involve the following:]
+This makes the frontend, or text analysis module, a critical component of many TTS systems. Its purpose is to transform text into a clean, structured linguistic feature representation suitable for the acoustic model @taylor_tts_2009. This process is fundamentally about converting the highest-level #smallcaps[Content] representations into a format that can be more easily mapped to acoustics. This can involve the following:]
 
 *Text Normalisation:* This stage converts non-standard words, such as numbers, abbreviations, and symbols, into their full written form. For example, "1989" becomes "nineteen eighty-nine" and "Dr." becomes "Doctor." This step can help to ensure correct pronunciation.
 

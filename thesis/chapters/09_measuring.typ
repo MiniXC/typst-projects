@@ -344,14 +344,14 @@ The TTSDS2 framework has also been extended for multilingual and recurring evalu
 
 We find that when comparing the ground truth language datasets to each other using TTSDS2, the scores correlate with the distances with $rho = −0.39$ for regular and $rho = −0.51$ (both significant with $p < 0.05$). The negative correlations are expected since a higher score correlates with a smaller distance. @fig:fig_uriel visualises these relationships using Multidimensional Scaling (MDS) to project the pairwise distances into 2D space, illustrating that TTSDS2 captures linguistic similarities akin to typological classifications.
 
-Additionally, @fig:fig_language_scores shows the distribution of TTSDS2 scores for the available #abbr.a[TTS] systems across the 14 supported languages (with $N$ TTS systems per language). While we do not have subjective ground truth for all these languages to strictly prove robustness, the range of scores combined with the typological correlation suggests the metric differentiates between systems across languages, while the objective ground truth data achieves consistent scores between 92 and 94.]
+Additionally, @fig:fig_language_scores shows the distribution of TTSDS2 scores for the available #abbr.a[TTS] systems across the 14 supported languages (with $N$ TTS systems per language). While subjective evaluation across all these languages would be needed to empirically demonstrate robustness, the range of scores combined with the typological correlation suggests the metric differentiates between systems across languages, while the objective ground truth data achieves consistent scores between 92 and 94.]
 
 #figure(
   image("../figures/9/uriel.png", width: 100%),
   placement: top,
   caption: [Multidimensional scaling (MDS) distance plots between languages (left to right) for i)
 Uriel+ typological distances ii) TTSDS2 without multilingual changes iii) multilingual TTSDS2. The
-three closest neighbors of each language are connected via lines.],
+three closest neighbours of each language are connected via lines.],
 ) <fig_uriel>
 
 

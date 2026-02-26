@@ -1,6 +1,6 @@
 #import "@preview/frame-it:2.0.0": *
 
-#let changelog = true
+#let changelog = false
 
 #let (_minorchange, _majorchange) = frames(
   _minorchange: ("Minor Change", teal),
